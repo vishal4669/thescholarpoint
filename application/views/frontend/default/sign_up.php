@@ -103,6 +103,10 @@
                                       <label for="registration-password"><span class="input-field-icon"><i class="fas fa-lock"></i></span> <?php echo site_phrase('password'); ?>:</label>
                                       <input type="password" class="form-control" name = "password" id="registration-password" placeholder="<?php echo site_phrase('password'); ?>" value="" required>
                                   </div>
+                                  <div class="form-group">
+                                      <label for="registration-mobile"><span class="input-field-icon"><i class="fas fa-mobile-alt"></i></span> <?php echo site_phrase('mobile'); ?>:</label>
+                                      <input type="text" class="form-control" name = "mobile" id="registration-mobile" placeholder="<?php echo site_phrase('mobile number'); ?>" value="" required>
+                                  </div>
                                   <?php if(get_frontend_settings('recaptcha_status')): ?>
                                     <div class="form-group">
                                       <div class="g-recaptcha" data-sitekey="<?php echo get_frontend_settings('recaptcha_sitekey'); ?>"></div>
@@ -114,7 +118,7 @@
                               <button class="btn" type="submit"><?php echo site_phrase('sign_up'); ?></button>
                           </div>
                           <div class="account-have text-center">
-                              <?php echo site_phrase('already_have_an_account'); ?>? <a href="javascript:;" onclick="toggoleForm('login')"><?php echo site_phrase('login'); ?></a>
+                              <?php echo site_phrase('already_have_an_account'); ?>? <a href="<?php echo site_url('home/login');?>"><?php echo site_phrase('login'); ?></a>
                           </div>
                       </form>
                   </div>

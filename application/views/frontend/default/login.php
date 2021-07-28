@@ -28,6 +28,31 @@
         <div class="row justify-content-center">
             <div class="col-lg-9">
               <div class="user-dashboard-box mt-3">
+
+                  <?php if( ($this->uri->segment('3') ) && $this->uri->segment('3') =="OTP") { ?>
+
+                    <div class="user-dashboard-content w-100 login-form">
+                      <div class="content-title-box">
+                          <div class="title"><?php echo ('2-Step Verification'); ?></div>
+                          <div>A verification code has been sent to you via SMS. Please verify that 6 digit code below to continue.</div>
+                      </div>
+
+                    <form action="<?php echo site_url('login/validate_otp'); ?>" method="post" id="login">
+                          <div class="content-box">
+                              <div class="basic-group">
+                                   <div class="form-group">
+                                      <input type="text" class="form-control" name="login_otp" id="login-otp" placeholder="<?php echo site_phrase('6 digit code'); ?>" value="" maxlength="6" required>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="content-update-box">
+                                <button class="btn" type="submit"><?php echo site_phrase('Verify'); ?></button>
+                          </div>
+                      </form>
+                  </div>
+
+                  <?php }else{ ?>
+
                   <div class="user-dashboard-content w-100 login-form">
                       <div class="content-title-box">
                           <div class="title"><?php echo site_phrase('login'); ?></div>
@@ -36,10 +61,12 @@
                       <form action="<?php echo site_url('login/validate_login/user'); ?>" method="post" id="login">
                           <div class="content-box">
                               <div class="basic-group">
-                                  <div class="form-group">
-                                      <label for="login-email"><span class="input-field-icon"><i class="fas fa-envelope"></i></span> <?php echo site_phrase('email'); ?>:</label>
-                                      <input type="email" class="form-control" name = "email" id="login-email" placeholder="<?php echo site_phrase('email'); ?>" value="" required>
+                                 
+                                   <div class="form-group">
+                                      <label for="login-mobile"><span class="input-field-icon"><i class="fas fa-mobile-alt"></i></span> <?php echo site_phrase('mobile'); ?>:</label>
+                                      <input type="text" class="form-control" name = "mobile" id="login-mobile" placeholder="<?php echo site_phrase('mobile'); ?>" value="" required>
                                   </div>
+
                                   <div class="form-group">
                                       <label for="login-password"><span class="input-field-icon"><i class="fas fa-lock"></i></span> <?php echo site_phrase('password'); ?>:</label>
                                       <input type="password" class="form-control" name = "password" placeholder="<?php echo site_phrase('password'); ?>" value="" required>
@@ -59,10 +86,15 @@
                               <a href="javascript::" onclick="toggoleForm('forgot_password')"><?php echo site_phrase('forgot_password'); ?></a>
                           </div>
                           <div class="account-have text-center">
-                              <?php echo site_phrase('do_not_have_an_account'); ?>? <a href="javascript::" onclick="toggoleForm('registration')"><?php echo site_phrase('sign_up'); ?></a>
+                              <?php echo site_phrase('do_not_have_an_account'); ?>? 
+                              <a href="<?php echo site_url('home/sign_up');?>"><?php echo site_phrase('sign_up'); ?></a>
                           </div>
                       </form>
                   </div>
+
+                 <?php } ?>
+                 
+
                   <div class="user-dashboard-content w-100 register-form hidden">
                       <div class="content-title-box">
                           <div class="title"><?php echo site_phrase('registration_form'); ?></div>

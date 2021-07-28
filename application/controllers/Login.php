@@ -24,6 +24,29 @@ class Login extends CI_Controller {
         }
     }
 
+    //Validate OTP.
+    public function validate_otp(){
+        if(isset($_POST['login_otp']) && $_POST['login_otp'] !=''){
+
+            if($_POST['login_otp'] == $this->session->userdata('otp_no')){
+                //Valid OTP.
+                $this->session->set_flashdata('flash_message', get_phrase('welcome to').' '.$this->session->userdata('name'));
+
+                if ($this->session->userdata('role_id') == 1) {
+                    $this->session->set_userdata('admin_login', '1');
+                    redirect(site_url('admin/dashboard'), 'refresh');
+                }else if($this->session->userdata('role_id') == 2){
+                    $this->session->set_userdata('user_login', '1');
+                    redirect(site_url('home'), 'refresh');
+                }
+            }else{
+                //Invalid OTP. Redirect to login form.
+                $this->session->set_flashdata('error_message', get_phrase('error_wrong_otp_entered,_please_enter_valid_OTP'));
+                redirect(site_url('home/login/OTP'), 'refresh');
+            }
+        }
+    }
+
     public function validate_login($from = "") {
 
         if($this->crud_model->check_recaptcha() == false && get_frontend_settings('recaptcha_status') == true){
@@ -31,15 +54,12 @@ class Login extends CI_Controller {
             redirect(site_url('home/login'), 'refresh');
         }
         
-        $email = $this->input->post('email');
+        $mobile = $this->input->post('mobile');
         $password = $this->input->post('password');
-        $credential = array('email' => $email, 'password' => sha1($password), 'status' => 1);
+        $credential = array('mobile' => $mobile, 'password' => sha1($password), 'status' => 1);
 
         // Checking login credential for admin
         $query = $this->db->get_where('users', $credential);
-
-       // echo $query->num_rows();
-
 
         if ($query->num_rows() > 0) {
             $row = $query->row();
@@ -48,9 +68,47 @@ class Login extends CI_Controller {
             $this->session->set_userdata('role', get_user_role('user_role', $row->id));
             $this->session->set_userdata('name', $row->first_name.' '.$row->last_name);
             $this->session->set_userdata('is_instructor', $row->is_instructor);
-            $this->session->set_flashdata('flash_message', get_phrase('welcome').' '.$row->first_name.' '.$row->last_name);
 
-         
+        //*******Generate the OTP and send it on mobile number*****************//
+            $otpno = rand(1000000,99999);
+            $otp_text_msg = ('TheScholarPoint OTP: '.$otpno. ' Login access code for your https://thescholarpoint.com');
+
+             $url = 'http://mobi1.blogdns.com/httpapi/httpapisms.aspx';
+
+            //Set the otp value in session.
+            $this->session->set_userdata('otp_no', $otpno);
+            
+            $ch = curl_init();
+            $headers = array(
+                'Accept: application/json',
+                'Content-Type: application/json',
+            );
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS,'UserID=Vishalkotak&UserPass=India@123&MobileNo='.$mobile.'&GSMID=INFORM&Message='.$otp_text_msg.'&UNICODE=TEXT');
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+            $output = curl_exec($ch);
+
+            /*Print error if any*/
+            if(curl_errno($ch))
+            {
+                $error =  'error:' . curl_error($ch);
+            }
+
+            //print_r($output);
+            curl_close($ch);
+            $op_arr = explode('=',$output);
+
+            if($op_arr[0] == 100){
+                redirect(site_url('home/login/OTP'), 'refresh');
+            }else{
+                 $this->session->set_flashdata('info_message', get_phrase('error_something_went_worng'));
+                redirect(site_url('home/login'), 'refresh');
+            }
+            //End the OTP generation...
+
+            $this->session->set_flashdata('flash_message', get_phrase('welcome').' '.$row->first_name.' '.$row->last_name);
 
 
             if ($row->role_id == 1) {
@@ -78,8 +136,11 @@ class Login extends CI_Controller {
         $data['email']  = html_escape($this->input->post('email'));
         $data['password']  = sha1($this->input->post('password'));
         $data['stream']  = html_escape($this->input->post('stream'));
+        $data['mobile']  = html_escape($this->input->post('mobile'));
+
+        //Need to check the
         
-        if(empty($data['first_name']) || empty($data['last_name']) || empty($data['email']) || empty($data['password']) || empty($data['stream']) ){
+        if(empty($data['first_name']) || empty($data['last_name']) || empty($data['email']) || empty($data['password']) || empty($data['stream']) || empty($data['mobile']) ){
             $this->session->set_flashdata('error_message',site_phrase('your_sign_up_form_is_empty').'. '.site_phrase('fill_out_the_form with_your_valid_data'));
             redirect(site_url('home/sign_up'), 'refresh');
         }
@@ -119,9 +180,10 @@ class Login extends CI_Controller {
         $data['stripe_keys'] = json_encode($stripe_info);
 
         $validity = $this->user_model->check_duplication('on_create', $data['email']);
+        $validity_mobile = $this->user_model->check_duplication_mobile('on_create', $data['mobile']);
 
-        if($validity === 'unverified_user' || $validity == true) {
-            if($validity === true){
+        if( ($validity === 'unverified_user' || $validity == true) && ( $validity_mobile === 'unverified_user' || $validity_mobile == true ) ) {
+            if($validity === true || $validity_mobile === true){
                 $this->user_model->register_user($data);
             }else{
                 $this->user_model->register_user_update_code($data);
@@ -130,7 +192,7 @@ class Login extends CI_Controller {
             if (get_settings('student_email_verification') == 'enable') {
                 $this->email_model->send_email_verification_mail($data['email'], $verification_code);
 
-                if($validity === 'unverified_user'){
+                if($validity === 'unverified_user' || $validity_mobile === 'unverified_user'){
                     $this->session->set_flashdata('info_message', get_phrase('you_have_already_registered').'. '.get_phrase('please_verify_your_email_address'));
                 }else{
                     $this->session->set_flashdata('flash_message', get_phrase('your_registration_has_been_successfully_done').'. '.get_phrase('please_check_your_mail_inbox_to_verify_your_email_address').'.');
@@ -143,7 +205,7 @@ class Login extends CI_Controller {
             }
 
         }else {
-            $this->session->set_flashdata('error_message', get_phrase('you_have_already_registered'));
+            $this->session->set_flashdata('error_message', get_phrase('you_have_already_registered_use_unique_mobile_and_email'));
             redirect(site_url('home/login'), 'refresh');
         }
     }
