@@ -198,6 +198,33 @@ class User_model extends CI_Model
         }
     }
 
+    public function check_duplication_mobile($action = "", $mobile = "", $user_id = "")
+    {
+        $duplicate_mobile_check = $this->db->get_where('users', array('mobile' => $mobile));
+
+        if ($action == 'on_create') {
+            if ($duplicate_mobile_check->num_rows() > 0) {
+                if ($duplicate_mobile_check->row()->status == 1) {
+                    return false;
+                } else {
+                    return 'unverified_user';
+                }
+            } else {
+                return true;
+            }
+        } elseif ($action == 'on_update') {
+            if ($duplicate_mobile_check->num_rows() > 0) {
+                if ($duplicate_mobile_check->row()->id == $user_id) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return true;
+            }
+        }
+    }
+
     public function edit_user($user_id = "")
     { // Admin does this editing
         $validity = $this->check_duplication('on_update', $this->input->post('email'), $user_id);

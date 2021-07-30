@@ -1342,5 +1342,18 @@
     "student_test_master_add": "Student test master add",
     "stream_name": "Stream name",
     "test": "Test",
-    "comment": "Comment"
+    "comment": "Comment",
+    "mobile": "Mobile",
+    "mobile_number": "Mobile number",
+    "you_have_already_registered_use_unique_mobile_and_email": "You have already registered use unique mobile and email",
+    "otp": "Otp",
+    "6_digit_code": "6 digit code",
+    "verify": "Verify",
+    "welcome_to": "Welcome to",
+    "error_wrong_otp_entered": "Error wrong otp entered",
+    "error_wrong_otp_entered_please_enter_valid_otp": "Error wrong otp entered please enter valid otp",
+    "error_wrong_otp_entered_,please_enter_valid_otp": "Error wrong otp entered ,please enter valid otp",
+    "error_wrong_otp_entered,_please_enter_valid_otp": "Error wrong otp entered, please enter valid otp",
+    "home/sign_up": "Home/sign up",
+    "login1": "Login1"
 }
