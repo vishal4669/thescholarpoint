@@ -400,7 +400,26 @@ if (!function_exists('get_bundle_validity')) {
         }
     }
 }
+// course bundle subscription data
 
+if (!function_exists('chk_user_token_session')) {
+//Check the only one session at a time for each user.
+    function chk_user_token_session(){
+        $CI = &get_instance();
+        $condition = array('mobile' => $CI->session->userdata('mobile'));
+        $query_token = $CI->db->get_where('user_token', $condition);
+        $token_count = $query_token->num_rows();
+
+        if($token_count >0 ){
+                $row_token = $query_token->row();
+            if($CI->session->userdata('session_token') != $row_token->token){
+                session_destroy();
+                redirect('login', 'refresh');
+            }
+        }
+
+    }
+}
 
 
 // ------------------------------------------------------------------------

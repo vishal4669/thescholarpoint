@@ -9,6 +9,8 @@ class Admin extends CI_Controller
 
         $this->load->database();
         $this->load->library('session');
+        chk_user_token_session(); //Prevention the multi login for admin
+        
         /*cache control*/
         $this->output->set_header('Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
         $this->output->set_header('Pragma: no-cache');
