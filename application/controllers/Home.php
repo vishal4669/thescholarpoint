@@ -19,8 +19,25 @@ class Home extends CI_Controller
         $this->session_data();
     }
 
+    //Check the only one session at a time for each user.
+    public function chk_user_token_session(){
+        $condition = array('mobile' => $this->session->userdata('mobile'));
+        $query_token = $this->db->get_where('user_token', $condition);
+        $token_count = $query_token->num_rows();
+
+        if($token_count >0 ){
+             $row_token = $query_token->row();
+            if($this->session->userdata('session_token') != $row_token->token){
+              session_destroy();
+             redirect('login', 'refresh');
+            }
+        }
+
+    }
+
     public function index()
     {
+        $this->chk_user_token_session(); 
         $this->home();
     }
 
@@ -53,6 +70,8 @@ class Home extends CI_Controller
 
     public function courses()
     {
+        $this->chk_user_token_session(); 
+
         if (!$this->session->userdata('layout')) {
             $this->session->set_userdata('layout', 'list');
         }
@@ -127,6 +146,8 @@ class Home extends CI_Controller
 
     public function course($slug = "", $course_id = "")
     {
+        $this->chk_user_token_session(); 
+
         $this->access_denied_courses($course_id);
         $page_data['course_id'] = $course_id;
         $page_data['page_name'] = "course_page";
@@ -144,6 +165,7 @@ class Home extends CI_Controller
 
     public function my_courses()
     {
+        $this->chk_user_token_session(); 
         if ($this->session->userdata('user_login') != true) {
             redirect(site_url('home'), 'refresh');
         }
@@ -155,6 +177,7 @@ class Home extends CI_Controller
 
     public function my_messages($param1 = "", $param2 = "")
     {
+        $this->chk_user_token_session(); 
         if ($this->session->userdata('user_login') != true) {
             redirect(site_url('home'), 'refresh');
         }
@@ -176,6 +199,7 @@ class Home extends CI_Controller
 
     public function my_notifications()
     {
+        $this->chk_user_token_session(); 
         $page_data['page_name'] = "my_notifications";
         $page_data['page_title'] = site_phrase('my_notifications');
         $this->load->view('frontend/' . get_frontend_settings('theme') . '/index', $page_data);
@@ -183,6 +207,7 @@ class Home extends CI_Controller
 
     public function my_wishlist()
     {
+        $this->chk_user_token_session(); 
         if (!$this->session->userdata('cart_items')) {
             $this->session->set_userdata('cart_items', array());
         }
@@ -195,6 +220,7 @@ class Home extends CI_Controller
 
     public function purchase_history()
     {
+        $this->chk_user_token_session(); 
         if ($this->session->userdata('user_login') != true) {
             redirect(site_url('home'), 'refresh');
         }
@@ -218,6 +244,8 @@ class Home extends CI_Controller
 
     public function profile($param1 = "")
     {
+        $this->chk_user_token_session(); 
+
         if ($this->session->userdata('user_login') != true) {
             redirect(site_url('home'), 'refresh');
         }
@@ -238,6 +266,8 @@ class Home extends CI_Controller
 
     public function update_profile($param1 = "")
     {
+        $this->chk_user_token_session(); 
+
         if ($param1 == 'update_basics') {
             $this->user_model->edit_user($this->session->userdata('user_id'));
             redirect(site_url('home/profile/user_profile'), 'refresh');
@@ -259,6 +289,7 @@ class Home extends CI_Controller
 
     public function handleWishList($return_number = "")
     {
+        $this->chk_user_token_session(); 
         if ($this->session->userdata('user_login') != 1) {
             echo false;
         } else {
@@ -275,6 +306,7 @@ class Home extends CI_Controller
     }
     public function handleCartItems($return_number = "")
     {
+        $this->chk_user_token_session(); 
         if (!$this->session->userdata('cart_items')) {
             $this->session->set_userdata('cart_items', array());
         }
@@ -298,6 +330,7 @@ class Home extends CI_Controller
 
     public function handleCartItemForBuyNowButton()
     {
+        $this->chk_user_token_session(); 
         if (!$this->session->userdata('cart_items')) {
             $this->session->set_userdata('cart_items', array());
         }
@@ -318,6 +351,7 @@ class Home extends CI_Controller
 
     public function refreshShoppingCart()
     {
+        $this->chk_user_token_session(); 
         $page_data['coupon_code'] = $this->input->post('couponCode');
         $this->load->view('frontend/' . get_frontend_settings('theme') . '/shopping_cart_inner_view', $page_data);
     }
@@ -333,6 +367,7 @@ class Home extends CI_Controller
     //choose payment gateway
     public function payment()
     {
+        $this->chk_user_token_session();
         if ($this->session->userdata('user_login') != 1)
             redirect('login', 'refresh');
 
@@ -344,6 +379,7 @@ class Home extends CI_Controller
     // SHOW PAYPAL CHECKOUT PAGE
     public function paypal_checkout($payment_request = "only_for_mobile")
     {
+        $this->chk_user_token_session();
         if ($this->session->userdata('user_login') != 1 && $payment_request != 'true')
             redirect('home', 'refresh');
 
@@ -395,6 +431,7 @@ class Home extends CI_Controller
     // SHOW STRIPE CHECKOUT PAGE
     public function stripe_checkout($payment_request = "only_for_mobile")
     {
+        $this->chk_user_token_session();
         if ($this->session->userdata('user_login') != 1 && $payment_request != 'true')
             redirect('home', 'refresh');
 
@@ -449,6 +486,7 @@ class Home extends CI_Controller
 
     public function lesson($slug = "", $course_id = "", $lesson_id = "")
     {
+        $this->chk_user_token_session();
         if ($this->session->userdata('user_login') != 1) {
             if ($this->session->userdata('admin_login') != 1) {
                 redirect('home', 'refresh');
@@ -521,6 +559,7 @@ class Home extends CI_Controller
 
     public function search($search_string = "")
     {
+        $this->chk_user_token_session();
         if (isset($_GET['query']) && !empty($_GET['query'])) {
             $search_string = $_GET['query'];
             $page_data['courses'] = $this->crud_model->get_courses_by_search_string($search_string)->result_array();
@@ -540,6 +579,7 @@ class Home extends CI_Controller
     }
     public function my_courses_by_search_string()
     {
+        $this->chk_user_token_session();
         $search_string = $this->input->post('search_string');
         $course_details = $this->crud_model->get_my_courses_by_search_string($search_string)->result_array();
         $page_data['my_courses'] = $course_details;
@@ -556,6 +596,7 @@ class Home extends CI_Controller
 
     public function reload_my_wishlists()
     {
+        $this->chk_user_token_session();
         $my_courses = $this->crud_model->get_courses_by_wishlists();
         $page_data['my_courses'] = $my_courses;
         $this->load->view('frontend/' . get_frontend_settings('theme') . '/reload_my_wishlists', $page_data);
@@ -563,6 +604,7 @@ class Home extends CI_Controller
 
     public function get_course_details()
     {
+        $this->chk_user_token_session();
         $course_id = $this->input->post('course_id');
         $course_details = $this->crud_model->get_course_by_id($course_id)->row_array();
         echo $course_details['title'];
@@ -570,6 +612,7 @@ class Home extends CI_Controller
 
     public function rate_course()
     {
+        $this->chk_user_token_session();
         $data['review'] = $this->input->post('review');
         $data['ratable_id'] = $this->input->post('course_id');
         $data['ratable_type'] = 'course';
@@ -581,6 +624,7 @@ class Home extends CI_Controller
 
     public function about_us()
     {
+        $this->chk_user_token_session();
         $page_data['page_name'] = 'about_us';
         $page_data['page_title'] = site_phrase('about_us');
         $this->load->view('frontend/' . get_frontend_settings('theme') . '/index', $page_data);
@@ -588,11 +632,13 @@ class Home extends CI_Controller
 
     public function request_refund()
     {
+        $this->chk_user_token_session();
         $this->load->view('frontend/'. get_frontend_settings('theme') .'/request_refund');
     }
 
     public function terms_and_condition()
     {
+        $this->chk_user_token_session();
         $page_data['page_name'] = 'terms_and_condition';
         $page_data['page_title'] = site_phrase('terms_and_condition');
         $this->load->view('frontend/' . get_frontend_settings('theme') . '/index', $page_data);
@@ -600,12 +646,14 @@ class Home extends CI_Controller
 
     public function privacy_policy()
     {
+        $this->chk_user_token_session();
         $page_data['page_name'] = 'privacy_policy';
         $page_data['page_title'] = site_phrase('privacy_policy');
         $this->load->view('frontend/' . get_frontend_settings('theme') . '/index', $page_data);
     }
     public function cookie_policy()
     {
+        $this->chk_user_token_session();
         $page_data['page_name'] = 'cookie_policy';
         $page_data['page_title'] = site_phrase('cookie_policy');
         $this->load->view('frontend/' . get_frontend_settings('theme') . '/index', $page_data);
@@ -615,6 +663,7 @@ class Home extends CI_Controller
     // Version 1.1
     public function dashboard($param1 = "")
     {
+        $this->chk_user_token_session();
         if ($this->session->userdata('user_login') != 1) {
             redirect('home', 'refresh');
         }
@@ -644,6 +693,7 @@ class Home extends CI_Controller
 
     public function edit_course($param1 = "", $param2 = "")
     {
+        $this->chk_user_token_session();
         if ($this->session->userdata('user_login') != 1) {
             redirect('home', 'refresh');
         }
@@ -661,6 +711,7 @@ class Home extends CI_Controller
 
     public function course_action($param1 = "", $param2 = "")
     {
+        $this->chk_user_token_session();
         if ($this->session->userdata('user_login') != 1) {
             redirect('home', 'refresh');
         }
@@ -687,6 +738,7 @@ class Home extends CI_Controller
 
     public function sections($action = "", $course_id = "", $section_id = "")
     {
+        $this->chk_user_token_session();
         if ($this->session->userdata('user_login') != 1) {
             redirect('home', 'refresh');
         }
@@ -715,6 +767,7 @@ class Home extends CI_Controller
 
     public function manage_lessons($action = "", $course_id = "", $lesson_id = "")
     {
+        $this->chk_user_token_session();
         if ($this->session->userdata('user_login') != 1) {
             redirect('home', 'refresh');
         }
@@ -733,6 +786,8 @@ class Home extends CI_Controller
 
     public function lesson_editing_form($lesson_id = "", $course_id = "")
     {
+        $this->chk_user_token_session();
+
         if ($this->session->userdata('user_login') != 1) {
             redirect('home', 'refresh');
         }
@@ -768,6 +823,7 @@ class Home extends CI_Controller
     // Version 1.3 codes
     public function get_enrolled_to_free_course($course_id)
     {
+        $this->chk_user_token_session();
         if ($this->session->userdata('user_login') == 1) {
             $this->crud_model->enrol_to_free_course($course_id, $this->session->userdata('user_id'));
             redirect(site_url('home/my_courses'), 'refresh');
@@ -779,13 +835,16 @@ class Home extends CI_Controller
     // Version 1.4 codes
     public function login()
     {
+
         if ($this->session->userdata('admin_login')) {
             redirect(site_url('admin'), 'refresh');
         } elseif ($this->session->userdata('user_login')) {
             redirect(site_url('user'), 'refresh');
         }
+   
         $page_data['page_name'] = 'login';
         $page_data['page_title'] = site_phrase('login');
+        
         $this->load->view('frontend/' . get_frontend_settings('theme') . '/index', $page_data);
     }
 
@@ -855,6 +914,7 @@ class Home extends CI_Controller
 
     private function access_denied_courses($course_id)
     {
+        $this->chk_user_token_session();
         $course_details = $this->crud_model->get_course_by_id($course_id)->row_array();
         if ($course_details['status'] == 'draft' && $course_details['user_id'] != $this->session->userdata('user_id')) {
             $this->session->set_flashdata('error_message', site_phrase('you_do_not_have_permission_to_access_this_course'));
@@ -869,6 +929,7 @@ class Home extends CI_Controller
 
     public function invoice($purchase_history_id = '')
     {
+        $this->chk_user_token_session();
         if ($this->session->userdata('user_login') != 1) {
             redirect('home', 'refresh');
         }
@@ -885,6 +946,7 @@ class Home extends CI_Controller
     /** COURSE COMPARE STARTS */
     public function compare()
     {
+        $this->chk_user_token_session();
         $course_id_1 = (isset($_GET['course-id-1']) && !empty($_GET['course-id-1'])) ? $_GET['course-id-1'] : null;
         $course_id_2 = (isset($_GET['course-id-2']) && !empty($_GET['course-id-2'])) ? $_GET['course-id-2'] : null;
         $course_id_3 = (isset($_GET['course-id-3']) && !empty($_GET['course-id-3'])) ? $_GET['course-id-3'] : null;
@@ -947,6 +1009,8 @@ class Home extends CI_Controller
     //FOR MOBILE
     public function course_purchase($auth_token = '', $course_id  = '')
     {
+        $this->chk_user_token_session();
+        
         $this->load->model('jwt_model');
         if (empty($auth_token) || $auth_token == "null") {
             $page_data['cart_item'] = $course_id;

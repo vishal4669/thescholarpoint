@@ -47,6 +47,20 @@ class Login extends CI_Controller {
         }
     }
 
+    // Generate token
+    public function getToken($length){
+      $token = "";
+      $codeAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      $codeAlphabet.= "abcdefghijklmnopqrstuvwxyz";
+      $codeAlphabet.= "0123456789";
+      $max = strlen($codeAlphabet); // edited
+
+      for ($i=0; $i < $length; $i++) {
+        $token .= $codeAlphabet[random_int(0, $max-1)];
+      }
+      return $token;
+    }
+
     public function validate_login($from = "") {
 
         if($this->crud_model->check_recaptcha() == false && get_frontend_settings('recaptcha_status') == true){
@@ -61,13 +75,41 @@ class Login extends CI_Controller {
         // Checking login credential for admin
         $query = $this->db->get_where('users', $credential);
 
-        if ($query->num_rows() > 0) {
+        if ($query->num_rows() > 0) {      
             $row = $query->row();
+
+           
+
+            //update user session token..
+            $token = $this->getToken(10);
+            $this->session->set_userdata('mobile', $mobile);
+            $this->session->set_userdata('session_token', $token);
+
+            // Update user token 
+            $condition = array('mobile' => $mobile);
+            $query_token = $this->db->get_where('user_token', $condition);
+            $token_count = $query_token->num_rows();
+
+            if($token_count > 0){
+                $this->db->where('mobile' , $mobile);
+                $this->db->update('user_token', array('token' => $token) );
+            }else{
+                $this->db->set('mobile', $mobile);
+                $this->db->set('token', $token);
+                $this->db->insert('user_token');
+            }
+            // End Update user token 
+
             $this->session->set_userdata('user_id', $row->id);
             $this->session->set_userdata('role_id', $row->role_id);
             $this->session->set_userdata('role', get_user_role('user_role', $row->id));
             $this->session->set_userdata('name', $row->first_name.' '.$row->last_name);
             $this->session->set_userdata('is_instructor', $row->is_instructor);
+
+            if ($row->role_id == 1) {
+                $this->session->set_userdata('admin_login', '1');
+                redirect(site_url('admin/dashboard'), 'refresh');
+            }
 
         //*******Generate the OTP and send it on mobile number*****************//
             $otpno = rand(1000000,99999);
@@ -96,7 +138,6 @@ class Login extends CI_Controller {
                 $error =  'error:' . curl_error($ch);
             }
 
-            //print_r($output);
             curl_close($ch);
             $op_arr = explode('=',$output);
 
@@ -110,6 +151,7 @@ class Login extends CI_Controller {
 
             $this->session->set_flashdata('flash_message', get_phrase('welcome').' '.$row->first_name.' '.$row->last_name);
 
+            
 
             if ($row->role_id == 1) {
                 $this->session->set_userdata('admin_login', '1');
@@ -118,6 +160,7 @@ class Login extends CI_Controller {
                 $this->session->set_userdata('user_login', '1');
                 redirect(site_url('home'), 'refresh');
             }
+
         }else {
             $this->session->set_flashdata('error_message',get_phrase('invalid_login_credentials'));
             redirect(site_url('home/login'), 'refresh');
