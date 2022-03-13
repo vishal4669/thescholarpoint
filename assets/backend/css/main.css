@@ -425,3 +425,9 @@ body.show {
 .h-300px{
   height: 300px;
 }
+.note-toolbar.card-header{
+    position: relative !important;
+}
+.d-hidden{
+  display: none;
+}

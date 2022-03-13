@@ -90,6 +90,26 @@ class Updater extends CI_Controller
                 copy($file['root_directory'], $file['update_directory']);
         }
 
+        // CREATE OR REPLACE NEW LIBRARIES
+        if (!empty($json['libraries'])) {
+            foreach ($json['libraries'] as $libraries){
+                copy($libraries['root_directory'], $libraries['update_directory']);
+
+                //Unzip zip file and remove zip file.
+                $library_path = $libraries['update_directory'];
+
+                // PATH OF EXTRACTING LIBRARY FILE
+                $library_path_array = explode('/', $library_path);
+                array_pop($library_path_array);
+                $extract_to = implode('/', $library_path_array);
+                $library_zip = new ZipArchive;
+                $library_result = $library_zip->open($library_path);
+                $library_zip->extractTo($extract_to);
+                $library_zip->close();
+                unlink($library_path);
+            }
+        }
+
         $this->session->set_flashdata('flash_message', get_phrase('product_updated_successfully'));
         redirect(site_url('admin/system_settings'));
     }

@@ -47,25 +47,6 @@ function checkWindowWidth(MqL) {
 	}
 }
 
-function viewMore(element, visibility) {
-	if (visibility == "hide") {
-		$(element).parent(".view-more-parent").addClass("expanded");
-		$(element).remove();
-	} else if ($(element).hasClass("view-more")) {
-		$(element).parent(".view-more-parent").addClass("expanded has-hide");
-		$(element)
-			.removeClass("view-more")
-			.addClass("view-less")
-			.html("- View Less");
-	} else if ($(element).hasClass("view-less")) {
-		$(element).parent(".view-more-parent").removeClass("expanded has-hide");
-		$(element)
-			.removeClass("view-less")
-			.addClass("view-more")
-			.html("+ View More");
-	}
-}
-
 $(window).resize(function () {
 	moveElements();
 });
@@ -99,7 +80,7 @@ $(window).scroll(function () {
 			courseSidebar
 				.removeClass("fixed")
 				.addClass("bottom")
-				.css("top", offsetBottom + margin - 400);
+				.css("top", offsetBottom + margin - 458);
 		}
 		if (offsetBottom > scrollTop && courseSidebar.hasClass("bottom")) {
 			courseSidebar.removeClass("bottom").addClass("fixed").css("top", margin);
@@ -108,6 +89,13 @@ $(window).scroll(function () {
 });
 
 $(document).ready(function () {
+	$(window).resize(function() {
+		if($(window).width() <= 991){
+	  		courseSidebar.removeClass('fixed');
+	  		courseSidebar.css('zIndex', '8');
+	  	}
+	});
+
 	//open search form
 	$(".mobile-search-trigger").on("click", function (event) {
 		event.preventDefault();
@@ -224,56 +212,6 @@ $(document).ready(function () {
 	$(function () {
 		$('[data-toggle="tooltip"]').tooltip();
 	});
-
-	// course carousel
-	if ($(".course-carousel")[0]) {
-		$(".course-carousel").slick({
-			dots: false,
-			infinite: false,
-			speed: 300,
-			slidesToShow: 6,
-			slidesToScroll: 6,
-			swipe: false,
-			touchMove: false,
-			responsive: [
-				{
-					breakpoint: 1300,
-					settings: {
-						slidesToShow: 5,
-						slidesToScroll: 5,
-					},
-				},
-				{
-					breakpoint: 1100,
-					settings: {
-						slidesToShow: 4,
-						slidesToScroll: 4,
-					},
-				},
-				{
-					breakpoint: 840,
-					settings: {
-						slidesToShow: 3,
-						slidesToScroll: 3,
-					},
-				},
-				{
-					breakpoint: 620,
-					settings: {
-						slidesToShow: 2,
-						slidesToScroll: 2,
-					},
-				},
-				{
-					breakpoint: 480,
-					settings: {
-						slidesToShow: 1,
-						slidesToScroll: 1,
-					},
-				},
-			],
-		});
-	}
 
 	//tinymce editor
 	if ($(".author-biography-editor")[0]) {

@@ -2,7 +2,7 @@
 $total_price = 0;
 ?>
 <div class="icon">
-	<a href="javascript::" onclick="showCartPage()"><i class="fas fa-shopping-cart"></i></a>
+	<a href="<?php echo site_url('home/shopping_cart'); ?>"><i class="fas fa-shopping-cart"></i></a>
 	<span class="number"><?php echo sizeof($this->session->userdata('cart_items')); ?></span>
 </div>
 
@@ -46,7 +46,7 @@ $total_price = 0;
 		<div class="dropdown-footer">
 			<div class="cart-total-price clearfix">
 				<span><?php echo site_phrase('total'); ?>:</span>
-				<div class="float-right">
+				<div class="float-end">
 					<span class="current-price"><?php echo currency($total_price); ?></span>
 					<!-- <span class="original-price">$94.99</span> -->
 				</div>
@@ -59,9 +59,3 @@ $total_price = 0;
 		<a href="">Keep Shopping</a>
 	</div>
 </div>
-
-<script type="text/javascript">
-function showCartPage() {
-	window.location.replace("<?php echo site_url('home/shopping_cart'); ?>");
-}
-</script>

@@ -13,6 +13,11 @@
  * @filesource
  */
 
+if (! function_exists('remove_js')) {
+    function remove_js($description = '') {
+        return preg_replace('/<script\b[^>]*>(.*?)<\/script>/is', "", $description);
+    }
+}
 
 if (!function_exists('has_permission')) {
     function has_permission($permission_for = '', $admin_id = '')
@@ -75,6 +80,84 @@ if (!function_exists('is_root_admin')) {
     }
 }
 
+if (!function_exists('custom_date')) {
+    function custom_date($strtotime = "", $format = "")
+    {
+        if ($format == "") {
+            return date('d', $strtotime) . ' ' . site_phrase(date('M', $strtotime)) . ' ' . date('Y', $strtotime);
+        } elseif ($format == 1) {
+            return site_phrase(date('D', $strtotime)) . ', ' . date('d', $strtotime) . ' ' . site_phrase(date('M', $strtotime)) . ' ' . date('Y', $strtotime);
+        }
+    }
+}
+
+if (! function_exists('get_past_time')) {
+    function get_past_time( $time = "" ) {
+        $time_difference = time() - $time;
+
+        if( $time_difference < 1 ) { return 'less than 1 second ago'; }
+
+        //864000 = 10 days
+        if($time_difference > 864000){ return custom_date($time, 1); }
+
+        $condition = array( 12 * 30 * 24 * 60 * 60 =>  site_phrase('year'),
+                    30 * 24 * 60 * 60       =>  site_phrase('month'),
+                    24 * 60 * 60            =>  site_phrase('day'),
+                    60 * 60                 =>  site_phrase('hour'),
+                    60                      =>  site_phrase('minute'),
+                    1                       =>  site_phrase('second')
+        );
+
+        foreach( $condition as $secs => $str )
+        {
+            $d = $time_difference / $secs;
+
+            if( $d >= 1 )
+            {
+                $t = round( $d );
+                return $t . ' ' . $str . ( $t > 1 ? 's' : '' ) .' '. site_phrase('ago');
+            }
+        }
+    }
+}
+
+if (! function_exists('resizeImage')) {
+    function resizeImage($filelocation = "", $target_path = "", $width = "", $height = "") {
+        $CI =&  get_instance();
+        $CI->load->database();
+        
+        if($width == ""){
+            $width = 200;
+        }
+
+        if($height == ""){
+            $maintain_ratio = TRUE;
+        }else{
+            $maintain_ratio = FALSE;
+        }
+
+        $config_manip = array(
+            'image_library' => 'gd2',
+            'source_image' => $filelocation,
+            'new_image' => $target_path,
+            'maintain_ratio' => $maintain_ratio,
+            'create_thumb' => TRUE,
+            'thumb_marker' => '',
+            'width' => $width,
+            'height' => $height
+        );
+        $CI->load->library('image_lib', $config_manip);
+
+        if ($CI->image_lib->resize()) {
+            return true;
+        }else{
+            $CI->image_lib->display_errors();
+            return false;
+        }
+        $CI->image_lib->clear();
+   }
+}
+
 if (!function_exists('get_settings')) {
     function get_settings($key = '')
     {
@@ -111,17 +194,12 @@ if (!function_exists('currency')) {
             } elseif ($position == 'left-space') {
                 return $symbol . ' ' . $price;
             }
-        }
-    }
-}
+        }else{
+            $CI->db->where('key', 'system_currency');
+            $currency_code = $CI->db->get('settings')->row()->value;
 
-if (!function_exists('custom_date')) {
-    function custom_date($strtotime = "", $format = "")
-    {
-        if ($format == "") {
-            return date('d', $strtotime) . '-' . site_phrase(date('M', $strtotime)) . '-' . date('Y', $strtotime);
-        } elseif ($format == 1) {
-            return site_phrase(date('D', $strtotime)) . ', ' . date('d', $strtotime) . '-' . site_phrase(date('M', $strtotime)) . '-' . date('Y', $strtotime);
+            $CI->db->where('code', $currency_code);
+            return $CI->db->get('currency')->row()->symbol;
         }
     }
 }
@@ -267,6 +345,9 @@ if (!function_exists('lesson_progress')) {
         }
         $user_details = $CI->user_model->get_all_user($user_id)->row_array();
         $watch_history_array = json_decode($user_details['watch_history'], true);
+        
+        if(!is_array($watch_history_array)) $watch_history_array = array();
+
         for ($i = 0; $i < count($watch_history_array); $i++) {
             $watch_history_for_each_lesson = $watch_history_array[$i];
             if ($watch_history_for_each_lesson['lesson_id'] == $lesson_id) {
@@ -400,8 +481,8 @@ if (!function_exists('get_bundle_validity')) {
         }
     }
 }
-// course bundle subscription data
 
+//Check the user token session...
 if (!function_exists('chk_user_token_session')) {
 //Check the only one session at a time for each user.
     function chk_user_token_session(){
@@ -420,7 +501,6 @@ if (!function_exists('chk_user_token_session')) {
 
     }
 }
-
 
 // ------------------------------------------------------------------------
 /* End of file common_helper.php */

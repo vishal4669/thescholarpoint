@@ -1,131 +1,29 @@
-<section class="page-header-area">
-    <div class="container">
-        <div class="row">
-            <div class="col">
-                <nav>
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="<?php echo site_url('home'); ?>"><i class="fas fa-home"></i></a></li>
-                        <li class="breadcrumb-item"><a href="#"><?php echo site_phrase('shopping_cart'); ?></a></li>
-                    </ol>
-                </nav>
-                <h1 class="page-title"><?php echo site_phrase('shopping_cart'); ?></h1>
-            </div>
-        </div>
+<section class="category-header-area" style="background-image: url('<?php echo base_url('uploads/system/shopping_cart.png'); ?>');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position-x: right;
+    background-color: #ec5252;">
+    <div class="image-placeholder-1"></div>
+    <div class="container-lg breadcrumb-container">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item display-6 fw-bold">
+                <a href="<?php echo site_url('home'); ?>">
+                    <?php echo site_phrase('home'); ?>
+                </a>
+            </li>
+            <li class="breadcrumb-item active text-light display-6 fw-bold">
+                <?php echo site_phrase('shopping_cart'); ?>
+            </li>
+          </ol>
+        </nav>
     </div>
 </section>
 
 <section class="cart-list-area">
     <div class="container">
         <div class="row" id="cart_items_details">
-            <div class="col-lg-9">
-                <div class="in-cart-box">
-                    <div class="title"><?php echo sizeof($this->session->userdata('cart_items')) . ' ' . site_phrase('courses_in_cart'); ?></div>
-                    <div class="">
-                        <ul class="cart-course-list">
-                            <?php
-                            $actual_price = 0;
-                            $total_price  = 0;
-                            foreach ($this->session->userdata('cart_items') as $cart_item) :
-                                $course_details = $this->crud_model->get_course_by_id($cart_item)->row_array();
-                                $instructor_details = $this->user_model->get_all_user($course_details['user_id'])->row_array();
-                            ?>
-                                <li>
-                                    <div class="cart-course-wrapper">
-                                        <div class="image">
-                                            <a href="<?php echo site_url('home/course/' . rawurlencode(slugify($course_details['title'])) . '/' . $course_details['id']); ?>">
-                                                <img src="<?php echo $this->crud_model->get_course_thumbnail_url($cart_item); ?>" alt="" class="img-fluid">
-                                            </a>
-                                        </div>
-                                        <div class="details">
-                                            <a href="<?php echo site_url('home/course/' . rawurlencode(slugify($course_details['title'])) . '/' . $course_details['id']); ?>">
-                                                <div class="name"><?php echo $course_details['title']; ?></div>
-                                            </a>
-
-                                            <?php if ($course_details['multi_instructor']) : ?>
-                                                <?php $instructors = $this->user_model->get_multi_instructor_details_with_csv($course_details['user_id']); ?>
-                                                <?php foreach ($instructors as $key => $instructor) : ?>
-                                                    <a href="<?php echo site_url('home/instructor_page/' . $instructor['id']); ?>">
-                                                        <div class="instructor">
-                                                            <?php echo site_phrase('by'); ?>
-                                                            <span class="instructor-name"><?php echo $instructor['first_name'] . ' ' . $instructor['last_name']; ?></span>
-                                                        </div>
-                                                    </a>
-                                                <?php endforeach; ?>
-                                            <?php else : ?>
-                                                <a href="<?php echo site_url('home/instructor_page/' . $instructor_details['id']); ?>">
-                                                    <div class="instructor">
-                                                        <?php echo site_phrase('by'); ?>
-                                                        <span class="instructor-name"><?php echo $instructor_details['first_name'] . ' ' . $instructor_details['last_name']; ?></span>
-                                                    </div>
-                                                </a>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="move-remove">
-                                            <div id="<?php echo $course_details['id']; ?>" onclick="removeFromCartList(this)"><?php echo site_phrase('remove'); ?></div>
-                                            <!-- <div>Move to Wishlist</div> -->
-                                        </div>
-                                        <div class="price">
-                                            <a href="">
-                                                <?php if ($course_details['discount_flag'] == 1) : ?>
-                                                    <div class="current-price">
-                                                        <?php
-                                                        $total_price += $course_details['discounted_price'];
-                                                        echo currency($course_details['discounted_price']);
-                                                        ?>
-                                                    </div>
-                                                    <div class="original-price">
-                                                        <?php
-                                                        $actual_price += $course_details['price'];
-                                                        echo currency($course_details['price']);
-                                                        ?>
-                                                    </div>
-                                                <?php else : ?>
-                                                    <div class="current-price">
-                                                        <?php
-                                                        $actual_price += $course_details['price'];
-                                                        $total_price  += $course_details['price'];
-                                                        echo currency($course_details['price']);
-                                                        ?>
-                                                    </div>
-                                                <?php endif; ?>
-                                                <span class="coupon-tag">
-                                                    <i class="fas fa-tag"></i>
-                                                </span>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </li>
-                            <?php endforeach; ?>
-                        </ul>
-                    </div>
-                </div>
-
-            </div>
-            <div class="col-lg-3">
-                <div class="cart-sidebar">
-                    <div class="total"><?php echo site_phrase('total'); ?>:</div>
-                    <span id="total_price_of_checking_out" hidden><?php echo $total_price;
-                                                                    $this->session->set_userdata('total_price_of_checking_out', $total_price); ?>
-                    </span>
-                    <div class="total-price"><?php echo currency($total_price); ?></div>
-                    <div class="total-original-price">
-                        <?php if ($course_details['discount_flag'] == 1) : ?>
-                            <span class="original-price"><?php echo currency($actual_price); ?></span>
-                        <?php endif; ?>
-                        <!-- <span class="discount-rate">95% off</span> -->
-                    </div>
-                    <div class="input-group mb-3">
-                        <input type="text" class="form-control" placeholder="<?php echo site_phrase('apply_coupon_code'); ?>" id="coupon-code">
-                        <div class="input-group-append">
-                            <button class="btn" type="button" onclick="applyCoupon()">
-                                <i class="fas fa-spinner fa-pulse hidden" id="spinner"></i>
-                                <?php echo site_phrase('apply'); ?>
-                            </button>
-                        </div>
-                    </div>
-                    <button type="button" class="btn btn-primary btn-block checkout-btn" onclick="handleCheckOut()"><?php echo site_phrase('checkout'); ?></button>
-                </div>
-            </div>
+            <?php include "shopping_cart_inner_view.php"; ?>
         </div>
     </div>
 </section>
@@ -182,7 +80,7 @@
 
     function handleCheckOut() {
         $.ajax({
-            url: '<?php echo site_url('home/isLoggedIn'); ?>',
+            url: '<?php echo site_url('home/isLoggedIn?url_history='.base64_encode(current_url())); ?>',
             success: function(response) {
                 if (!response) {
                     window.location.replace("<?php echo site_url('login'); ?>");

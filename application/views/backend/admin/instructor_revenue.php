@@ -26,10 +26,12 @@
             <tbody>
               <?php foreach ($payment_history as $payment) :
                 $course_data = $this->db->get_where('course', array('id' => $payment['course_id']))->row_array();
-                $user_data = $this->db->get_where('users', array('id' => $course_data['user_id']))->row_array(); ?>
-                <?php
-                $paypal_keys          = json_decode($user_data['paypal_keys'], true);
-                $stripe_keys          = json_decode($user_data['stripe_keys'], true);
+                $user_data = $this->db->get_where('users', array('id' => $course_data['user_id']))->row_array();
+
+                $payment_keys = json_decode($user_data['payment_keys'], true);
+                $paypal_keys = $payment_keys['paypal'];
+                $stripe_keys = $payment_keys['stripe'];
+                $razorpay_keys = $payment_keys['razorpay'];
                 ?>
                 <tr class="gradeU">
                   <td>

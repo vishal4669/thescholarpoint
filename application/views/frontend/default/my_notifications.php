@@ -27,7 +27,7 @@
                                                     </p>
                                                     <p class="notification-time">14 days ago</p>
                                                 </div>
-                                                <div class="mark-as-read" data-toggle="tooltip" data-placement="bottom" title="Mark as Read"></div>
+                                                <div class="mark-as-read" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Mark as Read"></div>
                                             </div>
                                         </a>
                                     </li>
@@ -61,7 +61,7 @@
                                                     </p>
                                                     <p class="notification-time">14 days ago</p>
                                                 </div>
-                                                <div class="mark-as-read" data-toggle="tooltip" data-placement="bottom" title="Mark as Read"></div>
+                                                <div class="mark-as-read" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Mark as Read"></div>
                                             </div>
                                         </a>
                                     </li>
@@ -78,7 +78,7 @@
                                                     </p>
                                                     <p class="notification-time">14 days ago</p>
                                                 </div>
-                                                <div class="mark-as-read" data-toggle="tooltip" data-placement="bottom" title="Mark as Read"></div>
+                                                <div class="mark-as-read" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Mark as Read"></div>
                                             </div>
                                         </a>
                                     </li>
@@ -95,7 +95,7 @@
                                                     </p>
                                                     <p class="notification-time">14 days ago</p>
                                                 </div>
-                                                <div class="mark-as-read" data-toggle="tooltip" data-placement="bottom" title="Mark as Read"></div>
+                                                <div class="mark-as-read" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Mark as Read"></div>
                                             </div>
                                         </a>
                                     </li>
@@ -112,7 +112,7 @@
                                                     </p>
                                                     <p class="notification-time">14 days ago</p>
                                                 </div>
-                                                <div class="mark-as-read" data-toggle="tooltip" data-placement="bottom" title="Mark as Read"></div>
+                                                <div class="mark-as-read" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Mark as Read"></div>
                                             </div>
                                         </a>
                                     </li>
@@ -129,7 +129,7 @@
                                                     </p>
                                                     <p class="notification-time">14 days ago</p>
                                                 </div>
-                                                <div class="mark-as-read" data-toggle="tooltip" data-placement="bottom" title="Mark as Read"></div>
+                                                <div class="mark-as-read" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Mark as Read"></div>
                                             </div>
                                         </a>
                                     </li>

@@ -51,8 +51,16 @@
         </div>
     <?php endif;?>
     <div class="custom-control custom-radio">
+        <input type="radio" id="google_drive_video" name="lesson_type" class="custom-control-input" value="google_drive_video" <?php if($selected_lesson == 'google_drive_video') echo 'checked'; ?>>
+        <label class="custom-control-label" for="google_drive_video"><?php echo get_phrase('google_drive_video'); ?></label>
+    </div>
+    <div class="custom-control custom-radio">
         <input type="radio" id="document" name="lesson_type" class="custom-control-input" value="document" <?php if($selected_lesson == 'document') echo 'checked'; ?>>
-        <label class="custom-control-label" for="document"><?php echo get_phrase('document'); ?></label>
+        <label class="custom-control-label" for="document"><?php echo get_phrase('document_file'); ?></label>
+    </div>
+    <div class="custom-control custom-radio">
+        <input type="radio" id="text" name="lesson_type" class="custom-control-input" value="text" <?php if($selected_lesson == 'text') echo 'checked'; ?>>
+        <label class="custom-control-label" for="text"><?php echo get_phrase('text'); ?></label>
     </div>
     <div class="custom-control custom-radio">
         <input type="radio" id="image" name="lesson_type" class="custom-control-input" value="image" <?php if($selected_lesson == 'image') echo 'checked'; ?>>

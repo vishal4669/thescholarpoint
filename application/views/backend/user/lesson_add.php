@@ -45,13 +45,22 @@ $sections = $this->crud_model->get_section('course', $param2)->result_array();
     <?php if ($param3 == 'html5'): include('html5_type_lesson_add.php'); endif; ?>
     <?php if ($param3 == 'video'): include('video_type_lesson_add.php'); endif; ?>
     <?php if ($param3 == 'amazon-s3' && addon_status('amazon-s3')): include('amazon_s3_type_lesson_add.php'); endif; ?>
+    <?php if ($param3 == 'google_drive_video'): include('google_drive_video_lesson_add.php'); endif; ?>
     <?php if ($param3 == 'document'): include('document_type_lesson_add.php'); endif; ?>
+    <?php if ($param3 == 'text'): include('text_type_lesson_add.php'); endif; ?>
     <?php if ($param3 == 'image'): include('image_type_lesson_add.php'); endif; ?>
     <?php if ($param3 == 'iframe'): include('iframe_type_lesson_add.php'); endif; ?>
 
     <div class="form-group">
         <label><?php echo get_phrase('summary'); ?></label>
         <textarea name="summary" class="form-control"></textarea>
+    </div>
+
+    <div class="form-group">
+        <label><?php echo get_phrase('do_you_want_to_keep_it_free_as_a_preview_lesson'); ?>?</label>
+        <br>
+        <input type="checkbox" name="free_lesson" id="free_lesson" value="1">
+        <label for="free_lesson"><?php echo get_phrase('mark_as_free_lesson'); ?></label>
     </div>
 
     <div class="text-center">
