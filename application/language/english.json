@@ -1083,5 +1083,6 @@
     "product_updated_successfully": "Product updated successfully",
     "it_looks_like_you_are_skipping_a_version": "It looks like you are skipping a version",
     "please_update_version": "Please update version",
-    "first": "First"
+    "first": "First",
+    "an_error_occurred_during_payment": "An error occurred during payment"
 }
