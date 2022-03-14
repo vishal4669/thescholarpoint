@@ -1,58 +1,42 @@
-<section class="category-header-area">
-    <div class="container-lg">
-        <div class="row">
-            <div class="col">
-                <nav>
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="<?php echo site_url('home'); ?>"><i class="fas fa-home"></i></a></li>
-                        <li class="breadcrumb-item">
-                            <a href="#">
-                                <?php echo $page_title; ?>
-                            </a>
-                        </li>
-                    </ol>
-                </nav>
-                <h1 class="category-name">
-                    <?php echo site_phrase('registered_user'); ?>
-                </h1>
-            </div>
-        </div>
-    </div>
-</section>
-<?php echo $this->session->userdata('is_instructor'); ?>
 <section class="category-course-list-area">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-9">
-              <div class="user-dashboard-box mt-3">
-                  <div class="user-dashboard-content w-100 login-form">
-                      <div class="content-title-box">
-                          <div class="title"><?php echo site_phrase('enter_the_code_from_your_email'); ?></div>
-                          <div class="subtitle"><?php echo site_phrase('let_us_know_that_this_email_address_belongs_to_you'); ?> <?php echo site_phrase('Enter_the_code_from_the_email_sent_to').' '.$this->session->userdata('register_email'); ?>.</div>
-                      </div>
-                      <form action="javascript:;" method="post">
-                          <div class="content-box">
-                              <div class="basic-group">
-                                  <div class="form-group">
-                                      <label for="login-email"><?php echo site_phrase('verification_code'); ?>:</label>
-                                      <input type="text" class="form-control" id = "verification_code" required>
-                                      <a href="javascript:;" class="text-left p-3" id="resend_mail_button" onclick="resend_verification_code()">
-                                        <div class="float-left"><?= site_phrase('resend_mail') ?></div>
-                                        <div id="resend_mail_loader" class="float-left pl-2"></div>
-                                      </a>
-                                  </div>
-                              </div>
-                          </div>
-                          <div class="content-update-box">
-                              <a href="javascript:;" onclick="continue_verify()" class="btn"><?php echo site_phrase('continue'); ?></a>
-                          </div>
-                      </form>
-                  </div>
-              </div>
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-6">
+        <div class="sign-up-form">
+          <div class="row mb-4 mt-3">
+            <div class="col-md-12 text-center">
+              <h1 class="fw-700"><?php echo site_phrase('email_verification'); ?></h1>
+              <p class="text-14px"><?php echo site_phrase('let_us_know_that_this_email_address_belongs_to_you'); ?> <?php echo site_phrase('Enter_the_code_from_the_email_sent_to').' <b>'.$this->session->userdata('register_email').'</b>'; ?></p>
             </div>
+          </div>
+          <form action="javascript:;" method="post" id="email_verification">
+            <div class="form-group">
+              <label for="verification_code"><?php echo site_phrase('verification_code'); ?></label>
+              <div class="input-group">
+                <span class="input-group-text bg-white" for="verification_code"><i class="fas fa-user"></i></span>
+                <input type="text" class="form-control" placeholder="<?php echo site_phrase('enter_the_verification_code'); ?>" aria-label="<?php echo site_phrase('verification_code'); ?>" aria-describedby="<?php echo site_phrase('verification_code'); ?>" id="verification_code" required>
+              </div>
+              <a href="javascript:;" class="text-14px fw-500 text-muted" id="resend_mail_button" onclick="resend_verification_code()">
+                <div class="float-start"><?= site_phrase('resend_mail') ?></div>
+                <div id="resend_mail_loader" class="float-start ps-1"></div>
+              </a>
+            </div>
+
+            <div class="form-group">
+              <button type="button" onclick="continue_verify()" class="btn red radius-10 mt-4 w-100"><?php echo site_phrase('continue'); ?></button>
+            </div>
+
+            <div class="form-group mt-4 mb-0 text-center">
+              <?php echo site_phrase('want_to_go_back'); ?>?
+              <a class="text-15px fw-700" href="<?php echo site_url('home/login') ?>"><?php echo site_phrase('login'); ?></a>
+            </div>
+          </form>
         </div>
+      </div>
     </div>
+  </div>
 </section>
+
 
 <script type="text/javascript">
   function continue_verify() {

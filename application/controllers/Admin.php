@@ -10,14 +10,18 @@ class Admin extends CI_Controller
         $this->load->database();
         $this->load->library('session');
         chk_user_token_session(); //Prevention the multi login for admin
-        
         /*cache control*/
         $this->output->set_header('Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
         $this->output->set_header('Pragma: no-cache');
         if (!$this->session->userdata('cart_items')) {
             $this->session->set_userdata('cart_items', array());
         }
+
+        if ($this->session->userdata('admin_login') != true) {
+            redirect(site_url('login'), 'refresh');
+        }
     }
+
 
     public function index()
     {
@@ -486,6 +490,11 @@ class Admin extends CI_Controller
             redirect(site_url('admin/payment_settings'), 'refresh');
         }
 
+        if ($param1 == 'razorpay_settings') {
+            $this->crud_model->update_razorpay_settings();
+            redirect(site_url('admin/payment_settings'), 'refresh');
+        }
+
         $page_data['page_name'] = 'payment_settings';
         $page_data['page_title'] = get_phrase('payment_settings');
         $this->load->view('backend/index', $page_data);
@@ -508,6 +517,26 @@ class Admin extends CI_Controller
 
         $page_data['page_name'] = 'smtp_settings';
         $page_data['page_title'] = get_phrase('smtp_settings');
+        $this->load->view('backend/index', $page_data);
+    }
+
+    public function social_login_settings($param1 = "")
+    {
+        if ($this->session->userdata('admin_login') != true) {
+            redirect(site_url('login'), 'refresh');
+        }
+
+        // CHECK ACCESS PERMISSION
+        check_permission('settings');
+
+        if ($param1 == 'update') {
+            $this->crud_model->update_social_login_settings();
+            $this->session->set_flashdata('flash_message', get_phrase('social_login_settings_updated_successfully'));
+            redirect(site_url('admin/social_login_settings'), 'refresh');
+        }
+
+        $page_data['page_name'] = 'social_login';
+        $page_data['page_title'] = get_phrase('social_login');
         $this->load->view('backend/index', $page_data);
     }
 
@@ -576,8 +605,7 @@ class Admin extends CI_Controller
         }
     }
 
-
-    /**Subject Master functions***/
+      /**Subject Master functions***/
 
     public function subject_master(){
 
@@ -1089,6 +1117,12 @@ class Admin extends CI_Controller
                 $this->liveclass_model->update_live_class($param2);
             }
 
+            // CHECK IF JITSI LIVE CLASS ADDON EXISTS, ADD OR UPDATE IT TO ADDON MODEL
+            if (addon_status('jitsi-live-class')) {
+                $this->load->model('addons/jitsi_liveclass_model', 'jitsi_liveclass_model');
+                $this->jitsi_liveclass_model->update_live_class($param2);
+            }
+
             redirect(site_url('admin/course_form/course_edit/' . $param2));
         } elseif ($param1 == 'delete') {
 
@@ -1375,11 +1409,11 @@ class Admin extends CI_Controller
         $payout_details = $this->crud_model->get_payouts($payout_id, 'payout')->row_array();
         $instructor_id = $payout_details['user_id'];
         $instructor_data = $this->db->get_where('users', array('id' => $instructor_id))->row_array();
-        $paypal_keys = json_decode($instructor_data['paypal_keys'], true);
-        $production_client_id = $paypal_keys[0]['production_client_id'];
-        $production_secret_key = $paypal_keys[0]['production_secret_key'];
-        // $production_client_id = 'AZDxjDScFpQtjWTOUtWKbyN_bDt4OgqaF4eYXlewfBP4-8aqX3PiV8e1GWU6liB2CUXlkA59kJXE7M6R';
-        // $production_secret_key = 'EFI50pO1s1cV1cySQ85wg2Pncn4VOPxKvTLBhyeGtd1QHNac-OJFsQlS7GAwlXZSg2wtm-BOJ9Ar3XJy';
+
+        $payment_keys = json_decode($instructor_data['payment_keys'], true);
+        $paypal_keys = $payment_keys['paypal'];
+        $production_client_id = $paypal_keys['production_client_id'];
+        $production_secret_key = $paypal_keys['production_secret_key'];
 
         //THIS IS HOW I CHECKED THE PAYPAL PAYMENT STATUS
         $status = $this->payment_model->paypal_payment($paypalPaymentID, $paypalPaymentToken, $paypalPayerID, $production_client_id, $production_secret_key);
@@ -1426,6 +1460,26 @@ class Admin extends CI_Controller
         }
 
         redirect(site_url('admin/instructor_payout'), 'refresh');
+    }
+
+    public function razorpay_checkout_for_instructor_revenue($user_id = "", $payout_id = "", $param1 = "", $razorpay_order_id = "", $payment_id = "", $amount = "", $signature = "")
+    {
+        if($param1 == 'paid'){
+            $status = $this->payment_model->razorpay_payment($razorpay_order_id, $payment_id, $amount, $signature);
+            if ($status == true) {
+                $this->crud_model->update_payout_status($payout_id, 'razorpay');
+                $this->session->set_flashdata('flash_message', get_phrase('payout_updated_successfully'));
+            } else {
+                $this->session->set_flashdata('error_message', $response['status_msg']);
+            }
+
+            redirect(site_url('admin/instructor_payout'), 'refresh');
+        }
+
+        $page_data['payout_id']    = $payout_id;
+        $page_data['user_details']    = $this->user_model->get_user($user_id)->row_array();
+        $page_data['amount_to_pay']   = $this->input->post('total_price_of_checking_out');
+        $this->load->view('backend/admin/razorpay_checkout', $page_data);
     }
 
     public function preview($course_id = '')
@@ -1933,4 +1987,111 @@ class Admin extends CI_Controller
         $question_json = $this->input->post('itemJSON');
         $this->crud_model->sort_question($question_json);
     }
+
+
+
+
+    //Start blog
+    function add_blog_category(){
+        $this->load->view('backend/admin/blog_category_add');
+    }
+
+    function edit_blog_category($blog_category_id = ""){
+        $data['blog_category'] = $this->crud_model->get_blog_categories($blog_category_id)->row_array();
+        $this->load->view('backend/admin/blog_category_edit', $data);
+    }
+
+    function blog_category($param1 = "", $param2 = ""){
+        if($param1 == 'add'){
+            $response = $this->crud_model->add_blog_category();
+            if($response == true){
+                $this->session->set_flashdata('flash_message', get_phrase('blog_category_added_successfully'));
+            }else{
+                $this->session->set_flashdata('error_message', get_phrase('there_is_already_a_blog_with_this_name'));
+            }
+            redirect(site_url('admin/blog_category'), 'refresh');
+        }elseif($param1 == 'update'){
+            $response = $this->crud_model->update_blog_category($param2);
+            if($response == true){
+                $this->session->set_flashdata('flash_message', get_phrase('blog_category_updated_successfully'));
+            }else{
+                $this->session->set_flashdata('error_message', get_phrase('there_is_already_a_blog_with_this_name'));
+            }
+            redirect(site_url('admin/blog_category'), 'refresh');
+        }elseif($param1 == 'delete'){
+            $this->crud_model->delete_blog_category($param2);
+            $this->session->set_flashdata('flash_message', get_phrase('blog_category_deleted_successfully'));
+            redirect(site_url('admin/blog_category'), 'refresh');
+        }
+        $page_data['categories'] = $this->crud_model->get_blog_categories();
+        $page_data['page_title'] = get_phrase('blog_category');
+        $page_data['page_name'] = 'blog_category';
+        $this->load->view('backend/index', $page_data);
+    }
+
+    function add_blog(){
+        $page_data['page_title'] = get_phrase('add_blog');
+        $page_data['page_name'] = 'blog_add';
+        $this->load->view('backend/index', $page_data);
+    }
+
+    function edit_blog($blog_id = ""){
+        $page_data['blog'] = $this->crud_model->get_blogs($blog_id)->row_array();
+        $page_data['page_title'] = get_phrase('edit_blog');
+        $page_data['page_name'] = 'blog_edit';
+        $this->load->view('backend/index', $page_data);
+    }
+
+    function blog($param1 = "", $param2 = ""){
+        if($param1 == 'add'){
+            $this->crud_model->add_blog();
+            $this->session->set_flashdata('flash_message', get_phrase('blog_added_successfully'));
+            redirect(site_url('admin/blog'), 'refresh');
+        }elseif($param1 == 'update'){
+            $this->crud_model->update_blog($param2);
+            $this->session->set_flashdata('flash_message', get_phrase('blog_updated_successfully'));
+            redirect(site_url('admin/blog'), 'refresh');
+        }elseif($param1 == 'status'){
+            $this->crud_model->update_blog_status($param2);
+            $this->session->set_flashdata('flash_message', get_phrase('blog_status_has_been_updated'));
+            redirect(site_url('admin/blog'), 'refresh');
+        }elseif($param1 == 'delete'){
+            $this->crud_model->blog_delete($param2);
+            $this->session->set_flashdata('flash_message', get_phrase('blog_deleted_successfully'));
+            redirect(site_url('admin/blog'), 'refresh');
+        }
+        $page_data['blogs'] = $this->crud_model->get_blogs();
+        $page_data['page_title'] = get_phrase('blog');
+        $page_data['page_name'] = 'blog';
+        $this->load->view('backend/index', $page_data);
+    }
+
+    function instructors_pending_blog($param1 = "", $param2 = ""){
+        if($param1 == 'approval_request'){
+            $this->crud_model->approve_blog($param2);
+            $this->session->set_flashdata('flash_message', get_phrase('the_blog_has_been_approved'));
+            redirect(site_url('admin/instructors_pending_blog'), 'refresh');
+        }elseif($param1 == 'delete'){
+            $this->crud_model->blog_delete($param2);
+            $this->session->set_flashdata('flash_message', get_phrase('blog_deleted_successfully'));
+            redirect(site_url('admin/instructors_pending_blog'), 'refresh');
+        }
+        $page_data['pending_blogs'] = $this->crud_model->get_instructors_pending_blog();
+        $page_data['page_title'] = get_phrase('instructors_pending_blog');
+        $page_data['page_name'] = 'instructors_pending_blog';
+        $this->load->view('backend/index', $page_data);
+    }
+
+    function blog_settings($param1 = ""){
+        if($param1 == 'update'){
+            $this->crud_model->update_blog_settings();
+            $this->session->set_flashdata('flash_message', get_phrase('blog_settings_updated_successfully'));
+            redirect(site_url('admin/blog_settings'), 'refresh');
+        }
+        $page_data['page_title'] = get_phrase('blog_settings');
+        $page_data['page_name'] = 'blog_settings';
+        $this->load->view('backend/index', $page_data);
+    }
+
+    //End blog
 }

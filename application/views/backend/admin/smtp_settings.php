@@ -8,8 +8,8 @@
     </div><!-- end col-->
 </div>
 
-<div class="row justify-content-center">
-    <div class="col-xl-7">
+<div class="row">
+    <div class="col-md-7">
         <div class="card">
             <div class="card-body">
                 <div class="col-lg-12">
@@ -17,7 +17,7 @@
 
                     <form class="required-form" action="<?php echo site_url('admin/smtp_settings/update'); ?>" method="post" enctype="multipart/form-data">
                         <div class="form-group">
-                            <label for="smtp_protocol"><?php echo get_phrase('protocol'); ?><span class="required">*</span></label>
+                            <label for="smtp_protocol"><?php echo get_phrase('protocol'); ?> <small>(smtp or ssmtp or mail)</small><span class="required">*</span></label>
                             <input type="text" name = "protocol" id = "smtp_protocol" class="form-control" value="<?php echo get_settings('protocol');  ?>" required>
                         </div>
 
@@ -38,7 +38,7 @@
 
                         <div class="form-group">
                             <label for="smtp_pass"><?php echo get_phrase('smtp_password'); ?><span class="required">*</span></label>
-                            <input type="text" name = "smtp_pass" id = "smtp_pass" class="form-control" value="<?php echo get_settings('smtp_pass');  ?>" required>
+                            <input onfocus="$(this).attr('type', 'text');" onblur="$(this).attr('type', 'password');" type="text" name = "smtp_pass" id = "smtp_pass" class="form-control" value="<?php echo get_settings('smtp_pass');  ?>" required>
                         </div>
 
                         <button type="button" class="btn btn-primary" onclick="checkRequiredFields()"><?php echo get_phrase('save'); ?></button>

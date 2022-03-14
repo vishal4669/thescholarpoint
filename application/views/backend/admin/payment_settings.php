@@ -3,6 +3,7 @@ $paypal_settings = $this->db->get_where('settings', array('key' => 'paypal'))->r
 $paypal = json_decode($paypal_settings);
 $stripe_settings = $this->db->get_where('settings', array('key' => 'stripe_keys'))->row()->value;
 $stripe = json_decode($stripe_settings);
+$razorpay = json_decode(get_settings('razorpay_keys'));
 ?>
 <!-- start page title -->
 <div class="row ">
@@ -194,6 +195,63 @@ $stripe = json_decode($stripe_settings);
     </div>
 </div>
 </div>
+
+<div class="col-md-12">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="header-title"><p><?php echo get_phrase('setup_razorpay_settings'); ?></p></h4>
+            <form class="" action="<?php echo site_url('admin/payment_settings/razorpay_settings'); ?>" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label><?php echo get_phrase('active'); ?></label>
+                    <select class="form-control select2" data-toggle="select2" id = "razorpay_active" name="razorpay_active">
+                        <option value="0" <?php if ($razorpay[0]->active == 0) echo 'selected';?>> <?php echo get_phrase('no');?></option>
+                        <option value="1" <?php if ($razorpay[0]->active == 1) echo 'selected';?>> <?php echo get_phrase('yes');?></option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label><?php echo get_phrase('razorpay_currency'); ?></label>
+                    <select class="form-control select2" data-toggle="select2" id = "razorpay_currency" name="razorpay_currency" required>
+                        <option value=""><?php echo get_phrase('select_razorpay_currency'); ?></option>
+                        <?php
+                        $currencies = $this->crud_model->get_currencies();
+                        foreach ($currencies as $currency):?>
+                            <option value="<?php echo $currency['code'];?>"
+                                <?php if (get_settings('razorpay_currency') == $currency['code'])echo 'selected';?>> <?php echo $currency['code'];?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label><?php echo get_phrase('key_id'); ?></label>
+                    <input type="text" name="key" class="form-control" value="<?php echo $razorpay[0]->key;?>" required />
+                </div>
+
+                <div class="form-group">
+                    <label><?php echo get_phrase('secret_key'); ?></label>
+                    <?php if (isset($razorpay[0]->secret_key)): ?>
+                        <input type="text" name="secret_key" class="form-control" value="<?php echo $razorpay[0]->secret_key;?>" required />
+                    <?php else: ?>
+                        <input type="text" name="secret_key" class="form-control" placeholder="<?php echo get_phrase('no_secret_key_found'); ?>" required />
+                    <?php endif; ?>
+                </div>
+
+                <div class="form-group">
+                    <label><?php echo get_phrase('theme_color'); ?></label>
+                    <input type="color" name="theme_color" class="form-control" value="<?php echo $razorpay[0]->theme_color;?>" required />
+                </div>
+
+                <div class="row justify-content-md-center">
+                    <div class="form-group col-md-6">
+                        <button class="btn btn-block btn-primary" type="submit"><?php echo get_phrase('update_razorpay_keys'); ?></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!--Paystack payment gateway addon-->
 <?php
 if(addon_status('paystack') == 1):

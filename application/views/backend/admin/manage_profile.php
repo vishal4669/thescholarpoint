@@ -35,27 +35,33 @@
 
 					<div class="form-group">
 						<label><?php echo get_phrase('facebook_link');?></label>
-						<input type="text" class="form-control" name="facebook_link" value="<?php echo $social_links['facebook'];?>" required/>
+						<input type="text" class="form-control" name="facebook_link" value="<?php echo $social_links['facebook'];?>"/>
 					</div>
 
 					<div class="form-group">
 						<label><?php echo get_phrase('twitter_link');?></label>
-						<input type="text" class="form-control" name="twitter_link" value="<?php echo $social_links['twitter'];?>" required/>
+						<input type="text" class="form-control" name="twitter_link" value="<?php echo $social_links['twitter'];?>"/>
 					</div>
 
 					<div class="form-group">
 						<label><?php echo get_phrase('linkedin_link');?></label>
-						<input type="text" class="form-control" name="linkedin_link" value="<?php echo $social_links['linkedin'];?>" required/>
+						<input type="text" class="form-control" name="linkedin_link" value="<?php echo $social_links['linkedin'];?>"/>
 					</div>
 
 					<div class="form-group">
 						<label><?php echo get_phrase('a_short_title_about_yourself'); ?></label>
-						<textarea rows="5" id="short-title" class="form-control" name="title" placeholder="<?php echo get_phrase('a_short_title_about_yourself'); ?>" required><?php echo $row['title']; ?></textarea>
+						<textarea rows="5" id="short-title" class="form-control" name="title" placeholder="<?php echo get_phrase('a_short_title_about_yourself'); ?>"><?php echo $row['title']; ?></textarea>
 					</div>
 
 					<div class="form-group">
+                        <label for="skills"><?php echo get_phrase('skills'); ?></label>
+                        <input type="text" class="form-control bootstrap-tag-input" id = "skills" name="skills" data-role="tagsinput" style="width: 100%;" value="<?php echo $row['skills'];  ?>"/>
+                        <small class="text-muted"><?php echo get_phrase('write_your_skill_and_click_the_enter_button'); ?></small>
+                    </div>
+
+					<div class="form-group">
 						<label><?php echo get_phrase('biography'); ?></label>
-						<textarea rows="5" class="form-control" name="biography" id="biography" placeholder="<?php echo get_phrase('biography'); ?>" required><?php echo $row['biography']; ?></textarea>
+						<textarea rows="5" class="form-control" name="biography" id="biography" placeholder="<?php echo get_phrase('biography'); ?>"><?php echo $row['biography']; ?></textarea>
 					</div>
 
 

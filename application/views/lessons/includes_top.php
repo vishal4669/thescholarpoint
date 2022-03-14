@@ -68,4 +68,7 @@ body {
     background-color: #007791 !important;
     padding: 13px !important;
 }
+a{
+    text-decoration: none;
+}
 </style>

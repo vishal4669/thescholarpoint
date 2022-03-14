@@ -38,10 +38,19 @@ $course_details = $this->crud_model->get_course_by_id($course_id)->row_array();
                                         </a>
                                     </li>
                                     <?php if (addon_status('live-class')) : ?>
-                                        <li class="nav-item">
+                                        <li class="nav-item jitsiLiveClassNavItem">
                                             <a href="#live-class" data-toggle="tab" class="nav-link rounded-0 pt-2 pb-2">
                                                 <i class="mdi mdi-video-account"></i>
-                                                <span class="d-none d-sm-inline"><?php echo get_phrase('live_class'); ?></span>
+                                                <span class="d-none d-sm-inline"><?php echo get_phrase('zoom_live_class'); ?></span>
+                                            </a>
+                                        </li>
+                                    <?php endif; ?>
+
+                                    <?php if (addon_status('jitsi-live-class')) : ?>
+                                        <li class="nav-item">
+                                            <a href="#jitsi-live-class" data-toggle="tab" class="nav-link rounded-0 pt-2 pb-2">
+                                                <i class="mdi mdi-video-account"></i>
+                                                <span class="d-none d-sm-inline"><?php echo get_phrase('jitsi_live_class'); ?></span>
                                             </a>
                                         </li>
                                     <?php endif; ?>
@@ -139,6 +148,14 @@ $course_details = $this->crud_model->get_course_by_id($course_id)->row_array();
                                     <!-- LIVE CLASS CODE BASE -->
                                     <?php if (addon_status('live-class')) : ?>
                                         <?php include 'live_class.php'; ?>
+                                    <?php endif; ?>
+                                    <!-- LIVE CLASS CODE BASE -->
+
+                                    <!-- Jitsi live class CODE BASE -->
+                                    <?php if (addon_status('jitsi-live-class')) : ?>
+                                        <div class="tab-pane" id="jitsi-live-class">
+                                            <?php include 'jitsi_live_class.php'; ?>
+                                        </div>
                                     <?php endif; ?>
                                     <!-- LIVE CLASS CODE BASE -->
 

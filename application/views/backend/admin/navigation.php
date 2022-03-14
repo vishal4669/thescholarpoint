@@ -25,9 +25,6 @@ $status_wise_courses = $this->crud_model->get_status_wise_courses();
 			</a>
 		</li>
 
-
-
-
 		<?php if (has_permission('course')) : ?>
 			<li class="side-nav-item <?php if ($page_name == 'courses' || $page_name == 'course_add' || $page_name == 'course_edit' || $page_name == 'categories' || $page_name == 'category_add' || $page_name == 'category_edit' || $page_name == 'coupons' || $page_name == 'coupon_add' || $page_name == 'coupon_edit' || $page_name == 'add_bundle' || $page_name == 'manage_course_bundle' || $page_name == 'edit_bundle' || $page_name == 'active_bundle_subscription_report' || $page_name == 'expire_bundle_subscription_report' || $page_name == 'bundle_invoice') echo 'active'; ?>">
 				<a href="javascript: void(0);" class="side-nav-link <?php if ($page_name == 'courses' || $page_name == 'course_add' || $page_name == 'course_edit' || $page_name == 'categories' || $page_name == 'category_add' || $page_name == 'category_edit' || $page_name == 'coupons' || $page_name == 'coupon_add' || $page_name == 'coupon_edit') : ?> active <?php endif; ?>">
@@ -140,6 +137,51 @@ $status_wise_courses = $this->crud_model->get_status_wise_courses();
 				</ul>
 			</li>
 		<?php endif; ?>
+
+		
+		<?php if (addon_status('ebook')) : ?>
+	        <li class="side-nav-item">
+	            <a href="javascript: void(0);"
+	                class="side-nav-link <?php if ($page_name == 'all_ebooks' || $page_name == 'add_ebook' || $page_name == 'ebook_edit') : ?> active <?php endif; ?>">
+	                <i class="dripicons-document"></i>
+	                <span> <?php echo get_phrase('ebook'); ?> </span>
+	                <span class="menu-arrow"></span>
+	            </a>
+	            <ul class="side-nav-second-level <?php if ($page_name == 'ebook_edit') echo 'in'; ?>" aria-expanded="false">
+	                <li class="<?php if ($page_name == 'all_ebooks' || $page_name == 'ebook_edit') echo 'active'; ?>">
+	                    <a
+	                        href="<?php echo site_url('addons/ebook_manager/ebook'); ?>"><?php echo get_phrase('all_ebooks'); ?></a>
+	                </li>
+	                <li class="<?php if ($page_name == 'add_ebook') echo 'active'; ?>">
+	                    <a
+	                        href="<?php echo site_url('ebook_manager/add_ebook'); ?>"><?php echo get_phrase('add_ebook'); ?></a>
+	                </li>
+	                <li class="<?php if ($page_name == 'ebook_payment_history') echo 'active'; ?>">
+	                    <a href="javascript: void(0);"
+	                        class="<?php if ($page_name == 'admin_revenue' || $page_name == 'instructor_revenue') : ?> active <?php endif; ?>"
+	                        aria-expanded="false"><?php echo get_phrase('payment_history'); ?>
+	                        <span class="menu-arrow"></span>
+	                    </a>
+
+	                    <ul class="side-nav-third-level" aria-expanded="false">
+	                        <li
+	                            class="<?php if ($page_name == 'admin_revenue'): ?> active <?php endif; ?>">
+	                            <a href="<?php echo site_url('addons/ebook_manager/payment_history/admin_revenue'); ?>"><?php echo get_phrase('admin_revenue'); ?></a>
+	                        </li>
+	                        <li class="<?php if ($page_name == 'instructor_revenue') echo 'active'; ?>">
+	                            <a
+	                                href="<?php echo site_url('addons/ebook_manager/payment_history/instructor_revenue'); ?>"><?php echo get_phrase('instructor_revenue'); ?></a>
+	                        </li>
+	                    </ul>
+	                </li>
+
+	                <li class="<?php if ($page_name == 'ebook_category') echo 'active'; ?>">
+	                    <a
+	                        href="<?php echo site_url('addons/ebook_manager/ebook_category'); ?>"><?php echo get_phrase('category'); ?></a>
+	                </li>
+	            </ul>
+	        </li>
+	    <?php endif; ?>
 
 		<?php if (has_permission('enrolment')) : ?>
 			<li class="side-nav-item <?php if ($page_name == 'enrol_history' || $page_name == 'enrol_student') : ?> active <?php endif; ?>">
@@ -289,6 +331,34 @@ $status_wise_courses = $this->crud_model->get_status_wise_courses();
 		<?php endif; ?>
 
 
+		<?php if (has_permission('blog')) : ?>
+			<li class="side-nav-item <?php if ($page_name == 'blog' || $page_name == 'blog_add' || $page_name == 'blog_edit' || $page_name == 'blog_category' || $page_name == 'blog_settings') : ?> active <?php endif; ?>">
+				<a href="javascript: void(0);" class="side-nav-link <?php if ($page_name == 'blog' || $page_name == 'blog_add' || $page_name == 'blog_edit' || $page_name == 'blog_category' || $page_name == 'blog_settings' || $page_name == 'instructors_pending_blog') : ?> active <?php endif; ?>">
+					<i class="dripicons-blog"></i>
+					<span> <?php echo get_phrase('blog'); ?> </span>
+					<span class="menu-arrow"></span>
+				</a>
+				<ul class="side-nav-second-level" aria-expanded="false">
+					<li class="<?php if ($page_name == 'blog') echo 'active'; ?>">
+						<a href="<?php echo site_url('admin/blog'); ?>"><?php echo get_phrase('all_blogs'); ?></a>
+					</li>
+
+					<li class="<?php if ($page_name == 'instructors_pending_blog') echo 'active'; ?>">
+						<a href="<?php echo site_url('admin/instructors_pending_blog'); ?>"><?php echo get_phrase('pending_blog'); ?> <span class="badge badge-danger-lighten"><?php echo $this->crud_model->get_instructors_pending_blog()->num_rows(); ?></span></a>
+					</li>
+
+					<li class="<?php if ($page_name == 'blog_category') echo 'active'; ?>">
+						<a href="<?php echo site_url('admin/blog_category'); ?>"><?php echo get_phrase('blog_category'); ?></a>
+					</li>
+
+					<li class="<?php if ($page_name == 'blog_settings') echo 'active'; ?>">
+						<a href="<?php echo site_url('admin/blog_settings'); ?>"><?php echo get_phrase('blog_settings'); ?></a>
+					</li>
+				</ul>
+			</li>
+		<?php endif; ?>
+
+
 		<?php if (addon_status('customer_support')) : ?>
 			<li class="side-nav-item <?php if ($page_name == 'tickets' || $page_name == 'support_category' || $page_name == 'support_macro' || $page_name == 'create_ticket') : ?> active <?php endif; ?>">
 				<a href="javascript: void(0);" class="side-nav-link">
@@ -373,6 +443,9 @@ $status_wise_courses = $this->crud_model->get_status_wise_courses();
 					</li>
 					<li class="<?php if ($page_name == 'smtp_settings') echo 'active'; ?>">
 						<a href="<?php echo site_url('admin/smtp_settings'); ?>"><?php echo get_phrase('smtp_settings'); ?></a>
+					</li>
+					<li class="<?php if ($page_name == 'social_login') echo 'active'; ?>">
+						<a href="<?php echo site_url('admin/social_login_settings'); ?>"><?php echo get_phrase('social_login'); ?></a>
 					</li>
 					<li class="<?php if ($page_name == 'about') echo 'active'; ?>">
 						<a href="<?php echo site_url('admin/about'); ?>"><?php echo get_phrase('about'); ?></a>

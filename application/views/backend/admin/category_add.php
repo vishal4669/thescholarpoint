@@ -37,9 +37,10 @@
                               <?php endif; ?>
                           <?php endforeach; ?>
                         </select>
+                        <span class="badge badge-light"><?php echo get_phrase('select_none_to_create_a_parent_category'); ?></span>
                     </div>
 
-                    <div class="form-group" id = "icon-picker-area">
+                    <div class="form-group">
                         <label for="font_awesome_class"><?php echo get_phrase('icon_picker'); ?></label>
                         <input type="text" id ="font_awesome_class" name="font_awesome_class" class="form-control icon-picker" autocomplete="off">
                     </div>
@@ -66,10 +67,8 @@
     function checkCategoryType(category_type) {
         if (category_type > 0) {
             $('#thumbnail-picker-area').hide();
-            $('#icon-picker-area').hide();
         }else {
             $('#thumbnail-picker-area').show();
-            $('#icon-picker-area').show();
         }
     }
 </script>

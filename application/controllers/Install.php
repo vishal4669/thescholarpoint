@@ -205,6 +205,7 @@ class Install extends CI_Controller {
       $admin_data['social_links']   = json_encode($social_links);
       $admin_data['role_id']   = 1;
       $admin_data['status']    = 1;
+      $admin_data['is_instructor']    = 1;
       $this->load->database();
       $this->db->insert('users', $admin_data);
 

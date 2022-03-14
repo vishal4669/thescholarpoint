@@ -85,4 +85,6 @@ function getCurrentTime() {
     });
   }
 }
+
+$('.remove_video_src').remove();
 </script>

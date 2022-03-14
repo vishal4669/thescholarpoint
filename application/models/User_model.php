@@ -26,17 +26,15 @@ class User_model extends CI_Model
         return $this->db->get('users');
     }
 
-    public function get_user_for_stream($stream_id = 0)
+    public function get_all_user($user_id = 0)
     {
-        if ($stream_id > 0) {
-            $this->db->where('stream', $stream_id);
+        if ($user_id > 0) {
+            $this->db->where('id', $user_id);
         }
-        $this->db->where('role_id', 2);
         return $this->db->get('users');
     }
 
-
-    //Get the stream value from database.
+     //Get the stream value from database.
     public function get_stream($id = 0)
     {
     
@@ -44,16 +42,15 @@ class User_model extends CI_Model
             $this->db->where('id', $id);
         }
         $this->db->where('is_active', 1);
-
         return  $this->db->get('streams'); 
-
     }
 
-    public function get_all_user($user_id = 0)
-    {
-        if ($user_id > 0) {
-            $this->db->where('id', $user_id);
-        }
+    public function get_user_referrals($referral_code = '')
+    {   
+        if(!$referral_code)
+            return false;     
+        $this->db->where('role_id', 2);
+        $this->db->where('referral_from', $referral_code);
         return $this->db->get('users');
     }
 
@@ -87,20 +84,24 @@ class User_model extends CI_Model
             $data['image'] = md5(rand(10000, 10000000));
 
             // Add paypal keys
-            $paypal_info = array();
+            $payment_keys = array();
+
             $paypal['production_client_id']  = html_escape($this->input->post('paypal_client_id'));
             $paypal['production_secret_key'] = html_escape($this->input->post('paypal_secret_key'));
-            array_push($paypal_info, $paypal);
-            $data['paypal_keys'] = json_encode($paypal_info);
+            $payment_keys['paypal'] = $paypal;
 
             // Add Stripe keys
-            $stripe_info = array();
-            $stripe_keys = array(
-                'public_live_key' => html_escape($this->input->post('stripe_public_key')),
-                'secret_live_key' => html_escape($this->input->post('stripe_secret_key'))
-            );
-            array_push($stripe_info, $stripe_keys);
-            $data['stripe_keys'] = json_encode($stripe_info);
+            $stripe['public_live_key'] = html_escape($this->input->post('stripe_public_key'));
+            $stripe['secret_live_key'] = html_escape($this->input->post('stripe_secret_key'));
+            $payment_keys['stripe'] = $stripe;
+
+            // Add razorpay keys
+            $razorpay['key_id'] = html_escape($this->input->post('key_id'));
+            $razorpay['secret_key'] = html_escape($this->input->post('secret_key'));
+            $payment_keys['razorpay'] = $razorpay;
+
+            //All payment keys
+            $data['payment_keys'] = json_encode($payment_keys);
 
             if ($is_instructor) {
                 $data['is_instructor'] = 1;
@@ -145,20 +146,24 @@ class User_model extends CI_Model
             $data['image'] = md5(rand(10000, 10000000));
 
             // Add paypal keys
-            $paypal_info = array();
+            $payment_keys = array();
+
             $paypal['production_client_id']  = '';
             $paypal['production_secret_key'] = '';
-            array_push($paypal_info, $paypal);
-            $data['paypal_keys'] = json_encode($paypal_info);
+            $payment_keys['paypal'] = $paypal;
 
             // Add Stripe keys
-            $stripe_info = array();
-            $stripe_keys = array(
-                'public_live_key' => '',
-                'secret_live_key' => ''
-            );
-            array_push($stripe_info, $stripe_keys);
-            $data['stripe_keys'] = json_encode($stripe_info);
+            $stripe['public_live_key'] = '';
+            $stripe['secret_live_key'] = '';
+            $payment_keys['stripe'] = $stripe;
+
+            // Add razorpay keys
+            $razorpay['key_id'] = '';
+            $razorpay['secret_key'] = '';
+            $payment_keys['razorpay'] = $razorpay;
+
+            //All payment keys
+            $data['payment_keys'] = json_encode($payment_keys);
 
             if ($is_instructor) {
                 $data['is_instructor'] = 1;
@@ -198,6 +203,7 @@ class User_model extends CI_Model
         }
     }
 
+    /** Check the duplication mobile****/
     public function check_duplication_mobile($action = "", $mobile = "", $user_id = "")
     {
         $duplicate_mobile_check = $this->db->get_where('users', array('mobile' => $mobile));
@@ -224,7 +230,7 @@ class User_model extends CI_Model
             }
         }
     }
-
+    
     public function edit_user($user_id = "")
     { // Admin does this editing
         $validity = $this->check_duplication('on_update', $this->input->post('email'), $user_id);
@@ -241,31 +247,37 @@ class User_model extends CI_Model
             $data['social_links'] = json_encode($social_link);
             $data['biography'] = $this->input->post('biography');
             $data['title'] = html_escape($this->input->post('title'));
+            $data['skills'] = html_escape($this->input->post('skills'));
             $data['last_modified'] = strtotime(date("Y-m-d H:i:s"));
 
             if (isset($_FILES['user_image']) && $_FILES['user_image']['name'] != "") {
                 unlink('uploads/user_image/' . $this->db->get_where('users', array('id' => $user_id))->row('image') . '.jpg');
                 $data['image'] = md5(rand(10000, 10000000));
+                $this->upload_user_image($data['image']);
             }
 
             // Update paypal keys
-            $paypal_info = array();
+            $payment_keys = array();
+
             $paypal['production_client_id']  = html_escape($this->input->post('paypal_client_id'));
             $paypal['production_secret_key'] = html_escape($this->input->post('paypal_secret_key'));
-            array_push($paypal_info, $paypal);
-            $data['paypal_keys'] = json_encode($paypal_info);
+            $payment_keys['paypal'] = $paypal;
+
             // Update Stripe keys
-            $stripe_info = array();
-            $stripe_keys = array(
-                'public_live_key' => html_escape($this->input->post('stripe_public_key')),
-                'secret_live_key' => html_escape($this->input->post('stripe_secret_key'))
-            );
-            array_push($stripe_info, $stripe_keys);
-            $data['stripe_keys'] = json_encode($stripe_info);
+            $stripe['public_live_key'] = html_escape($this->input->post('stripe_public_key'));
+            $stripe['secret_live_key'] = html_escape($this->input->post('stripe_secret_key'));
+            $payment_keys['stripe'] = $stripe;
+
+            // Update razorpay keys
+            $razorpay['key_id'] = html_escape($this->input->post('key_id'));
+            $razorpay['secret_key'] = html_escape($this->input->post('secret_key'));
+            $payment_keys['razorpay'] = $razorpay;
+
+            //All payment keys
+            $data['payment_keys'] = json_encode($payment_keys);
 
             $this->db->where('id', $user_id);
             $this->db->update('users', $data);
-            $this->upload_user_image($data['image']);
             $this->session->set_flashdata('flash_message', get_phrase('user_update_successfully'));
         } else {
             $this->session->set_flashdata('error_message', get_phrase('email_duplication'));
@@ -330,7 +342,6 @@ class User_model extends CI_Model
                     return;
                 }
             }
-            $data['email'] = html_escape($this->input->post('email'));
             $this->db->where('id', $user_id);
             $this->db->update('users', $data);
             $this->session->set_flashdata('flash_message', get_phrase('updated_successfully'));
@@ -427,25 +438,46 @@ class User_model extends CI_Model
 
     public function update_instructor_paypal_settings($user_id = '')
     {
+        $user_details = $this->get_all_user($user_id)->row_array();
+        $payment_keys = json_decode($user_details['payment_keys'], true);
         // Update paypal keys
-        $paypal_info = array();
         $paypal['production_client_id'] = html_escape($this->input->post('paypal_client_id'));
         $paypal['production_secret_key'] = html_escape($this->input->post('paypal_secret_key'));
-        array_push($paypal_info, $paypal);
-        $data['paypal_keys'] = json_encode($paypal_info);
+        $payment_keys['paypal'] = $paypal;
+
+        //All payment keys
+        $data['payment_keys'] = json_encode($payment_keys);
+
         $this->db->where('id', $user_id);
         $this->db->update('users', $data);
     }
     public function update_instructor_stripe_settings($user_id = '')
     {
-        // Update Stripe keys
-        $stripe_info = array();
-        $stripe_keys = array(
-            'public_live_key' => html_escape($this->input->post('stripe_public_key')),
-            'secret_live_key' => html_escape($this->input->post('stripe_secret_key'))
-        );
-        array_push($stripe_info, $stripe_keys);
-        $data['stripe_keys'] = json_encode($stripe_info);
+        $user_details = $this->get_all_user($user_id)->row_array();
+        $payment_keys = json_decode($user_details['payment_keys'], true);
+        // Update stripe keys
+        $stripe['public_live_key'] = html_escape($this->input->post('stripe_public_key'));
+        $stripe['secret_live_key'] = html_escape($this->input->post('stripe_secret_key'));
+        $payment_keys['stripe'] = $stripe;
+
+        //All payment keys
+        $data['payment_keys'] = json_encode($payment_keys);
+
+        $this->db->where('id', $user_id);
+        $this->db->update('users', $data);
+    }
+
+    public function update_instructor_razorpay_settings($user_id = ''){
+        $user_details = $this->get_all_user($user_id)->row_array();
+        $payment_keys = json_decode($user_details['payment_keys'], true);
+        // Update razorpay keys
+        $razorpay['key_id'] = html_escape($this->input->post('key_id'));
+        $razorpay['secret_key'] = html_escape($this->input->post('secret_key'));
+        $payment_keys['razorpay'] = $razorpay;
+
+        //All payment keys
+        $data['payment_keys'] = json_encode($payment_keys);
+
         $this->db->where('id', $user_id);
         $this->db->update('users', $data);
     }

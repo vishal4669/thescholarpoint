@@ -10,40 +10,50 @@
                 </div>
                 <div class="course-details">
                     <a href="<?php echo site_url('home/course/' . rawurlencode(slugify($course['title'])) . '/' . $course['id']); ?>" class="course-title"><?php echo $course['title']; ?></a>
-                    <?php if ($course['multi_instructor']) : ?>
-                        <?php $instructors = $this->user_model->get_multi_instructor_details_with_csv($course['user_id']); ?>
-                        <?php foreach ($instructors as $key => $instructor) : ?>
-                            <a href="<?php echo site_url('home/instructor_page/' . $instructor['id']) ?>" class="course-instructor">
-                                <span class="instructor-name"><?php echo $instructor['first_name'] . ' ' . $instructor['last_name']; ?></span>
-                            </a>
-                        <?php endforeach; ?>
-                    <?php else : ?>
-                        <a href="<?php echo site_url('home/instructor_page/' . $instructor_details['id']) ?>" class="course-instructor">
-                            <span class="instructor-name"><?php echo $instructor_details['first_name'] . ' ' . $instructor_details['last_name']; ?></span>
-                        </a>
-                    <?php endif; ?>
 
-                    <div class="course-subtitle">
-                        <?php echo $course['short_description']; ?>
+                    <div class="course-subtitle d-none d-md-block">
+                        <?php echo ellipsis($course['short_description'], 60); ?>
                     </div>
 
                     <div class="course-meta">
-                        <?php if ($course['course_type'] == 'general') : ?>
-                            <span class=""><i class="fas fa-play-circle"></i>
-                                <?php
-                                $number_of_lessons = $this->crud_model->get_lessons('course', $course['id'])->num_rows();
-                                echo $number_of_lessons . ' ' . site_phrase('lessons');
-                                ?>
-                            </span>
-                            <span class=""><i class="far fa-clock"></i>
-                                <?php echo $this->crud_model->get_total_duration_of_lesson_by_course_id($course['id']); ?>
-                            </span>
-                        <?php endif; ?>
-                        <span class=""><i class="fas fa-closed-captioning"></i><?php echo site_phrase($course['language']); ?></span>
-                        <span class=""><i class="fa fa-level-up"></i><?php echo site_phrase($course['level']); ?></span>
-                        <p class="text-left text-secondary d-inline-block course-compare" style="font-size: 13px; cursor : pointer; font-weight : 500; color : #4d98ad !important;" redirect_to="<?php echo site_url('home/compare?course-1=' . rawurlencode(slugify($course['title'])) . '&&course-id-1=' . $course['id']); ?>">
-                            <i class="fas fa-balance-scale"></i> <?php echo site_phrase('compare_this_course'); ?>
-                        </p>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <?php if ($course['course_type'] == 'general') : ?>
+                                    <span class=""><i class="fas fa-play-circle"></i>
+                                        <?php
+                                        $number_of_lessons = $this->crud_model->get_lessons('course', $course['id'])->num_rows();
+                                        echo $number_of_lessons . ' ' . site_phrase('lessons');
+                                        ?>
+                                    </span>
+                                    <span class=""><i class="far fa-clock"></i>
+                                        <?php echo $this->crud_model->get_total_duration_of_lesson_by_course_id($course['id']); ?>
+                                    </span>
+                                <?php endif; ?>
+                                <span class=""><i class="fas fa-closed-captioning"></i><?php echo site_phrase($course['language']); ?></span>
+                                <span class=""><i class="fa fa-level-up"></i><?php echo site_phrase($course['level']); ?></span>
+                                <button class="brn-compare-sm" onclick="event.stopPropagation(); $(location).attr('href', '<?php echo site_url('home/compare?course-1=' . rawurlencode(slugify($course['title'])) . '&&course-id-1=' . $course['id']); ?>');"><i class="fas fa-balance-scale"></i> <?php echo site_phrase('compare'); ?></button>
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="floating-user d-inline-block">
+                                    <?php if ($course['multi_instructor']):
+                                        $instructor_details = $this->user_model->get_multi_instructor_details_with_csv($course['user_id']);
+                                        $margin = 0;
+                                        foreach ($instructor_details as $key => $instructor_detail) { ?>
+                                            <img style="margin-left: <?php echo $margin; ?>px;" class="position-absolute" src="<?php echo $this->user_model->get_user_image_url($instructor_detail['id']); ?>" width="30px" data-bs-toggle="tooltip" data-bs-placement="top" title="<?php echo $instructor_detail['first_name'].' '.$instructor_detail['last_name']; ?>" onclick="event.stopPropagation(); $(location).attr('href', '<?php echo site_url('home/instructor_page/'.$instructor_detail['id']); ?>');">
+                                            <?php $margin = $margin+17; ?>
+                                        <?php } ?>
+                                    <?php else: ?>
+                                        <?php $user_details = $this->user_model->get_all_user($course['user_id'])->row_array(); ?>
+                                        <img src="<?php echo $this->user_model->get_user_image_url($user_details['id']); ?>" width="30px" data-bs-toggle="tooltip" data-bs-placement="top" title="<?php echo $user_details['first_name'].' '.$user_details['last_name']; ?>" onclick="event.stopPropagation(); $(location).attr('href', '<?php echo site_url('home/instructor_page/'.$user_details['id']); ?>');">
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
                 <div class="course-price-rating">

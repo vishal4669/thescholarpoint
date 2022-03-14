@@ -12,6 +12,24 @@
         </a>
 
         <ul class="list-unstyled topbar-right-menu float-right mb-0">
+            <li class="dropdown notification-list topbar-dropdown">
+                <a class="nav-link dropdown-toggle arrow-none" data-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
+                    <span class="align-middle"><?php echo ucwords($this->session->userdata('language')); ?></span> <i class="mdi mdi-chevron-down"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right dropdown-menu-animated topbar-dropdown-menu" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-59px, 72px, 0px);">
+
+                    <?php $languages = $this->crud_model->get_all_languages();
+                    foreach ($languages as $language): ?>
+                        <?php if (trim($language) != "" && $this->session->userdata('language') != strtolower($language)): ?>
+                            <a href="javascript:void(0);" onclick="switch_language('<?php echo strtolower($language); ?>')" class="dropdown-item notify-item">
+                                <span class="align-middle"><?php echo ucwords($language);?></span>
+                            </a>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                    <!-- item-->
+
+                </div>
+            </li>
             <?php if($this->session->userdata('is_instructor') == 1 || $this->session->userdata('admin_login') == 1): ?>
                 <li class="dropdown notification-list">
                     <a class="nav-link dropdown-toggle arrow-none" data-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
@@ -25,28 +43,32 @@
 
                         <div class="row row-paddingless" style="padding-left: 15px; padding-right: 15px;">
                             <!--begin:Item-->
-                            <div class="col-6 p-0 border-bottom border-right">
-                                <a href="#" class="d-block text-center py-3 bg-hover-light" onclick="showAjaxModal('<?= site_url($logged_in_user_role.'/course_form/add_course_shortcut'); ?>', '<?= get_phrase('create_course'); ?>')">
-                                    <i class="dripicons-archive text-20"></i>
-                                    <span class="w-100 d-block text-muted"><?= get_phrase('add_course'); ?></span>
-                                </a>
-                            </div>
+                            <?php if ($this->session->userdata('is_instructor') == 1 && !$this->session->userdata('admin_login')  || has_permission('course')) : ?>
+                                <div class="col-6 p-0 border-bottom border-right">
+                                    <a href="#" class="d-block text-center py-3 bg-hover-light" onclick="showAjaxModal('<?= site_url($logged_in_user_role.'/course_form/add_course_shortcut'); ?>', '<?= get_phrase('create_course'); ?>')">
+                                        <i class="dripicons-archive text-20"></i>
+                                        <span class="w-100 d-block text-muted"><?= get_phrase('add_course'); ?></span>
+                                    </a>
+                                </div>
 
-                            <div class="col-6 p-0 border-bottom">
-                                <a href="#" class="d-block text-center py-3 bg-hover-light" onclick="showAjaxModal('<?php echo site_url('modal/popup/lesson_types/add_shortcut_lesson'); ?>', '<?php echo get_phrase('add_new_lesson'); ?>')">
-                                    <i class="dripicons-media-next text-20"></i>
-                                    <span class="d-block text-muted"><?= get_phrase('add_lesson'); ?></span>
-                                </a>
-                            </div>
+                                <div class="col-6 p-0 border-bottom">
+                                    <a href="#" class="d-block text-center py-3 bg-hover-light" onclick="showAjaxModal('<?php echo site_url('modal/popup/lesson_types/add_shortcut_lesson'); ?>', '<?php echo get_phrase('add_new_lesson'); ?>')">
+                                        <i class="dripicons-media-next text-20"></i>
+                                        <span class="d-block text-muted"><?= get_phrase('add_lesson'); ?></span>
+                                    </a>
+                                </div>
+                            <?php endif; ?>
 
-                            <?php if($this->session->userdata('admin_login')): ?>
+                            <?php if($this->session->userdata('admin_login') && has_permission('student')): ?>
                                 <div class="col-6 p-0 border-right">
                                     <a href="#" class="d-block text-center py-3 bg-hover-light" onclick="showAjaxModal('<?php echo site_url('modal/popup/shortcut_add_student'); ?>', '<?php echo get_phrase('add_student'); ?>')">
                                         <i class="dripicons-user text-20"></i>
                                         <span class="w-100 d-block text-muted"><?= get_phrase('add_student'); ?></span>
                                     </a>
                                 </div>
+                            <?php endif; ?>
 
+                            <?php if($this->session->userdata('admin_login') && has_permission('enrolment')): ?>
                                 <div class="col-6 p-0">
                                     <a href="#" class="d-block text-center py-3 bg-hover-light" onclick="showAjaxModal('<?php echo site_url('modal/popup/shortcut_enrol_student'); ?>', '<?php echo get_phrase('enrol_a_student'); ?>')">
                                         <i class="dripicons-network-3 text-20"></i>
@@ -111,8 +133,8 @@
     </div>
 </a>
 <div class="visit_website">
-    <h4 style="color: #fff; float: left;"> <?php echo $this->db->get_where('settings' , array('key'=>'system_name'))->row()->value; ?></h4>
-    <a href="<?php echo site_url('home'); ?>" target="" class="btn btn-outline-light ml-3"><?php echo get_phrase('visit_website'); ?></a>
+    <h4 style="color: #fff; float: left;" class="d-none d-md-inline-block"> <?php echo $this->db->get_where('settings' , array('key'=>'system_name'))->row()->value; ?></h4>
+    <a href="<?php echo site_url('home'); ?>" target="" class="btn btn-outline-light ml-3 d-none d-md-inline-block"><?php echo get_phrase('visit_website'); ?></a>
 </div>
 </div>
 </div>

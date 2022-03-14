@@ -37,6 +37,22 @@
                         <label for="cookie_note"><?php echo get_phrase('cookie_note'); ?></label>
                         <textarea name="cookie_note" id = "cookie_note" class="form-control" rows="5"><?php echo get_frontend_settings('cookie_note'); ?></textarea>
                     </div>
+
+                    <div class="form-group">
+                        <label for="facebook"><?php echo get_phrase('facebook'); ?></label>
+                        <input type="text" name = "facebook" id = "facebook" class="form-control" value="<?php echo get_frontend_settings('facebook');  ?>">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="twitter"><?php echo get_phrase('twitter'); ?></label>
+                        <input type="text" name = "twitter" id = "twitter" class="form-control" value="<?php echo get_frontend_settings('twitter');  ?>">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="linkedin"><?php echo get_phrase('linkedin'); ?></label>
+                        <input type="text" name = "linkedin" id = "linkedin" class="form-control" value="<?php echo get_frontend_settings('linkedin');  ?>">
+                    </div>
+
                     <div class="form-group">
                         <label for="cookie_policy"><?php echo get_phrase('cookie_policy'); ?></label>
                         <textarea name="cookie_policy" id = "cookie_policy" class="form-control" rows="5"><?php echo get_frontend_settings('cookie_policy'); ?></textarea>
@@ -52,6 +68,11 @@
                     <div class="form-group">
                         <label for="privacy_policy"><?php echo get_phrase('privacy_policy'); ?></label>
                         <textarea name="privacy_policy" id = "privacy_policy" class="form-control" rows="5"><?php echo get_frontend_settings('privacy_policy'); ?></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="refund_policy"><?php echo get_phrase('refund_policy'); ?></label>
+                        <textarea name="refund_policy" id = "refund_policy" class="form-control" rows="5"><?php echo get_frontend_settings('refund_policy'); ?></textarea>
                     </div>
 
                     <div class="row justify-content-center">
@@ -238,6 +259,6 @@
 
 <script type="text/javascript">
   $(document).ready(function () {
-    initSummerNote(['#about_us', '#terms_and_condition', '#privacy_policy', '#cookie_policy']);
+    initSummerNote(['#about_us', '#terms_and_condition', '#privacy_policy', '#cookie_policy', '#refund_policy']);
   });
 </script>

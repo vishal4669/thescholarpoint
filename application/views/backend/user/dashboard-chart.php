@@ -1,5 +1,6 @@
 <?php
      $months = array('january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december');
+     $translated_month = array(get_phrase('january'), get_phrase('february'), get_phrase('march'), get_phrase('april'), get_phrase('may'), get_phrase('june'), get_phrase('july'), get_phrase('august'), get_phrase('september'), get_phrase('october'), get_phrase('november'), get_phrase('december'));
      $month_wise_income = array();
 
     for ($i = 0; $i < 12; $i++) {
@@ -57,7 +58,7 @@
          if (0 < o("#task-area-chart").length) {
              t.push(this.respChart(o("#task-area-chart"), "Line", {
                  labels: [
-                      <?php foreach ($months as $month): ?>
+                      <?php foreach ($translated_month as $month): ?>
                     "<?php echo ucfirst($month); ?>",
                     <?php endforeach; ?>
                  ],

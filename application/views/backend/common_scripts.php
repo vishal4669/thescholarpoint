@@ -42,6 +42,19 @@
   </script>
 <?php endif; ?>
 
+<script type="text/javascript">
+  function switch_language(language) {
+      $.ajax({
+          url: '<?php echo site_url('home/site_language'); ?>',
+          type: 'post',
+          data: {language : language},
+          success: function(response) {
+              setTimeout(function(){ location.reload(); }, 500);
+          }
+      });
+  }
+</script>
+
 <?php if ($page_name == 'student_test_master_add' || $page_name == 'student_test_master_edit' ): ?>
 <script type="text/javascript">
 function get_students(stream_id, student_id = ''){
@@ -70,5 +83,3 @@ function get_students(stream_id, student_id = ''){
 
   </script>
 <?php endif; ?>
-
-

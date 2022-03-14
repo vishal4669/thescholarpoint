@@ -9,12 +9,12 @@
         <div class="col-12">
             <ul class="nav nav-tabs" id="lessonTab" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link active" id="section_and_lessons-tab" data-toggle="tab" href="#section_and_lessons" role="tab" aria-controls="section_and_lessons" aria-selected="true"><?php echo get_phrase('Lessons') ?></a>
+                    <a class="nav-link active" id="section_and_lessons-tab" data-bs-toggle="tab" href="#section_and_lessons" role="tab" aria-controls="section_and_lessons" aria-selected="true"><?php echo get_phrase('Lessons') ?></a>
                 </li>
                 <!-- ZOOM LIVE CLASS TAB STARTS -->
-                <?php if (addon_status('live-class')): ?>
+                <?php if (addon_status('live-class') || addon_status('jitsi-live-class')): ?>
                     <li class="nav-item">
-                        <a class="nav-link" id="liveclass-tab" data-toggle="tab" href="#liveclass" role="tab" aria-controls="liveclass" aria-selected="false">
+                        <a class="nav-link" id="liveclass-tab" data-bs-toggle="tab" href="#liveclass" role="tab" aria-controls="liveclass" aria-selected="false">
                             <?php echo get_phrase('live_class'); ?>
                         </a>
                     </li>
@@ -24,7 +24,7 @@
                 <!-- CERTIFICATE TAB -->
                 <?php if (addon_status('certificate')): ?>
                     <li class="nav-item">
-                        <a class="nav-link" id="certificate-tab" data-toggle="tab" href="#certificate" role="tab" aria-controls="certificate" aria-selected="false" onclick="checkCertificateEligibility()"><?php echo get_phrase('certificate'); ?></a>
+                        <a class="nav-link" id="certificate-tab" data-bs-toggle="tab" href="#certificate" role="tab" aria-controls="certificate" aria-selected="false" onclick="checkCertificateEligibility()"><?php echo get_phrase('certificate'); ?></a>
                     </li>
                 <?php endif; ?>
                 <!-- CERTIFICATE TAB -->
@@ -39,21 +39,19 @@
                             <div class="card" style="margin:0px 0px;">
                                 <div class="card-header course_card" id="<?php echo 'heading-'.$section['id']; ?>">
 
-                                    <h5 class="mb-0">
-                                        <button class="btn btn-link w-100 text-left" type="button" data-toggle="collapse" data-target="<?php echo '#collapse-'.$section['id']; ?>" <?php if($opened_section_id == $section['id']): ?> aria-expanded="true" <?php else: ?> aria-expanded="false" <?php endif; ?> aria-controls="<?php echo 'collapse-'.$section['id']; ?>" style="color: #535a66; background: none; border: none; white-space: normal;" onclick = "toggleAccordionIcon(this, '<?php echo $section['id']; ?>')">
-                                            <h6 style="color: #959aa2; font-size: 13px;">
-                                                <?php echo get_phrase('section').' '.($key+1);?>
-                                                <span style="float: right; font-weight: 100;" class="accordion_icon" id="accordion_icon_<?php echo $section['id']; ?>">
-                                                    <?php if($opened_section_id == $section['id']): ?>
-                                                        <i class="fa fa-minus"></i>
-                                                    <?php else: ?>
-                                                        <i class="fa fa-plus"></i>
-                                                    <?php endif; ?>
-                                                </span>
-                                            </h6>
-                                            <?php echo $section['title']; ?>
-                                        </button>
-                                    </h5>
+                                    <button class="btn btn-link w-100 text-start d-grid" type="button" data-bs-toggle="collapse" data-bs-target="<?php echo '#collapse-'.$section['id']; ?>" <?php if($opened_section_id == $section['id']): ?> aria-expanded="true" <?php else: ?> aria-expanded="false" <?php endif; ?> aria-controls="<?php echo 'collapse-'.$section['id']; ?>" style="color: #535a66; background: none; border: none; white-space: normal;" onclick = "toggleAccordionIcon(this, '<?php echo $section['id']; ?>')">
+                                        <p class="w-100" style="color: #959aa2; font-size: 13px;">
+                                            <span class="d-block-inline float-start"><?php echo get_phrase('section').' '.($key+1);?></span>
+                                            <span style="float: right; font-weight: 100;" class="accordion_icon" id="accordion_icon_<?php echo $section['id']; ?>">
+                                                <?php if($opened_section_id == $section['id']): ?>
+                                                    <i class="fa fa-minus"></i>
+                                                <?php else: ?>
+                                                    <i class="fa fa-plus"></i>
+                                                <?php endif; ?>
+                                            </span>
+                                        </p>
+                                        <p class="d-inline-block float-start text-start text-13px fw-500"><?php echo $section['title']; ?></p>
+                                    </button>
                                 </div>
 
                                 <div id="<?php echo 'collapse-'.$section['id']; ?>" class="collapse <?php if($section_id == $section['id']) echo 'show'; ?>" aria-labelledby="<?php echo 'heading-'.$section['id']; ?>" data-parent="#accordionExample">
@@ -95,6 +93,10 @@
                                                                 <?php echo readable_time_for_humans($lesson['duration']); ?>
                                                             <?php elseif($lesson['lesson_type'] == 'quiz'): ?>
                                                                 <i class="far fa-question-circle"></i> <?php echo get_phrase('quiz'); ?>
+
+                                                            <?php elseif ($lesson_details['lesson_type'] == 'text' && $lesson_details['attachment_type'] == 'description'): ?>
+                                                                <i class="far fa-file-alt"></i> <?php echo get_phrase('text'); ?>
+
                                                             <?php else: ?>
                                                                 <?php if ($lesson['attachment_type'] == 'iframe'): ?>
                                                                     <i class="fas fa-code"></i>  <?php echo get_phrase('external_source'); ?>
@@ -128,27 +130,52 @@
                 </div>
 
                 <!-- ZOOM LIVE CLASS TAB STARTS-->
-                <?php if (addon_status('live-class')): ?>
+                
                     <div class="tab-pane fade" id="liveclass" role="tabpanel" aria-labelledby="liveclass-tab" style="text-align: center;">
-                        <?php
-                        $live_class = $this->db->get_where('live_class', array('course_id' => $course_id));
-                        if ($live_class->num_rows() > 0):
-                            $live_class = $this->db->get_where('live_class', array('course_id' => $course_id))->row_array(); ?>
-                            <div style="padding: 30px 0px;">
-                                <i class="fa fa-calendar-check"></i> <?php echo get_phrase('live_class_schedule'); ?>
-                                <h5 style="margin-top: 20px;"><?php echo date('h:i A', $live_class['time']); ?> : <?php echo date('D, d M Y', $live_class['date']); ?></h5>
-                                <div class="live_class_note">
-                                    <?php echo $live_class['note_to_students']; ?>
+                        <?php if (addon_status('live-class')): ?>
+                            <?php
+                            $live_class = $this->db->get_where('live_class', array('course_id' => $course_id));
+                            if ($live_class->num_rows() > 0):
+                                $live_class = $this->db->get_where('live_class', array('course_id' => $course_id))->row_array(); ?>
+                                <div style="padding: 30px 0px;">
+                                    <i class="fa fa-calendar-check"></i> <?php echo get_phrase('zoom_live_class_schedule'); ?>
+                                    <h5 style="margin-top: 20px;"><?php echo date('h:i A', $live_class['time']); ?> : <?php echo date('D, d M Y', $live_class['date']); ?></h5>
+                                    <div class="live_class_note">
+                                        <?php echo $live_class['note_to_students']; ?>
+                                    </div>
+                                    <a href="<?php echo site_url('addons/liveclass/join/'.$course_id);?>" class="btn btn_zoom">
+                                        <i class="fa fa-video"></i>&nbsp;
+                                        <?php echo get_phrase('join_live_video_class'); ?>
+                                    </a>
                                 </div>
-                                <a href="<?php echo site_url('addons/liveclass/join/'.$course_id);?>" class="btn btn_zoom">
-                                    <i class="fa fa-video"></i>&nbsp;
-                                    <?php echo get_phrase('join_live_video_class'); ?>
-                                </a>
-                            </div>
-                        <?php else: ?>
-                            <div class="alert alert-warning" role="alert" style="padding: 30px 0px;">
-                              <?php echo get_phrase('live_class_is_not_scheduled_to_this_course_yet'); ?>
-                            </div>
+                            <?php else: ?>
+                                <div class="alert alert-warning" role="alert" style="padding: 30px 0px;">
+                                  <?php echo get_phrase('live_class_is_not_scheduled_to_this_course_yet'); ?>
+                                </div>
+                            <?php endif; ?>
+                        <?php endif; ?>
+                        <?php if (addon_status('live-class') && addon_status('jitsi-live-class'))echo '<hr>'; ?>
+                        <?php if (addon_status('jitsi-live-class')): ?>
+                            <?php
+                            $live_class = $this->db->get_where('jitsi_live_class', array('course_id' => $course_id));
+                            if ($live_class->num_rows() > 0):
+                                $live_class = $live_class->row_array(); ?>
+                                <div style="padding: 30px 0px;">
+                                    <i class="fa fa-calendar-check"></i> <?php echo get_phrase('jitsi_live_class_schedule'); ?>
+                                    <h5 style="margin-top: 20px;"><?php echo date('h:i A', $live_class['time']); ?> : <?php echo date('D, d M Y', $live_class['date']); ?></h5>
+                                    <div class="live_class_note">
+                                        <?php echo $live_class['note_to_students']; ?>
+                                    </div>
+                                    <a target="_blank" href="<?php echo site_url('addons/jitsi_liveclass/join/'.$course_id);?>" class="btn btn_zoom">
+                                        <i class="fa fa-video"></i>&nbsp;
+                                        <?php echo get_phrase('join_live_video_class'); ?>
+                                    </a>
+                                </div>
+                            <?php else: ?>
+                                <div class="alert alert-warning" role="alert" style="padding: 30px 0px;">
+                                  <?php echo get_phrase('live_class_is_not_scheduled_to_this_course_yet'); ?>
+                                </div>
+                            <?php endif; ?>
                         <?php endif; ?>
                     </div>
 
@@ -174,7 +201,6 @@
                         border-color: #2781FF;
                     }
                     </style>
-                <?php endif; ?>
                 <!-- ZOOM LIVE CLASS TAB ENDS-->
 
                 <?php if (addon_status('certificate')): ?>
