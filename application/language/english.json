@@ -1084,5 +1084,7 @@
     "it_looks_like_you_are_skipping_a_version": "It looks like you are skipping a version",
     "please_update_version": "Please update version",
     "first": "First",
-    "an_error_occurred_during_payment": "An error occurred during payment"
+    "an_error_occurred_during_payment": "An error occurred during payment",
+    "subject_updated_successfully": "Subject updated successfully",
+    "test_updated_successfully": "Test updated successfully"
 }

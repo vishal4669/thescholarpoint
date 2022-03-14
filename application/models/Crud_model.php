@@ -490,6 +490,151 @@ class Crud_model extends CI_Model
         }
     }
 
+    public function add_subject($param1 = ""){
+
+        $outcomes = $this->trim_and_return_json($this->input->post('outcomes'));
+        $requirements = $this->trim_and_return_json($this->input->post('requirements'));
+
+        $data['subject_name'] = $this->input->post('subject_name');
+    
+        $this->db->insert('subject_master', $data);
+
+        $subject_id = $this->db->insert_id();
+    
+        $this->session->set_flashdata('flash_message', get_phrase('subject_has_been_added_successfully'));
+        return $subject_id;
+
+    }
+
+    
+    public function update_subject($id){
+        $data['subject_name'] = $this->input->post('subject_name');
+        $this->db->where('id', $id);
+        $this->db->update('subject_master', $data);
+        $this->session->set_flashdata('flash_message', get_phrase('subject_updated_successfully'));
+
+    }
+
+    public function get_subject_by_id($id = "")
+    {
+        return $this->db->get_where('subject_master', array('id' => $id));
+    }
+
+
+    public function delete_subject($id = "")
+    {
+        $this->db->where('id', $id);
+        $this->db->delete('subject_master');
+    }
+
+
+    //Get the subject master data
+    public function get_subject_master($id=0){
+        if ($id > 0) {
+            $this->db->where('id', $id);
+        }
+        return  $this->db->get('subject_master'); 
+    }
+
+
+    public function add_student_test($param1 = "")
+    {
+        $outcomes = $this->trim_and_return_json($this->input->post('outcomes'));
+        $requirements = $this->trim_and_return_json($this->input->post('requirements'));
+
+        $data['stream_id'] = $this->input->post('stream_id');
+        $data['student_id'] = $this->input->post('student_id');
+        $data['test_id'] = $this->input->post('test_id');
+        $data['marks'] = $this->input->post('marks');
+        $data['comment'] = html_escape($this->input->post('comment'));
+
+        $this->db->insert('student_test_master', $data);
+        $student_test_id = $this->db->insert_id();
+        $this->session->set_flashdata('flash_message', get_phrase('student_test_has_been_added_successfully'));
+        return $student_test_id;
+    }
+
+    public function update_student_test($student_test_id){
+        $test_details = $this->get_test_by_id($student_test_id)->row_array();
+        $data['stream_id'] = $this->input->post('stream_id');
+        $data['student_id'] = $this->input->post('student_id');
+        $data['test_id'] = $this->input->post('test_id');
+        $data['marks'] = $this->input->post('marks');
+        $data['comment'] = html_escape($this->input->post('comment'));
+
+        $this->db->where('id', $student_test_id);
+        $this->db->update('student_test_master', $data);
+        $this->session->set_flashdata('flash_message', get_phrase('student_test_updated_successfully'));
+    }
+
+
+   public function get_student_test_by_id($student_test_id = "")
+    {
+        return $this->db->get_where('student_test_master', array('id' => $student_test_id));
+    }
+
+    public function delete_student_test($test_id = "")
+    {
+        $this->db->where('id', $test_id);
+        $this->db->delete('student_test_master');
+    }
+
+    public function add_test($param1 = "")
+    {
+        $outcomes = $this->trim_and_return_json($this->input->post('outcomes'));
+        $requirements = $this->trim_and_return_json($this->input->post('requirements'));
+
+        $data['test_name'] = $this->input->post('test_name');
+        $testDate = $this->input->post('test_date');
+        $data['test_date'] = date("Y-m-d", strtotime($testDate)); //need to convert as per the calender
+        $data['test_stream'] = html_escape($this->input->post('test_stream'));
+        $data['test_subject'] = $this->input->post('test_subject');
+        $data['test_total_marks'] = $this->input->post('test_total_marks');
+        
+        $data['is_active'] = 1;
+
+        $this->db->insert('test_master', $data);
+
+        $test_id = $this->db->insert_id();
+      
+        if ($data['status'] == 'approved') {
+            $this->session->set_flashdata('flash_message', get_phrase('test_added_successfully'));
+        } elseif ($data['status'] == 'pending') {
+            $this->session->set_flashdata('flash_message', get_phrase('test_added_successfully') . '. ' . get_phrase('please_wait_untill_Admin_approves_it'));
+        }
+
+        $this->session->set_flashdata('flash_message', get_phrase('test_has_been_added_successfully'));
+        return $test_id;
+    }
+
+    public function update_test($test_id){
+
+        $test_details = $this->get_test_by_id($test_id)->row_array();
+
+        $data['test_name'] = $this->input->post('test_name');
+        $testDate = $this->input->post('test_date');
+        $data['test_date'] = date("Y-m-d", strtotime($testDate));
+        $data['test_stream'] = html_escape($this->input->post('test_stream'));
+        $data['test_subject'] = $this->input->post('test_subject');
+        $data['test_total_marks'] = $this->input->post('test_total_marks');
+
+        $this->db->where('id', $test_id);
+        $this->db->update('test_master', $data);
+        $this->session->set_flashdata('flash_message', get_phrase('test_updated_successfully'));
+
+    }
+
+    public function delete_test($test_id = "")
+    {
+        $this->db->where('id', $test_id);
+        $this->db->delete('test_master');
+    }
+
+    public function get_test_by_id($test_id = "")
+    {
+        return $this->db->get_where('test_master', array('id' => $test_id));
+    }
+
     public function add_course($param1 = "")
     {
         $outcomes = $this->trim_and_return_json($this->input->post('outcomes'));
@@ -622,6 +767,7 @@ class Crud_model extends CI_Model
     function trim_and_return_json($untrimmed_array)
     {
         $trimmed_array = array();
+
         if (sizeof($untrimmed_array) > 0) {
             foreach ($untrimmed_array as $row) {
                 if ($row != "") {
