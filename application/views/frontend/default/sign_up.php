@@ -36,7 +36,7 @@
                   </div>
                 </div>
 
-                 <div class="form-group">
+                 <div class="form-group" style="display: none;">
                       <label for="stream"><span class="input-field-icon"><i class="fas"></i></span> <?php echo site_phrase('stream'); ?>:</label>
                       <select required="required" name="stream" id="stream" class="form-select">
                           <option value="">Select Stream</option>

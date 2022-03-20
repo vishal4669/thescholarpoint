@@ -192,11 +192,10 @@ class Login extends CI_Controller
         $data['last_name']  = html_escape($this->input->post('last_name'));
         $data['email']  = html_escape($this->input->post('email'));
         $data['password']  = sha1($this->input->post('password'));
-        $data['stream']  = html_escape($this->input->post('stream'));
         $data['mobile']  = html_escape($this->input->post('mobile'));        
         $data['referral_from']  = html_escape($this->input->post('referral_from'));
         
-        if (empty($data['first_name']) || empty($data['last_name']) || empty($data['email']) || empty($data['password']) || empty($data['stream']) || empty($data['mobile']) ) {
+        if (empty($data['first_name']) || empty($data['last_name']) || empty($data['email']) || empty($data['password']) || empty($data['mobile']) ) {
             $this->session->set_flashdata('error_message', site_phrase('your_sign_up_form_is_empty') . '. ' . site_phrase('fill_out_the_form with_your_valid_data'));
             redirect(site_url('home/sign_up'), 'refresh');
         }
