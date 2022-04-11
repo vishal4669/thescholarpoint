@@ -959,6 +959,7 @@ class Home extends CI_Controller
         }
         $page_data['page_name'] = 'login';
         $page_data['page_title'] = site_phrase('login');
+
         $this->load->view('frontend/' . get_frontend_settings('theme') . '/index', $page_data);
     }
 

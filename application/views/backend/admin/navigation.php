@@ -80,63 +80,7 @@ $status_wise_courses = $this->crud_model->get_status_wise_courses();
 			</li>
 		<?php endif; ?>
 
-		<?php if (has_permission('subject_master')) : ?>
-			<li class="side-nav-item <?php if ($page_name == 'subject_master' || $page_name == 'subject_master_add') : ?> active <?php endif; ?>">
-
-				<a href="javascript: void(0);" class="side-nav-link <?php if ($page_name == 'subject_master' || $page_name == 'subject_master_add') : ?> active <?php endif; ?>">
-					<i class="dripicons-box"></i>
-					<span> <?php echo get_phrase('subject_master'); ?> </span>
-					<span class="menu-arrow"></span>
-				</a>
-				<ul class="side-nav-second-level" aria-expanded="false">
-					<li class="<?php if ($page_name == 'subject_master') echo 'active'; ?>">
-						<a href="<?php echo site_url('admin/subject_master'); ?>"><?php echo get_phrase('subject_master'); ?></a>
-					</li>
-					<li class="<?php if ($page_name == 'subject_master_add') echo 'active'; ?>">
-						<a href="<?php echo site_url('admin/subject_form/subject_master_add'); ?>"><?php echo get_phrase('subject_master_add'); ?></a>
-					</li>
-				</ul>
-			</li>
-		<?php endif; ?>
-
-
-		<?php if (has_permission('test_master')) : ?>
-			<li class="side-nav-item <?php if ($page_name == 'test_master' || $page_name == 'test_master_add') : ?> active <?php endif; ?>">
-
-				<a href="javascript: void(0);" class="side-nav-link <?php if ($page_name == 'test_master' || $page_name == 'test_master_add') : ?> active <?php endif; ?>">
-					<i class="dripicons-box"></i>
-					<span> <?php echo get_phrase('test_master'); ?> </span>
-					<span class="menu-arrow"></span>
-				</a>
-				<ul class="side-nav-second-level" aria-expanded="false">
-					<li class="<?php if ($page_name == 'test_master') echo 'active'; ?>">
-						<a href="<?php echo site_url('admin/test_master'); ?>"><?php echo get_phrase('test_master'); ?></a>
-					</li>
-					<li class="<?php if ($page_name == 'add_test_master') echo 'active'; ?>">
-						<a href="<?php echo site_url('admin/test_form/add_test_master'); ?>"><?php echo get_phrase('test_master_add'); ?></a>
-					</li>
-				</ul>
-			</li>
-		<?php endif; ?>
-
-		<?php if (has_permission('student_test_master')) : ?>
-			<li class="side-nav-item <?php if ($page_name == 'student_test_master' || $page_name == 'student_test_master_add' || $page_name == 'student_test_master_edit' ) : ?> active <?php endif; ?>">
-
-				<a href="javascript: void(0);" class="side-nav-link <?php if ($page_name == 'student_test_master' || $page_name == 'student_test_master_add') : ?> active <?php endif; ?>">
-					<i class="dripicons-box"></i>
-					<span> <?php echo get_phrase('student_test_master'); ?> </span>
-					<span class="menu-arrow"></span>
-				</a>
-				<ul class="side-nav-second-level" aria-expanded="false">
-					<li class="<?php if ($page_name == 'student_test_master') echo 'active'; ?>">
-						<a href="<?php echo site_url('admin/student_test_master'); ?>"><?php echo get_phrase('student_test_master'); ?></a>
-					</li>
-					<li class="<?php if ($page_name == 'student_test_master_add') echo 'active'; ?>">
-						<a href="<?php echo site_url('admin/student_test_form/student_test_master_add'); ?>"><?php echo get_phrase('student_test_master_add'); ?></a>
-					</li>
-				</ul>
-			</li>
-		<?php endif; ?>
+		
 
 		
 		<?php if (addon_status('ebook')) : ?>

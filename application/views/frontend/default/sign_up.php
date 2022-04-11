@@ -36,20 +36,6 @@
                   </div>
                 </div>
 
-                 <div class="form-group">
-                      <label for="stream"><span class="input-field-icon"><i class="fas"></i></span> <?php echo site_phrase('stream'); ?>:</label>
-                      <select required="required" name="stream" id="stream" class="form-select">
-                          <option value="">Select Stream</option>
-                           <?php
-                            foreach ($this->user_model->get_stream()->result() as $row)
-                            {    
-                              echo '<option value="'.$row->id.'">'.$row->stream_name.'</option>';
-                            }
-                            ?>
-                      </select>
-                  </div>
-
-
                 <div class="form-group">
                   <label for="registration-email"><?php echo site_phrase('email'); ?></label>
                   <div class="input-group">
