@@ -5,8 +5,8 @@
         <div class="sign-up-form">
           <div class="row mb-4 mt-3">
             <div class="col-md-12 text-center">
-              <h1 class="fw-700"><?php echo site_phrase('email_verification'); ?></h1>
-              <p class="text-14px"><?php echo site_phrase('let_us_know_that_this_email_address_belongs_to_you'); ?> <?php echo site_phrase('Enter_the_code_from_the_email_sent_to').' <b>'.$this->session->userdata('register_email').'</b>'; ?></p>
+              <h1 class="fw-700"><?php echo site_phrase('account_verification'); ?></h1>
+              <p class="text-14px"><?php echo site_phrase('let_us_know_that_this_account_belongs_to_you.'); ?> <?php echo site_phrase('Enter_the_otp_code_to_get_on_your_mobile'); ?></p>
             </div>
           </div>
           <form action="javascript:;" method="post" id="email_verification">
@@ -17,7 +17,7 @@
                 <input type="text" class="form-control" placeholder="<?php echo site_phrase('enter_the_verification_code'); ?>" aria-label="<?php echo site_phrase('verification_code'); ?>" aria-describedby="<?php echo site_phrase('verification_code'); ?>" id="verification_code" required>
               </div>
               <a href="javascript:;" class="text-14px fw-500 text-muted" id="resend_mail_button" onclick="resend_verification_code()">
-                <div class="float-start"><?= site_phrase('resend_mail') ?></div>
+                <div class="float-start"><?= site_phrase('resend_otp') ?></div>
                 <div id="resend_mail_loader" class="float-start ps-1"></div>
               </a>
             </div>
@@ -64,7 +64,7 @@
       url: '<?php echo site_url('login/resend_verification_code/'); ?>',
       data: {email : email},
       success: function(response){
-        toastr.success('<?php echo site_phrase('mail_successfully_sent_to_your_inbox');?>');
+        toastr.success('<?php echo site_phrase('otp_successfully_sent_on_your_mobile');?>');
         $("#resend_mail_loader").html('');
       }
     });

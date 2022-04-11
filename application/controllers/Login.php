@@ -27,6 +27,44 @@ class Login extends CI_Controller
         $this->load->view('frontend/' . get_frontend_settings('theme') . '/index', $page_data);
     }
 
+     /**
+     * @verification_code
+     * @mobile_number
+     **/
+
+    public function SendOTPMobile($verification_code, $mobile_number)
+    {
+        $otp_text_msg = ('TheScholarPoint Verification OTP: '.$verification_code. ' validate your signup - https://thescholarpoint.com');
+        $url = 'http://mobi1.blogdns.com/httpapi/httpapisms.aspx';
+        
+        $ch = curl_init();
+        $headers = array(
+            'Accept: application/json',
+            'Content-Type: application/json',
+        );
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS,'UserID=Vishalkotak&UserPass=India@123&MobileNo='.$mobile_number.'&GSMID=INFORM&Message='.$otp_text_msg.'&UNICODE=TEXT');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $output = curl_exec($ch);
+
+        /*Print error if any*/
+        if(curl_errno($ch))
+        {
+            $error =  'error:' . curl_error($ch);
+        }
+        curl_close($ch);
+
+        $op_arr = explode('=',$output);
+
+        if($op_arr[0] != 100){
+           return 0;
+        }else{
+            return 1;
+        }
+    }
+
+
      //Validate OTP.
     public function validate_otp(){
         if(isset($_POST['login_otp']) && $_POST['login_otp'] !=''){
@@ -109,56 +147,8 @@ class Login extends CI_Controller
             $this->session->set_userdata('role', get_user_role('user_role', $row->id));
             $this->session->set_userdata('name', $row->first_name.' '.$row->last_name);
             $this->session->set_userdata('is_instructor', $row->is_instructor);
-
-            if ($row->role_id == 1) {
-                $this->session->set_userdata('admin_login', '1');
-                redirect(site_url('admin/dashboard'), 'refresh');
-            }else{
-                $this->session->set_userdata('user_login', '1');
-                redirect(site_url('home'), 'refresh');
-            }
-
-        //*******Generate the OTP and send it on mobile number*****************//
-            $otpno = rand(1000000,99999);
-            $otp_text_msg = ('TheScholarPoint OTP: '.$otpno. ' Login access code for your https://thescholarpoint.com');
-
-             $url = 'http://mobi1.blogdns.com/httpapi/httpapisms.aspx';
-
-            //Set the otp value in session.
-            $this->session->set_userdata('otp_no', $otpno);
-            
-            $ch = curl_init();
-            $headers = array(
-                'Accept: application/json',
-                'Content-Type: application/json',
-            );
-            curl_setopt($ch, CURLOPT_URL, $url);
-            curl_setopt($ch, CURLOPT_POST, 1);
-            curl_setopt($ch, CURLOPT_POSTFIELDS,'UserID=Vishalkotak&UserPass=India@123&MobileNo='.$mobile.'&GSMID=INFORM&Message='.$otp_text_msg.'&UNICODE=TEXT');
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-            $output = curl_exec($ch);
-
-            /*Print error if any*/
-            if(curl_errno($ch))
-            {
-                $error =  'error:' . curl_error($ch);
-            }
-
-            curl_close($ch);
-            $op_arr = explode('=',$output);
-
-            if($op_arr[0] == 100){
-                redirect(site_url('home/login/OTP'), 'refresh');
-            }else{
-                 $this->session->set_flashdata('info_message', get_phrase('error_something_went_worng'));
-                redirect(site_url('home/login'), 'refresh');
-            }
-            //End the OTP generation...
-
+           
             $this->session->set_flashdata('flash_message', get_phrase('welcome').' '.$row->first_name.' '.$row->last_name);
-
-            
 
             if ($row->role_id == 1) {
                 $this->session->set_userdata('admin_login', '1');
@@ -232,6 +222,7 @@ class Login extends CI_Controller
 
 
         if( ($validity === 'unverified_user' || $validity == true) && ( $validity_mobile === 'unverified_user' || $validity_mobile == true ) ) {
+            
             if($validity === true || $validity_mobile === true){
                 $this->user_model->register_user($data);
             } else {
@@ -239,12 +230,20 @@ class Login extends CI_Controller
             }
 
             if (get_settings('student_email_verification') == 'enable') {
-                $this->email_model->send_email_verification_mail($data['email'], $verification_code);
+
+                /***********OTP Send on Mobile number************/
+                $response_mobile_otp = $this->SendOTPMobile($verification_code, $data['mobile']);
+                if($response_mobile_otp == 0){
+                     $this->session->set_flashdata('error_message', get_phrase('mobile_otp_sending_failed'));
+                }
+                /***********OTP Send on Mobile number************/
+
+                //$this->email_model->send_email_verification_mail($data['email'], $verification_code);
 
                 if ($validity === 'unverified_user') {
                     $this->session->set_flashdata('info_message', get_phrase('you_have_already_registered') . '. ' . get_phrase('please_verify_your_email_address'));
                 } else {
-                    $this->session->set_flashdata('flash_message', get_phrase('your_registration_has_been_successfully_done') . '. ' . get_phrase('please_check_your_mail_inbox_to_verify_your_email_address') . '.');
+                    $this->session->set_flashdata('flash_message', get_phrase('your_registration_has_been_successfully_done') . '. ' . get_phrase('please_check_your_mobile_message_to_get_otp_and_verify_your_account') . '.');
                 }
                 $this->session->set_userdata('register_email', $this->input->post('email'));
                 redirect(site_url('home/verification_code'), 'refresh');
@@ -352,7 +351,15 @@ class Login extends CI_Controller
     {
         $email = $this->input->post('email');
         $verification_code = $this->db->get_where('users', array('email' => $email))->row('verification_code');
-        $this->email_model->send_email_verification_mail($email, $verification_code);
+        $mobile_number = $this->db->get_where('users', array('email' => $email))->row('mobile');
+
+        /***********OTP Send on Mobile number************/
+        $response_mobile_otp = $this->SendOTPMobile($verification_code, $mobile_number);
+        if($response_mobile_otp == 0){
+             $this->session->set_flashdata('error_message', get_phrase('mobile_otp_sending_failed'));
+        }
+        /***********OTP Send on Mobile number************/
+        //$this->email_model->send_email_verification_mail($email, $verification_code);
 
         return true;
     }

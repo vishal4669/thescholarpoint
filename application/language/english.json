@@ -1086,5 +1086,15 @@
     "first": "First",
     "an_error_occurred_during_payment": "An error occurred during payment",
     "subject_updated_successfully": "Subject updated successfully",
-    "test_updated_successfully": "Test updated successfully"
+    "test_updated_successfully": "Test updated successfully",
+    "resend_otp": "Resend otp",
+    "please_check_your_mail_inbox_or_mobile_to_get_otp_and_verify_your_account": "Please check your mail inbox or mobile to get otp and verify your account",
+    "otp_successfully_sent_to_your_inbox_and_mobile": "Otp successfully sent to your inbox and mobile",
+    "please_check_your_mobile_message_to_get_otp_and_verify_your_account": "Please check your mobile message to get otp and verify your account",
+    "otp_successfully_sent_on_your_mobile": "Otp successfully sent on your mobile",
+    "account_verification": "Account verification",
+    "let_us_know_that_this_account_belongs_to_you": "Let us know that this account belongs to you",
+    "enter_the_code_from_the_mobile_sent_to": "Enter the code from the mobile sent to",
+    "enter_the_otp_code_get_on_your_mobile": "Enter the otp code get on your mobile",
+    "let_us_know_that_this_account_belongs_to_you.": "Let us know that this account belongs to you."
 }
