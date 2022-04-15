@@ -269,7 +269,7 @@
     </div>
 </section>
 
-<section class="course-carousel-area">
+<section class="course-carousel-area" style="display:none;">
     <div class="container-lg">
         <div class="row">
             <div class="col">
@@ -441,7 +441,7 @@
 </section>
 
 
-<section class="featured-instructor">
+<section class="featured-instructor" style="display: none;">
     <div class="container-lg">
         <div class="row">
             <div class="col">

@@ -1096,5 +1096,13 @@
     "let_us_know_that_this_account_belongs_to_you": "Let us know that this account belongs to you",
     "enter_the_code_from_the_mobile_sent_to": "Enter the code from the mobile sent to",
     "enter_the_otp_code_get_on_your_mobile": "Enter the otp code get on your mobile",
-    "let_us_know_that_this_account_belongs_to_you.": "Let us know that this account belongs to you."
+    "let_us_know_that_this_account_belongs_to_you.": "Let us know that this account belongs to you.",
+    "enter_valid_image_extension": "Enter valid image extension",
+    "please_enter_valid_image_extension_such_as_png_jpg_jpeg": "Please enter valid image extension such as png jpg jpeg",
+    "please_enter_valid_image_extension_such_as_.png_.jpg_.jpeg": "Please enter valid image extension such as .png .jpg .jpeg",
+    "please_select_your_profile_image": "Please select your profile image",
+    "email1": "Email1",
+    "keywords": "Keywords",
+    "click_the_enter_button_after_writing_your_keyword": "Click the enter button after writing your keyword",
+    "update_blog": "Update blog"
 }
