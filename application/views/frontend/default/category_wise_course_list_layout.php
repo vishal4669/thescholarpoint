@@ -1,6 +1,9 @@
 <ul>
     <?php foreach ($courses as $course) :
-        $instructor_details = $this->user_model->get_all_user($course['user_id'])->row_array(); ?>
+        $instructor_details = $this->user_model->get_all_user($course['user_id'])->row_array();
+        $is_course_launch = compare_course_launch_date($course['course_launch_date']);
+
+        ?>
         <li>
             <div class="course-box-2">
                 <div class="course-image">
@@ -31,7 +34,10 @@
                                 <?php endif; ?>
                                 <span class=""><i class="fas fa-closed-captioning"></i><?php echo site_phrase($course['language']); ?></span>
                                 <span class=""><i class="fa fa-level-up"></i><?php echo site_phrase($course['level']); ?></span>
-                                <button class="brn-compare-sm" onclick="event.stopPropagation(); $(location).attr('href', '<?php echo site_url('home/compare?course-1=' . rawurlencode(slugify($course['title'])) . '&&course-id-1=' . $course['id']); ?>');"><i class="fas fa-balance-scale"></i> <?php echo site_phrase('compare'); ?></button>
+
+                                <?php if($is_course_launch =='YES') : ?>
+                                    <button class="brn-compare-sm" onclick="event.stopPropagation(); $(location).attr('href', '<?php echo site_url('home/compare?course-1=' . rawurlencode(slugify($course['title'])) . '&&course-id-1=' . $course['id']); ?>');"><i class="fas fa-balance-scale"></i> <?php echo site_phrase('compare'); ?></button>
+                                <?php endif;?>
                             </div>
                         </div>
 

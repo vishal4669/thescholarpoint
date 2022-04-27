@@ -151,6 +151,14 @@
                                                     </select>
                                                 </div>
                                             </div>
+
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-2 col-form-label" for="course_launch_date"><?php echo get_phrase('course_launch_date'); ?></label>                                                
+                                                    <div class="col-md-10">
+                                                        <input type="text" class="form-control" id="course_launch_date" name = "course_launch_date" placeholder="<?php echo get_phrase('select_date'); ?>" required>                                                    
+                                                    </div>
+                                            </div>
+
                                             <div class="form-group row mb-3">
                                                 <div class="offset-md-2 col-md-10">
                                                     <div class="custom-control custom-checkbox">
@@ -432,6 +440,13 @@ function calculateDiscountPercentage(discounted_price) {
     }
   }
 }
+
+
+$(document).ready(function(){
+    $("#course_launch_date").datepicker({
+        minDate: 0
+    });
+});
 
 </script>
 

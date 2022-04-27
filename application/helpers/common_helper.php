@@ -502,6 +502,26 @@ if (!function_exists('chk_user_token_session')) {
     }
 }
 
+//Compare Course Launch Date...
+if (!function_exists('compare_course_launch_date')) {
+    function compare_course_launch_date($launch_date){       
+       if($launch_date != ""){
+            $courseLaunchDate = strtotime($launch_date);
+            $current_date = strtotime(date("Y-m-d"));
+
+              if($courseLaunchDate > $current_date): 
+              //Not to display the Add to cart button 
+                return $course_launch_message = 'Course will be launched on '.date("d/m/Y", strtotime($launch_date));
+             else:
+                return "YES";
+              endif;
+
+        }else{
+            return "YES";
+        }
+    }
+}
+
 // ------------------------------------------------------------------------
 /* End of file common_helper.php */
 /* Location: ./system/helpers/common.php */
