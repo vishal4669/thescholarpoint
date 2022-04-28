@@ -111,7 +111,8 @@
                     <?php $top_courses = $this->crud_model->get_top_courses()->result_array();
                     $cart_items = $this->session->userdata('cart_items');
                     foreach ($top_courses as $top_course) : ?>
-                        <?php
+                        <?php                            
+                            $is_course_launch = compare_course_launch_date($top_course['course_launch_date']);
                             $lessons = $this->crud_model->get_lessons('course', $top_course['id']);
                             $course_duration = $this->crud_model->get_total_duration_of_lesson_by_course_id($top_course['id']);
                         ?>
@@ -160,9 +161,13 @@
                                             <div class="col-6">
                                                 <span class="badge badge-sub-warning text-11px"><?php echo site_phrase($top_course['level']); ?></span>
                                             </div>
+
+                                            <?php if($is_course_launch =='YES') : ?>
                                             <div class="col-6 text-end">
                                                 <button class="brn-compare-sm" onclick="return check_action(this, '<?php echo site_url('home/compare?course-1=' . rawurlencode(slugify($top_course['title'])) . '&&course-id-1=' . $top_course['id']); ?>');"><i class="fas fa-balance-scale"></i> <?php echo site_phrase('compare'); ?></button>
                                             </div>
+                                            <?php endif;?>
+
                                         </div>
 
                                         <hr class="divider-1">
@@ -246,6 +251,8 @@
                                                 } ?>
                                                 <a href="<?php echo $url; ?>" class="btn green radius-10" onclick="handleEnrolledButton()"><?php echo site_phrase('get_enrolled'); ?></a>
                                             <?php else : ?>
+
+                                            <?php if($is_course_launch =='YES') : ?>
                                                 <button type="button" class="btn red add-to-cart-btn <?php if (in_array($top_course['id'], $cart_items)) echo 'addedToCart'; ?> big-cart-button-<?php echo $top_course['id']; ?>" id="<?php echo $top_course['id']; ?>" onclick="handleCartItems(this)">
                                                     <?php
                                                     if (in_array($top_course['id'], $cart_items))
@@ -254,6 +261,12 @@
                                                         echo site_phrase('add_to_cart');
                                                     ?>
                                                 </button>
+                                                <?php else : ?>
+                                                <button type="button" class="btn red add-to-cart-btn" id="">
+                                                        <?php echo $is_course_launch;?>
+                                                </button>
+                                                <?php endif;?>
+
                                             <?php endif; ?>
                                             <button type="button" class="wishlist-btn <?php if ($this->crud_model->is_added_to_wishlist($top_course['id'])) echo 'active'; ?>" title="Add to wishlist" onclick="handleWishList(this)" id="<?php echo $top_course['id']; ?>"><i class="fas fa-heart"></i></button>
                                         <?php endif; ?>
@@ -269,7 +282,7 @@
     </div>
 </section>
 
-<section class="course-carousel-area">
+<section class="course-carousel-area" style="display:none;">
     <div class="container-lg">
         <div class="row">
             <div class="col">
@@ -283,6 +296,8 @@
                     $latest_courses = $this->crud_model->get_latest_10_course();
                     foreach ($latest_courses as $latest_course) : ?>
                         <?php
+
+
                             $lessons = $this->crud_model->get_lessons('course', $latest_course['id']);
                             $course_duration = $this->crud_model->get_total_duration_of_lesson_by_course_id($latest_course['id']);
                         ?>
@@ -330,10 +345,10 @@
                                         <div class="row mt-3">
                                             <div class="col-6">
                                                 <span class="badge badge-sub-warning text-11px"><?php echo site_phrase($latest_course['level']); ?></span>
-                                            </div>
+                                            </div>                                    
                                             <div class="col-6 text-end">
                                                 <button class="brn-compare-sm" onclick="return check_action(this, '<?php echo site_url('home/compare?course-1=' . rawurlencode(slugify($latest_course['title'])) . '&&course-id-1=' . $latest_course['id']); ?>');"><i class="fas fa-balance-scale"></i> <?php echo site_phrase('compare'); ?></button>
-                                            </div>
+                                            </div>                                            
                                         </div>
 
                                         <hr class="divider-1">
@@ -417,6 +432,7 @@
                                                 } ?>
                                                 <a href="<?php echo $url; ?>" class="btn green radius-10" onclick="handleEnrolledButton()"><?php echo site_phrase('get_enrolled'); ?></a>
                                             <?php else : ?>
+                                                
                                                 <button type="button" class="btn red add-to-cart-btn <?php if (in_array($latest_course['id'], $cart_items)) echo 'addedToCart'; ?> big-cart-button-<?php echo $latest_course['id']; ?>" id="<?php echo $latest_course['id']; ?>" onclick="handleCartItems(this)">
                                                     <?php
                                                     if (in_array($latest_course['id'], $cart_items))
@@ -425,6 +441,7 @@
                                                         echo site_phrase('add_to_cart');
                                                     ?>
                                                 </button>
+                                                
                                             <?php endif; ?>
                                             <button type="button" class="wishlist-btn <?php if ($this->crud_model->is_added_to_wishlist($latest_course['id'])) echo 'active'; ?>" title="Add to wishlist" onclick="handleWishList(this)" id="<?php echo $latest_course['id']; ?>"><i class="fas fa-heart"></i></button>
                                         <?php endif; ?>
@@ -441,7 +458,7 @@
 </section>
 
 
-<section class="featured-instructor">
+<section class="featured-instructor" style="display: none;">
     <div class="container-lg">
         <div class="row">
             <div class="col">

@@ -656,6 +656,7 @@ class Crud_model extends CI_Model
         $data['level'] = $this->input->post('level');
         $data['is_free_course'] = $this->input->post('is_free_course');
         $data['video_url'] = html_escape($this->input->post('course_overview_url'));
+        $data['course_launch_date'] = html_escape(date("Y-m-d", strtotime($this->input->post('course_launch_date'))));
 
         if ($this->input->post('course_overview_url') != "") {
             $data['course_overview_provider'] = html_escape($this->input->post('course_overview_provider'));
@@ -799,6 +800,7 @@ class Crud_model extends CI_Model
         $data['discounted_price'] = $this->input->post('discounted_price');
         $data['level'] = $this->input->post('level');
         $data['video_url'] = $this->input->post('course_overview_url');
+        $data['course_launch_date'] = html_escape(date("Y-m-d", strtotime($this->input->post('course_launch_date'))));
 
         if ($this->input->post('course_overview_url') != "") {
             $data['course_overview_provider'] = html_escape($this->input->post('course_overview_provider'));

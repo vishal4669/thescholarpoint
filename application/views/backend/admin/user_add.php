@@ -100,6 +100,12 @@
                                             </div>
                                         </div>
                                         <div class="form-group row mb-3">
+                                            <label class="col-md-3 col-form-label" for="mobile"><?php echo get_phrase('mobile'); ?><span class="required">*</span></label>
+                                            <div class="col-md-9">
+                                                <input type="text" id="mobile" name="mobile" class="form-control" required>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row mb-3">
                                             <label class="col-md-3 col-form-label" for="password"><?php echo get_phrase('password'); ?><span class="required">*</span></label>
                                             <div class="col-md-9">
                                                 <input type="password" id="password" name="password" class="form-control" required>

@@ -287,6 +287,14 @@ $course_details = $this->crud_model->get_course_by_id($course_id)->row_array();
                                                         </select>
                                                     </div>
                                                 </div>
+
+                                                <div class="form-group row mb-3">
+                                                    <label class="col-md-2 col-form-label" for="course_launch_date"><?php echo get_phrase('course_launch_date'); ?></label>                                                
+                                                    <div class="col-md-10">
+                                                        <input type="text" class="form-control" id="course_launch_date" name = "course_launch_date" placeholder="<?php echo get_phrase('select_date'); ?>" value="<?php echo date("d/m/Y", strtotime($course_details['course_launch_date'])); ?>" required>                                                    
+                                                    </div>
+                                                </div>
+
                                                 <div class="form-group row mb-3">
                                                     <div class="offset-md-2 col-md-10">
                                                         <div class="custom-control custom-checkbox">
@@ -654,4 +662,12 @@ $course_details = $this->crud_model->get_course_by_id($course_id)->row_array();
         var id = this.id;
         $('#widgets-of-' + id).hide();
     });
+
+    $(document).ready(function(){
+        $("#course_launch_date").datepicker({
+            minDate: 0
+        });
+    });
+
+
 </script>
