@@ -1,8 +1,8 @@
 <section class="category-header-area" style="
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position-x: right;
-    background-color: #5b5b5b;">
+    
+    background-image: url('<?= base_url("uploads/page_banners/about_us_1.jpg"); ?>');
+    ">
+
     <div class="image-placeholder-1"></div>
     <div class="container-lg breadcrumb-container">
         <nav aria-label="breadcrumb">
