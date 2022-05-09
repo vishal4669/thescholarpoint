@@ -1113,5 +1113,12 @@
     "buy_now1": "Buy now1",
     "fri": "Fri",
     "apr": "Apr",
-    "short_title": "Short title"
+    "short_title": "Short title",
+    "live_class_settings": "Live class settings",
+    "zoom_account_settings": "Zoom account settings",
+    "zoom_api_key": "Zoom api key",
+    "zoom_secret_key": "Zoom secret key",
+    "add_update": "Add update",
+    "ge_to_addon_list": "Ge to addon list",
+    "update_addon": "Update addon"
 }
