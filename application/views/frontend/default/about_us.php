@@ -1,6 +1,6 @@
 <section class="category-header-area" style="
     
-    background-image: url('<?= base_url("uploads/page_banners/about_us_1.jpg"); ?>');
+    background-image: url('<?= base_url("uploads/page_banners/about_us.jpg"); ?>');
     ">
 
     <div class="image-placeholder-1"></div>
@@ -9,11 +9,11 @@
           <ol class="breadcrumb">
             <li class="breadcrumb-item display-6 fw-bold">
                 <a href="<?php echo site_url('home'); ?>">
-                    <?php echo site_phrase('home'); ?>
+                    <?php//echo site_phrase('home'); ?>
                 </a>
             </li>
             <li class="breadcrumb-item active text-light display-6 fw-bold">
-                <?php echo site_phrase('about_us'); ?>
+                &nbsp;
             </li>
           </ol>
         </nav>
@@ -29,3 +29,12 @@
         </div>
     </div>
 </section>
+
+
+<style type="text/css">
+.breadcrumb-item+.breadcrumb-item::before {
+    content:none;
+} 
+</style>
+
+

@@ -1120,5 +1120,9 @@
     "zoom_secret_key": "Zoom secret key",
     "add_update": "Add update",
     "ge_to_addon_list": "Ge to addon list",
-    "update_addon": "Update addon"
+    "update_addon": "Update addon",
+    "enter_the_otp_code_to_get_on_your_mobile": "Enter the otp code to get on your mobile",
+    "wait_for_20_25_sec_and_otp_successfully_sent_on_your_mobile": "Wait for 20 25 sec and otp successfully sent on your mobile",
+    "wait_for_20_25_sec_and_please_check_your_mobile_message_to_get_otp_and_verify_your_account": "Wait for 20 25 sec and please check your mobile message to get otp and verify your account",
+    "wait_for_20_to_25_sec_and_otp_successfully_sent_on_your_mobile": "Wait for 20 to 25 sec and otp successfully sent on your mobile"
 }

@@ -1,19 +1,16 @@
 <section class="category-header-area" style="
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position-x: right;
-    background-color: #5b5b5b;">
+    
+    background-image: url('<?= base_url("uploads/page_banners/privacy_policy.jpg"); ?>');
+    ">
     <div class="image-placeholder-1"></div>
     <div class="container-lg breadcrumb-container">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb">
             <li class="breadcrumb-item display-6 fw-bold">
-                <a href="<?php echo site_url('home'); ?>">
-                    <?php echo site_phrase('home'); ?>
-                </a>
+               &nbsp;
             </li>
             <li class="breadcrumb-item active text-light display-6 fw-bold">
-                <?php echo site_phrase('privacy_policy'); ?>
+                &nbsp;
             </li>
           </ol>
         </nav>
@@ -29,3 +26,12 @@
         </div>
     </div>
 </section>
+
+<style type="text/css">
+.breadcrumb .breadcrumb-item.active, .breadcrumb-item+.breadcrumb-item.active::before {
+    color: #D1D2D3 !important;
+} 
+.breadcrumb-item+.breadcrumb-item::before {
+    content:none;
+} 
+</style>

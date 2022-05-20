@@ -35,7 +35,7 @@ class Login extends CI_Controller
     public function SendOTPMobile($verification_code, $mobile_number)
     {
         $otp_text_msg = ('TheScholarPoint Verification OTP: '.$verification_code. ' validate your signup - https://thescholarpoint.com');
-        $url = 'http://mobi1.blogdns.com/httpapi/httpapisms.aspx';
+        $url = 'https://onlysms.co.in/api/sms.aspx';
         
         $ch = curl_init();
         $headers = array(
@@ -222,7 +222,6 @@ class Login extends CI_Controller
 
 
         if( ($validity === 'unverified_user' || $validity == true) && ( $validity_mobile === 'unverified_user' || $validity_mobile == true ) ) {
-            
             if($validity === true || $validity_mobile === true){
                 $this->user_model->register_user($data);
             } else {
@@ -243,7 +242,7 @@ class Login extends CI_Controller
                 if ($validity === 'unverified_user') {
                     $this->session->set_flashdata('info_message', get_phrase('you_have_already_registered') . '. ' . get_phrase('please_verify_your_email_address'));
                 } else {
-                    $this->session->set_flashdata('flash_message', get_phrase('your_registration_has_been_successfully_done') . '. ' . get_phrase('please_check_your_mobile_message_to_get_otp_and_verify_your_account') . '.');
+                    $this->session->set_flashdata('flash_message', get_phrase('your_registration_has_been_successfully_done') . '. ' . get_phrase('wait_for_20_25_sec_and_please_check_your_mobile_message_to_get_otp_and_verify_your_account') . '.');
                 }
                 $this->session->set_userdata('register_email', $this->input->post('email'));
                 redirect(site_url('home/verification_code'), 'refresh');
