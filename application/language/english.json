@@ -1124,5 +1124,10 @@
     "enter_the_otp_code_to_get_on_your_mobile": "Enter the otp code to get on your mobile",
     "wait_for_20_25_sec_and_otp_successfully_sent_on_your_mobile": "Wait for 20 25 sec and otp successfully sent on your mobile",
     "wait_for_20_25_sec_and_please_check_your_mobile_message_to_get_otp_and_verify_your_account": "Wait for 20 25 sec and please check your mobile message to get otp and verify your account",
-    "wait_for_20_to_25_sec_and_otp_successfully_sent_on_your_mobile": "Wait for 20 to 25 sec and otp successfully sent on your mobile"
+    "wait_for_20_to_25_sec_and_otp_successfully_sent_on_your_mobile": "Wait for 20 to 25 sec and otp successfully sent on your mobile",
+    "send_otp": "Send otp",
+    "enter_the_otp_verification_code": "Enter the otp verification code",
+    "your_registration_has_been_successfully_done_verify_your_account_via_otp": "Your registration has been successfully done verify your account via otp",
+    "your_account_has_been_successfully_verified": "Your account has been successfully verified",
+    "please_verify_your_account": "Please verify your account"
 }

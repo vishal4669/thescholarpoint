@@ -113,15 +113,15 @@
 					debug: false,
 
 					showMethod: 'fadeIn', //fadeIn, slideDown, and show are built into jQuery
-					showDuration: 300,
+					showDuration: 2000,
 					showEasing: 'swing', //swing and linear are built into jQuery
 					onShown: undefined,
 					hideMethod: 'fadeOut',
-					hideDuration: 1000,
+					hideDuration: 5000,
 					hideEasing: 'swing',
 					onHidden: undefined,
 
-					extendedTimeOut: 1000,
+					extendedTimeOut: 5000,
 					iconClasses: {
 						error: 'toast-error',
 						info: 'toast-info',

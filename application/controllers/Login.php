@@ -113,12 +113,17 @@ class Login extends CI_Controller
         
         $mobile = $this->input->post('mobile');
         $password = $this->input->post('password');
-        $credential = array('mobile' => $mobile, 'password' => sha1($password), 'status' => 1);
 
+        //$credential = array('mobile' => $mobile, 'password' => sha1($password), 'status' => 1);
         // Checking login credential for admin
+        $this->db->where('mobile', $mobile);
+        $this->db->where('password', sha1($password));
+        $this->db->where('status', 1);
+        $this->db->where('mobile !=', 0);
+        $this->db->or_where('email', $mobile);
         $query = $this->db->get_where('users', $credential);
 
-        if ($query->num_rows() > 0) {      
+        if ($query->num_rows() > 0) { 
             $row = $query->row();
 
             //update user session token..
@@ -177,12 +182,11 @@ class Login extends CI_Controller
             redirect(site_url('home/login'), 'refresh');
         }
 
-
         $data['first_name'] = html_escape($this->input->post('first_name'));
         $data['last_name']  = html_escape($this->input->post('last_name'));
         $data['email']  = html_escape($this->input->post('email'));
         $data['password']  = sha1($this->input->post('password'));
-        $data['mobile']  = html_escape($this->input->post('mobile'));        
+        $data['mobile']  = html_escape($this->input->post('mobile'));
         $data['referral_from']  = html_escape($this->input->post('referral_from'));
         
         if (empty($data['first_name']) || empty($data['last_name']) || empty($data['email']) || empty($data['password']) || empty($data['mobile']) ) {
@@ -231,20 +235,21 @@ class Login extends CI_Controller
             if (get_settings('student_email_verification') == 'enable') {
 
                 /***********OTP Send on Mobile number************/
-                $response_mobile_otp = $this->SendOTPMobile($verification_code, $data['mobile']);
-                if($response_mobile_otp == 0){
-                     $this->session->set_flashdata('error_message', get_phrase('mobile_otp_sending_failed'));
-                }
+                // $response_mobile_otp = $this->SendOTPMobile($verification_code, $data['mobile']);
+                // if($response_mobile_otp == 0){
+                //      $this->session->set_flashdata('error_message', get_phrase('mobile_otp_sending_failed'));
+                // }
                 /***********OTP Send on Mobile number************/
-
                 //$this->email_model->send_email_verification_mail($data['email'], $verification_code);
 
                 if ($validity === 'unverified_user') {
-                    $this->session->set_flashdata('info_message', get_phrase('you_have_already_registered') . '. ' . get_phrase('please_verify_your_email_address'));
+                    $this->session->set_flashdata('info_message', get_phrase('you_have_already_registered') . '. ' . get_phrase('please_verify_your_account'));
                 } else {
-                    $this->session->set_flashdata('flash_message', get_phrase('your_registration_has_been_successfully_done') . '. ' . get_phrase('wait_for_20_25_sec_and_please_check_your_mobile_message_to_get_otp_and_verify_your_account') . '.');
+                    $this->session->set_flashdata('flash_message', get_phrase('your_registration_has_been_successfully_done_verify_your_account_via_otp') .'.');
                 }
                 $this->session->set_userdata('register_email', $this->input->post('email'));
+                $this->session->set_userdata('mobile', $this->input->post('mobile'));
+
                 redirect(site_url('home/verification_code'), 'refresh');
             } else {
                 $this->session->set_flashdata('flash_message', get_phrase('your_registration_has_been_successfully_done'));
@@ -367,7 +372,8 @@ class Login extends CI_Controller
     {
         $email = $this->input->post('email');
         $verification_code = $this->input->post('verification_code');
-        $user_details = $this->db->get_where('users', array('email' => $email, 'verification_code' => $verification_code));
+
+        $user_details = $this->db->get_where('users', array('email' => $email, 'status' => 0));
         if ($user_details->num_rows() > 0) {
             $user_details = $user_details->row_array();
             $updater = array(
@@ -375,7 +381,8 @@ class Login extends CI_Controller
             );
             $this->db->where('id', $user_details['id']);
             $this->db->update('users', $updater);
-            $this->session->set_flashdata('flash_message', get_phrase('congratulations') . '!' . get_phrase('your_email_address_has_been_successfully_verified') . '.');
+
+            $this->session->set_flashdata('flash_message', get_phrase('congratulations') . '!' . get_phrase('your_account_has_been_successfully_verified') . '.');
             $this->session->set_userdata('register_email', null);
             echo true;
         } else {

@@ -10,42 +10,24 @@
             </div>
           </div>
           <form action="javascript:;" method="post" id="email_verification">
-            <div class="form-group">
+            <div class="form-group">                
 
-
-              <div id="recaptcha-container"></div>
-                                        <div class="form-group mt-4">
-                                            <input type="text" name="" id="codeToVerify" name="getcode"
-                                                class="form-control" placejolder="Enter Code" placeholder="OTP">
-                                                
-                                            <Input type="hidden" class="form-control" name="phone_no" id="number"
-                                                placeholder="Ph Number(code) *************"
-                                                value="{{ $user_phone }}"></Input>
-                                            <a href="#" id="getcode" class="link-success">Resend</a>
-                                            <br>
-                                            <br>
-                                                <button type="submit"
-                                                class="btn btn-fill-out btn-block hover-up font-weight-bold" id="verifPhNum">Verify OTP</button>
-                                        </div>
-
-
+                <input type="hidden" id="mobile" name="mobile" value="+91<?php echo $mobile = $this->session->userdata('mobile'); ?>">               
+                <div id="recaptcha-container"></div>
               <label for="verification_code"><?php echo site_phrase('verification_code'); ?></label>
               <div class="input-group">
                 <span class="input-group-text bg-white" for="verification_code"><i class="fas fa-user"></i></span>
-
-                <div id="recaptcha-container"></div>
-
-
-                <input type="text" class="form-control" placeholder="<?php echo site_phrase('enter_the_verification_code'); ?>" aria-label="<?php echo site_phrase('verification_code'); ?>" aria-describedby="<?php echo site_phrase('verification_code'); ?>" id="verification_code" required>
+                <input type="text" class="form-control" placeholder="<?php echo site_phrase('enter_the_otp_verification_code'); ?>" aria-label="<?php echo site_phrase('verification_code'); ?>" aria-describedby="<?php echo site_phrase('verification_code'); ?>" id="verification_code" required>
               </div>
-              <a href="javascript:;" class="text-14px fw-500 text-muted" id="resend_mail_button" onclick="resend_verification_code()">
-                <div class="float-start"><?= site_phrase('resend_otp') ?></div>
+
+              <a href="javascript:;" class="text-14px fw-500 text-muted" id="resend_mail_button" onclick="phoneAuth()">
+                <div class="float-start"><?php echo 'Send OTP'; ?></div>
                 <div id="resend_mail_loader" class="float-start ps-1"></div>
               </a>
-            </div>
 
+            </div>
             <div class="form-group">
-              <button type="button" onclick="continue_verify()" class="btn red radius-10 mt-4 w-100"><?php echo site_phrase('continue'); ?></button>
+              <button type="button" onclick="codeverify()" class="btn red radius-10 mt-4 w-100"><?php echo site_phrase('continue'); ?></button>
             </div>
 
             <div class="form-group mt-4 mb-0 text-center">
@@ -59,119 +41,84 @@
   </div>
 </section>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.0.1/firebase.js"></script>
-
-<script type="text/javascript">
-
- // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-
-  function continue_verify() {
-    var email = '<?= $this->session->userdata('register_email'); ?>';
-    var verification_code = $('#verification_code').val();
-    $.ajax({
-      type: 'post',
-      url: '<?php echo site_url('login/verify_email_address/'); ?>',
-      data: {verification_code : verification_code, email : email},
-      success: function(response){
-        if(response){
-          window.location.replace('<?= site_url('home/login'); ?>');
-        }else{
-          location.reload();
-        }
-      }
-    });
-  }
-  
-  function resend_verification_code() {
-    $("#resend_mail_loader").html('<img src="<?= base_url('assets/global/gif/page-loader-3.gif'); ?>" style="width: 25px;">');
-    var email = '<?= $this->session->userdata('register_email'); ?>';
-    $.ajax({
-      type: 'post',
-      url: '<?php echo site_url('login/resend_verification_code/'); ?>',
-      data: {email : email},
-      success: function(response){
-        toastr.success('<?php echo site_phrase('wait_for_20_to_25_sec_and_otp_successfully_sent_on_your_mobile');?>');
-        $("#resend_mail_loader").html('');
-      }
-    });
-  }
-
-
-
-  $(document).ready(function() {
-    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-    const firebaseConfig = {
-        apiKey: "AIzaSyDDe4WkSypbCwbIyiNrMfGBBBr8eS5z78M",
-        authDomain: "thescholarpoint-92c1e.firebaseapp.com",
-        projectId: "thescholarpoint-92c1e",
-        storageBucket: "thescholarpoint-92c1e.appspot.com",
-        messagingSenderId: "529681315992",
-        appId: "1:529681315992:web:d5e50d8650c5d5e68838ed",
-        measurementId: "G-SXPCG676DZ"
+<script src="https://www.gstatic.com/firebasejs/8.3.1/firebase.js"></script>
+<script>
+    // Your web app's Firebase configuration
+    var firebaseConfig = {
+    apiKey: "AIzaSyDDe4WkSypbCwbIyiNrMfGBBBr8eS5z78M",
+    authDomain: "thescholarpoint-92c1e.firebaseapp.com",
+    projectId: "thescholarpoint-92c1e",
+    storageBucket: "thescholarpoint-92c1e.appspot.com",
+    messagingSenderId: "529681315992",
+    appId: "1:529681315992:web:d5e50d8650c5d5e68838ed",
+    measurementId: "G-SXPCG676DZ"
     };
 
     // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
+    firebase.initializeApp(firebaseConfig);
+    //firebase.analytics();
+</script>
 
-    console.log('Initialised'+app);
-    
+<script type="text/javascript">
 
-    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+/*******FireBase Js*********************************************/
+window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
         'size': 'invisible',
-        'callback': function(response) {
-            // reCAPTCHA solved, allow signInWithPhoneNumber.
+        'callback': function(response) {           
             console.log('recaptcha resolved');
+            
         }
     });
 
-    //send otp
-    // code here
-    var phoneNo = '9377073717';
-    console.log(phoneNo);
-    // getCode(phoneNo);
-    var appVerifier = window.recaptchaVerifier;
+$(document).ready(function() {
+    phoneAuth();
+});
 
-    firebase.auth().signInWithPhoneNumber(phoneNo, appVerifier)
-        .then(function(confirmationResult) {
+function phoneAuth() {
+    //get the number
+    var number = document.getElementById('mobile').value;
+    //it takes two parameter first one is number and second one is recaptcha
+    firebase.auth().signInWithPhoneNumber(number, window.recaptchaVerifier).then(function(confirmationResult) {
+        //s is in lowercase
+        window.confirmationResult = confirmationResult;
+        coderesult = confirmationResult;
+        console.log(coderesult);
+        toastr.success('<?php echo site_phrase('Otp_successfully_sent_on_your_mobile');?>');
 
-            window.confirmationResult = confirmationResult;
-            coderesult = confirmationResult;
-            console.log(coderesult);
-        }).catch(function(error) {
-            console.log(error.message);
+    }).catch(function(error) {
+        //alert(error.message);
+        toastr.error(error.message);
 
+    });
+}
+
+function codeverify() {
+    var code = document.getElementById('verification_code').value;
+    var email = '<?= $this->session->userdata('register_email'); ?>';
+
+    coderesult.confirm(code).then(function(result) {
+        console.log("Successfully registered");
+        var user = result.user;
+        console.log(user);
+
+         $.ajax({
+          type: 'post',
+          url: '<?php echo site_url('login/verify_email_address/'); ?>',
+          data: {verification_code : code, email : email},
+          success: function(response){
+            if(response){
+              window.location.replace('<?= site_url('home/login'); ?>');
+            }else{
+              location.reload();
+            }
+          }
         });
 
-    //send otp
-    $('#getcode').on('click', function () {
-
-        var phoneNo = '9377073717';
-
-        //console.log(phoneNo);
-        // getCode(phoneNo);
-        var appVerifier = window.recaptchaVerifier;
-
-      console.log("App Verified::"+appVerifier);
-
-        firebase.auth().signInWithPhoneNumber(phoneNo, appVerifier)
-        .then(function (confirmationResult) {
-
-          console.log(confirmationResult);
-
-            window.confirmationResult=confirmationResult;
-
-            coderesult=confirmationResult;
-
-            console.log(coderesult);
-
-        }).catch(function (error) {
-            console.log(error.message);
-
-        });
+    }).catch(function(error) {
+        alert(error.message);
     });
 
-});
+}
+
 
 </script>

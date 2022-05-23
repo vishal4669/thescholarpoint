@@ -28,8 +28,8 @@
               </div> -->
 
               <div class="form-group">
-                  <label for="login-mobile"><span class="input-field-icon"><i class="fas fa-mobile-alt"></i></span> <?php echo site_phrase('mobile'); ?>:</label>
-                  <input type="text" class="form-control" name = "mobile" id="login-mobile" placeholder="<?php echo site_phrase('mobile'); ?>" value="" required>
+                  <label for="login-mobile"><span class="input-field-icon"><i class="fas fa-mobile-alt"></i></span> <?php echo site_phrase('mobile').' / '.site_phrase('email'); ?>:</label>
+                  <input type="text" class="form-control" name = "mobile" id="login-mobile" placeholder="<?php echo site_phrase('mobile').' OR '.site_phrase('email'); ?>" value="" required>
               </div>
 
               <div class="form-group">
