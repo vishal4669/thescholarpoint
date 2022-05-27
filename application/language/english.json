@@ -394,7 +394,7 @@
     "sign_up": "Sign up",
     "accept": "Accept",
     "learn_on_your_schedule": "Learn on your schedule",
-    "study_any_topic,_anytime._explore_thousands_of_courses_for_the_lowest_price_ever!": "Study any topic, anytime. explore thousands of courses for the lowest price ever!",
+    "study_any_topic,_anytime._explore_thousands_of_courses_for_the_lowest_price_ever!": "One-Stop Platform for the people who want to have an in-depth knowledge of a certain topic in no time and without paying much, as well as for the people who have in-depth knowledge of a certain topic and want to share it with the world along with being paid for the same.",
     "what_do_you_want_to_learn": "What do you want to learn",
     "online_courses": "Online courses",
     "explore_a_variety_of_fresh_topics": "Explore a variety of fresh topics",
@@ -1129,5 +1129,8 @@
     "enter_the_otp_verification_code": "Enter the otp verification code",
     "your_registration_has_been_successfully_done_verify_your_account_via_otp": "Your registration has been successfully done verify your account via otp",
     "your_account_has_been_successfully_verified": "Your account has been successfully verified",
-    "please_verify_your_account": "Please verify your account"
+    "please_verify_your_account": "Please verify your account",
+    "join_now_student_content": "Want to know more about a topic in detail, or get introduced to a new subject or learn hands-on skills through a virtual workshop or seminar? This is the right place for you.",
+    "become_instructor_content": "Want to share the immense knowledge you have on a particular topic or subject and also get paid for the same through the virtual workshop or seminar? This is the right place for you. Join now as an instructor.",
+    "your_registration_has_been_successfully_done_please_verify_your_account_via_otp": "Your registration has been successfully done please verify your account via otp"
 }

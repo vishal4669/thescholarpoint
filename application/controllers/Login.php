@@ -235,17 +235,12 @@ class Login extends CI_Controller
             if (get_settings('student_email_verification') == 'enable') {
 
                 /***********OTP Send on Mobile number************/
-                // $response_mobile_otp = $this->SendOTPMobile($verification_code, $data['mobile']);
-                // if($response_mobile_otp == 0){
-                //      $this->session->set_flashdata('error_message', get_phrase('mobile_otp_sending_failed'));
-                // }
-                /***********OTP Send on Mobile number************/
                 //$this->email_model->send_email_verification_mail($data['email'], $verification_code);
 
                 if ($validity === 'unverified_user') {
                     $this->session->set_flashdata('info_message', get_phrase('you_have_already_registered') . '. ' . get_phrase('please_verify_your_account'));
                 } else {
-                    $this->session->set_flashdata('flash_message', get_phrase('your_registration_has_been_successfully_done_verify_your_account_via_otp') .'.');
+                    $this->session->set_flashdata('flash_message', get_phrase('your_registration_has_been_successfully_done_please_verify_your_account_via_otp') .'.');
                 }
                 $this->session->set_userdata('register_email', $this->input->post('email'));
                 $this->session->set_userdata('mobile', $this->input->post('mobile'));
@@ -383,8 +378,26 @@ class Login extends CI_Controller
             $this->db->update('users', $updater);
 
             $this->session->set_flashdata('flash_message', get_phrase('congratulations') . '!' . get_phrase('your_account_has_been_successfully_verified') . '.');
-            $this->session->set_userdata('register_email', null);
-            echo true;
+            //$this->session->set_userdata('register_email', null);
+        
+            // Checking login credential for admin
+            $this->db->where('email', $email);
+            $this->db->where('status', 1);
+            $this->db->where('mobile !=', 0);
+            $query = $this->db->get_where('users');
+            $row = $query->row();
+
+            $this->session->set_userdata('user_id', $row->id);
+            $this->session->set_userdata('role_id', $row->role_id);
+            $this->session->set_userdata('referral_code', $row->referral_code);
+            $this->session->set_userdata('role', get_user_role('user_role', $row->id));
+            $this->session->set_userdata('name', $row->first_name.' '.$row->last_name);
+            $this->session->set_userdata('is_instructor', $row->is_instructor);
+            $this->session->set_userdata('user_login', '1');
+
+            //redirect(site_url('home'), 'refresh');
+
+            echo site_url('home');
         } else {
             $this->session->set_flashdata('error_message', get_phrase('the_verification_code_is_wrong') . '.');
             echo false;

@@ -107,7 +107,8 @@ function codeverify() {
           data: {verification_code : code, email : email},
           success: function(response){
             if(response){
-              window.location.replace('<?= site_url('home/login'); ?>');
+              console.log(response);
+              window.location.replace(response);
             }else{
               location.reload();
             }
