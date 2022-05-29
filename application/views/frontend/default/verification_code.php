@@ -10,20 +10,24 @@
             </div>
           </div>
           <form action="javascript:;" method="post" id="email_verification">
-            <div class="form-group">
+            <div class="form-group">                
+
+                <input type="hidden" id="mobile" name="mobile" value="+91<?php echo $mobile = $this->session->userdata('mobile'); ?>">               
+                <div id="recaptcha-container"></div>
               <label for="verification_code"><?php echo site_phrase('verification_code'); ?></label>
               <div class="input-group">
                 <span class="input-group-text bg-white" for="verification_code"><i class="fas fa-user"></i></span>
-                <input type="text" class="form-control" placeholder="<?php echo site_phrase('enter_the_verification_code'); ?>" aria-label="<?php echo site_phrase('verification_code'); ?>" aria-describedby="<?php echo site_phrase('verification_code'); ?>" id="verification_code" required>
+                <input type="text" class="form-control" placeholder="<?php echo site_phrase('enter_the_otp_verification_code'); ?>" aria-label="<?php echo site_phrase('verification_code'); ?>" aria-describedby="<?php echo site_phrase('verification_code'); ?>" id="verification_code" required>
               </div>
-              <a href="javascript:;" class="text-14px fw-500 text-muted" id="resend_mail_button" onclick="resend_verification_code()">
-                <div class="float-start"><?= site_phrase('resend_otp') ?></div>
+
+              <a href="javascript:;" class="text-14px fw-500 text-muted" id="resend_mail_button" onclick="phoneAuth()">
+                <div class="float-start"><?php echo 'Send OTP'; ?></div>
                 <div id="resend_mail_loader" class="float-start ps-1"></div>
               </a>
-            </div>
 
+            </div>
             <div class="form-group">
-              <button type="button" onclick="continue_verify()" class="btn red radius-10 mt-4 w-100"><?php echo site_phrase('continue'); ?></button>
+              <button type="button" onclick="codeverify()" class="btn red radius-10 mt-4 w-100"><?php echo site_phrase('continue'); ?></button>
             </div>
 
             <div class="form-group mt-4 mb-0 text-center">
@@ -37,36 +41,85 @@
   </div>
 </section>
 
+<script src="https://www.gstatic.com/firebasejs/8.3.1/firebase.js"></script>
+<script>
+    // Your web app's Firebase configuration
+    var firebaseConfig = {
+    apiKey: "AIzaSyDDe4WkSypbCwbIyiNrMfGBBBr8eS5z78M",
+    authDomain: "thescholarpoint-92c1e.firebaseapp.com",
+    projectId: "thescholarpoint-92c1e",
+    storageBucket: "thescholarpoint-92c1e.appspot.com",
+    messagingSenderId: "529681315992",
+    appId: "1:529681315992:web:d5e50d8650c5d5e68838ed",
+    measurementId: "G-SXPCG676DZ"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    //firebase.analytics();
+</script>
 
 <script type="text/javascript">
-  function continue_verify() {
-    var email = '<?= $this->session->userdata('register_email'); ?>';
-    var verification_code = $('#verification_code').val();
-    $.ajax({
-      type: 'post',
-      url: '<?php echo site_url('login/verify_email_address/'); ?>',
-      data: {verification_code : verification_code, email : email},
-      success: function(response){
-        if(response){
-          window.location.replace('<?= site_url('home/login'); ?>');
-        }else{
-          location.reload();
+
+/*******FireBase Js*********************************************/
+window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+        'size': 'invisible',
+        'callback': function(response) {           
+            console.log('recaptcha resolved');
+            
         }
-      }
     });
-  }
-  
-  function resend_verification_code() {
-    $("#resend_mail_loader").html('<img src="<?= base_url('assets/global/gif/page-loader-3.gif'); ?>" style="width: 25px;">');
+
+$(document).ready(function() {
+    phoneAuth();
+});
+
+function phoneAuth() {
+    //get the number
+    var number = document.getElementById('mobile').value;
+    //it takes two parameter first one is number and second one is recaptcha
+    firebase.auth().signInWithPhoneNumber(number, window.recaptchaVerifier).then(function(confirmationResult) {
+        //s is in lowercase
+        window.confirmationResult = confirmationResult;
+        coderesult = confirmationResult;
+        console.log(coderesult);
+        toastr.success('<?php echo site_phrase('Otp_successfully_sent_on_your_mobile');?>');
+
+    }).catch(function(error) {
+        //alert(error.message);
+        toastr.error(error.message);
+
+    });
+}
+
+function codeverify() {
+    var code = document.getElementById('verification_code').value;
     var email = '<?= $this->session->userdata('register_email'); ?>';
-    $.ajax({
-      type: 'post',
-      url: '<?php echo site_url('login/resend_verification_code/'); ?>',
-      data: {email : email},
-      success: function(response){
-        toastr.success('<?php echo site_phrase('otp_successfully_sent_on_your_mobile');?>');
-        $("#resend_mail_loader").html('');
-      }
+
+    coderesult.confirm(code).then(function(result) {
+        console.log("Successfully registered");
+        var user = result.user;
+        console.log(user);
+
+         $.ajax({
+          type: 'post',
+          url: '<?php echo site_url('login/verify_email_address/'); ?>',
+          data: {verification_code : code, email : email},
+          success: function(response){
+            if(response){
+              console.log(response);
+              window.location.replace(response);
+            }else{
+              location.reload();
+            }
+          }
+        });
+
+    }).catch(function(error) {
+        alert(error.message);
     });
-  }
+
+}
+
+
 </script>

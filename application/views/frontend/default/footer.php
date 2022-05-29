@@ -64,13 +64,13 @@
   <section class="border-top">
     <div class="container-xl">
       <div class="row mt-3 py-1">
-        <div class="col-6 col-sm-6 col-md-3 text-muted text-13px">
-          &copy; 2021 <?php echo get_settings('system_name'); ?>, <?php echo site_phrase('all_rights_reserved'); ?>
+        <div class="col-6 col-sm-6 col-md-8 text-muted text-13px">
+          &copy; 2022 <?php echo get_settings('system_name'); ?>, <?php echo site_phrase('all_rights_reserved'); ?>
         </div>
 
         <div class="col-6 col-sm-6 col-md-3 d-none d-md-block"></div>
         <div class="col-6 col-sm-6 col-md-3 d-none d-md-block"></div>
-        <div class="col-6 col-sm-6 col-md-3 text-center text-md-start">
+        <div class="col-6 col-sm-6 col-md-3 text-center text-md-start" style="display: none;">
           <select class="language_selector" onchange="switch_language(this.value)">
             <?php
              $languages = $this->crud_model->get_all_languages();

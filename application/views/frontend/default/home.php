@@ -555,6 +555,7 @@
       <div class="col-md-6 <?php if (get_settings('allow_instructor') != 1) echo 'w-100'; ?> mt-3 mt-md-0">
         <div class="become-user-label text-center mt-3">
           <h3 class="pb-4"><?php echo site_phrase('join_now_to_start_learning'); ?></h3>
+          <div class="pb-4"><?php echo site_phrase('join_now_student_content'); ?></div>
           <a href="<?php echo site_url('home/sign_up'); ?>"><?php echo site_phrase('get_started'); ?></a>
         </div>
       </div>
@@ -562,6 +563,7 @@
           <div class="col-md-6">
             <div class="become-user-label text-center mt-3">
                 <h3 class="pb-4"><?php echo site_phrase('become_instructor'); ?></h3>
+                <div class="pb-4"><?php echo site_phrase('become_instructor_content'); ?></div>
                 <?php if($this->session->userdata('user_id')): ?>
                     <a href="<?php echo site_url('user/become_an_instructor'); ?>"><?php echo site_phrase('join_now'); ?></a>
                 <?php else: ?>

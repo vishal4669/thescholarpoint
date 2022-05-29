@@ -2,8 +2,6 @@
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <?php endif; ?>
 
-
-
 <section class="category-course-list-area">
     <div class="container">
         <div class="row mb-5 mt-3">

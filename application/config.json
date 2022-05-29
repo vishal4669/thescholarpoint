@@ -1,0 +1,38 @@
+{
+    "name" : "Live Class",
+    "unique_identifier" : "live-class",
+    "version" : "1.3",
+    "about" : "Live Class addon adds an essential feature to Academy. Nowadays Live class has become so popular that it becomes necessary. On that note we decided to add Zoom in our application.",
+    "directories" :
+    [
+
+    ],
+    "sql_file"  : "updater.php",
+    "files"     :
+    [
+        {
+            "root_directory"    : "uploads/addons/live-class/controllers/Liveclass.php",
+            "update_directory"  : "application/controllers/addons/Liveclass.php"
+        },
+        {
+            "root_directory"    : "uploads/addons/live-class/models/Liveclass_model.php",
+            "update_directory"  : "application/models/addons/Liveclass_model.php"
+        },
+        {
+            "root_directory"    : "uploads/addons/live-class/views/live_class_settings.php",
+            "update_directory"  : "application/views/backend/admin/live_class_settings.php"
+        },
+        {
+            "root_directory"    : "uploads/addons/live-class/views/live_class.php",
+            "update_directory"  : "application/views/lessons/live_class.php"
+        },
+        {
+            "root_directory"    : "uploads/addons/live-class/views/backend/live_class.php",
+            "update_directory"  : "application/views/backend/admin/live_class.php"
+        },
+        {
+            "root_directory"    : "uploads/addons/live-class/views/backend/live_class.php",
+            "update_directory"  : "application/views/backend/user/live_class.php"
+        }
+    ]
+}
