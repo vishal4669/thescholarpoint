@@ -9,31 +9,22 @@ var videoProvider = '<?php echo isset($provider) ? $provider : null; ?>';
 function markThisLessonAsCompleted(lesson_id) {
   $('#lesson_list_area').hide();
   $('#lesson_list_loader').show();
-  var progress;
-  if ($('input#'+lesson_id).is(':checked')) {
-    progress = 1;
-  }else{
-    progress = 0;
-  }
+  var course_id = "<?php echo $course_details['id']; ?>";
+
   $.ajax({
     type : 'POST',
-    url : '<?php echo site_url('user/save_course_progress'); ?>',
-    data : {lesson_id : lesson_id, progress : progress},
+    url : '<?php echo site_url('home/update_watch_history_manually'); ?>',
+    data : {lesson_id : lesson_id, course_id:course_id},
     success : function(response){
-      currentProgress = response;
       $('#lesson_list_area').show();
       $('#lesson_list_loader').hide();
+      var responseVal = JSON.parse(response);
+      // console.log(responseVal);
+      // console.log(responseVal.course_progress);
     }
   });
 }
 
-
-var timer = setInterval(function(){
-  console.log('Current Progress is '+currentProgress);
-  if (lessonType == 'video' && videoProvider == 'html5' && currentProgress != 1) {
-    getCurrentTime();
-  }
-}, 1000);
 
 $(document).ready(function() {
   if (lessonType == 'video' && videoProvider == 'html5') {
@@ -46,6 +37,7 @@ $(document).ready(function() {
     }
   }
 });
+
 var counter = 0;
 player.on('canplay', event => {
   if (counter == 0) {
@@ -58,33 +50,42 @@ player.on('canplay', event => {
   counter++;
 });
 
-function getCurrentTime() {
-  var lesson_id = '<?php echo $lesson_id; ?>';
-  newProgress = document.querySelector('#player').currentTime;
-  var totalDuration = document.querySelector('#player').duration;
 
-  console.log('Current Progress is '+currentProgress);
-  console.log('New Progress is '+newProgress);
+//const player = new Plyr('#player');
+if(<?php echo $course_details['enable_drip_content']; ?> && typeof player === 'object' && player !== null){
+    let lesson_id = '<?php echo $lesson_id; ?>';
+    let course_id = '<?php echo $course_details['id']; ?>';
+    let previousSavedDuration = 0;
+    let currentDuration = 0;
+    setInterval(function(){
+        if("<?php echo $lesson_details['lesson_type']; ?>" == "video"){
+            currentDuration = parseInt(player.currentTime);
+        }else{
+            currentDuration = 0;
+        }
 
-  if (newProgress != savedProgress && newProgress > 0 && currentProgress != 1) {
+        if (lesson_id && course_id && (currentDuration%5) == 0 && previousSavedDuration != currentDuration) {
+            previousSavedDuration = currentDuration;
 
-    // if the user watches the entire video the lesson will be marked as seen automatically.
-    if (totalDuration == newProgress) {
-      newProgress = 1;
-      $('input#'+lesson_id).prop('checked', true);
-    }
+            $.ajax({
+              type : 'POST',
+              url : '<?php echo site_url('home/update_watch_history_with_duration'); ?>',
+              data : {lesson_id : lesson_id, course_id : course_id, current_duration: currentDuration},
+              success : function(response){
+                var responseVal = JSON.parse(response);
+                // console.log(responseVal);
+                // console.log(responseVal.course_progress);
 
-    // update the video prgress here.
-    $.ajax({
-      type : 'POST',
-      url : '<?php echo site_url('user/save_course_progress'); ?>',
-      data : {lesson_id : lesson_id, progress : newProgress},
-      success : function(response){
-        savedProgress = response;
-      }
-    });
-  }
+              }
+            });
+        }
+
+        //console.log('Avoid Server Call'+currentDuration);
+    }, 1000);
 }
 
-$('.remove_video_src').remove();
+
+setTimeout(function(){
+  $('.remove_video_src').remove();
+}, 500);
 </script>

@@ -19,23 +19,23 @@
             <?php if(get_settings('fb_social_login')) include "facebook_login.php"; ?>
 
             <form action="<?php echo site_url('login/validate_login/user'); ?>" method="post" id="sign_up">
-             <!--  <div class="form-group" style="">
+             <!--  <div class="form-group">
                 <label for="login-email"><?php //echo site_phrase('email'); ?></label>
                 <div class="input-group">
-                  <span class="input-group-text bg-white" for="email"><i class="fas fa-user"></i></span>
+                  <span class="input-group-text bg-white" for="email"><i class="fas fa-envelope"></i></span>
                   <input type="email" name="email" class="form-control" placeholder="<?php //echo site_phrase('email'); ?>" aria-label="<?php //echo site_phrase('email'); ?>" aria-describedby="<?php //echo site_phrase('email'); ?>" id="login-email" required>
                 </div>
               </div> -->
 
               <div class="form-group">
                   <label for="login-mobile"><span class="input-field-icon"><i class="fas fa-mobile-alt"></i></span> <?php echo site_phrase('mobile').' / '.site_phrase('email'); ?>:</label>
-                  <input type="text" class="form-control" name = "mobile" id="login-mobile" placeholder="<?php echo site_phrase('mobile').' OR '.site_phrase('email'); ?>" value="" required>
+                  <input type="text" class="form-control" name = "mobile" id="login-mobile" placeholder="<?php echo site_phrase('enter_mobile').' OR '.site_phrase('email'); ?>" value="" required>
               </div>
 
               <div class="form-group">
                 <label for="login-password"><?php echo site_phrase('password'); ?></label>
                 <div class="input-group">
-                  <span class="input-group-text bg-white" for="password"><i class="fas fa-user"></i></span>
+                  <span class="input-group-text bg-white" for="password"><i class="fas fa-key"></i></span>
                   <input type="password" name="password" class="form-control" placeholder="<?php echo site_phrase('password'); ?>" aria-label="<?php echo site_phrase('password'); ?>" aria-describedby="<?php echo site_phrase('password'); ?>" id="login-password" required>
                 </div>
                 <a class="text-muted text-12px fw-500 float-end" href="<?php echo site_url('home/forgot_password'); ?>"><?php echo site_phrase('forgot_password'); ?>?</a>

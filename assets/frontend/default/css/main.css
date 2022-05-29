@@ -277,7 +277,7 @@ menu code was here
 
 .menu-icon-box{
     position: relative;
-    margin: 0 5px;
+    margin-left: 5px;
 }
 .menu-icon-box .icon{
     position: relative;
@@ -990,7 +990,7 @@ homepage styles
     color: #fff;
 }*/
 .home-banner-wrap{
-    max-width: 490px;
+    max-width: 462px;
 }
 .home-banner-wrap h2{
     font-size: 44px;
@@ -2316,7 +2316,7 @@ course content
 }
 .student-feedback-box .individual-rating ul li .progress-bar{
     border-radius: 5px;
-    background-color: #008000;
+    background-color: #ec5252;
     font-size: 11px;
 }
 .student-feedback-box .individual-rating .rating i {
@@ -4753,4 +4753,7 @@ color: #2a303b;
 }
 .radius-bottom-10{
     border-radius: 0px 0px 10px 10px !important;
+}
+.btn-hover-gray.active, .btn-hover-gray:hover, .btn-hover-gray:focus{
+    background-color: rgba(20,23,28,.05);
 }

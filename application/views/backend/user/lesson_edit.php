@@ -32,7 +32,7 @@ $sections = $this->crud_model->get_section('course', $param3)->result_array();
 </div>
 
 <!-- ACTUAL LESSON ADDING FORM -->
-<form action="<?php echo site_url('user/lessons/'.$param3.'/edit'.'/'.$param2); ?>" method="post" enctype="multipart/form-data">
+<form class="<?php if($lesson_details['lesson_type'] == 'video' && strtolower($lesson_details['video_type']) == 'system'): ?>ajaxFormSubmission<?php endif; ?>" action="<?php echo site_url('user/lessons/'.$param3.'/edit'.'/'.$param2); ?>" method="post" enctype="multipart/form-data">
 
     <div class="form-group">
         <label><?php echo get_phrase('title'); ?></label>
@@ -63,7 +63,7 @@ $sections = $this->crud_model->get_section('course', $param3)->result_array();
 
     <div class="form-group">
         <label><?php echo get_phrase('summary'); ?></label>
-        <textarea name="summary" class="form-control"><?php echo htmlspecialchars_decode($lesson_details['summary']); ?></textarea>
+        <textarea name="summary" id="lesson_summary" class="form-control"><?php echo htmlspecialchars_decode($lesson_details['summary']); ?></textarea>
     </div>
 
     <div class="form-group">
@@ -74,12 +74,13 @@ $sections = $this->crud_model->get_section('course', $param3)->result_array();
     </div>
 
     <div class="text-center">
-        <button class = "btn btn-success" type="submit" name="button"><?php echo get_phrase('update_lesson'); ?></button>
+        <button class = "btn btn-success formSubmissionBtn" type="submit" name="button"><?php echo get_phrase('update_lesson'); ?></button>
     </div>
 </form>
 
 <script type="text/javascript">
 $(document).ready(function() {
+    initSummerNote(['#lesson_summary']);
     initSelect2(['#section_id','#lesson_type', '#lesson_provider', '#lesson_provider_for_mobile_application']);
     initTimepicker();
 
@@ -124,4 +125,37 @@ function checkURLValidity(video_url) {
         return false;
     }
 }
+
+$(function() {
+    var formSubmissionBtn = $('.formSubmissionBtn');
+    var formSubmissionBtnTxt = $(formSubmissionBtn).html();
+    //The form of submission to RailTeam js is defined here.(Form class or ID)
+    $('.ajaxFormSubmission').ajaxForm({
+        beforeSend: function() {
+            var percentVal = '0%';
+            $(formSubmissionBtn).html('<?php echo get_phrase('uploading'); ?>... '+percentVal);
+            $(formSubmissionBtn).attr('disabled', true);
+        },
+        uploadProgress: function(event, position, total, percentComplete) {
+            var percentVal = percentComplete + '%';
+            if(percentComplete < 100){
+                $(formSubmissionBtn).html('<?php echo get_phrase('uploading'); ?>... '+percentVal);
+            }else{
+                $(formSubmissionBtn).html('<?php echo get_phrase('please_wait'); ?>... '+percentVal);
+            }
+        },
+        complete: function(xhr) {
+            setTimeout(function(){
+                $(formSubmissionBtn).attr('disabled', false);
+                $(formSubmissionBtn).html(formSubmissionBtnTxt);
+                set_js_flashdata('<?php echo site_url('home/set_flashdata_for_js/flash_message/your_video_file_uploaded_succesfully') ?>');
+                location.reload();
+            }, 500);
+        },
+        error: function()
+        {
+            //You can write here your js error message
+        }
+    });
+});
 </script>

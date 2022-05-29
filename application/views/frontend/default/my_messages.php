@@ -45,6 +45,9 @@
                                                         $user_to_show_details = $this->user_model->get_all_user($user_to_show_id)->row_array();
                                                         echo $user_to_show_details['first_name'].' '.$user_to_show_details['last_name'];
                                                         ?>
+                                                        <?php if($unreaded_message > 0): ?>
+                                                            <span class="badge bg-warning"><?php echo $unreaded_message; ?></span>
+                                                        <?php endif; ?>
                                                     </div>
                                                 </div>
                                                 <div class="message-time d-inline-block float-end"><?php echo date('D, d-M-Y', $last_messages_details['timestamp']); ?></div>

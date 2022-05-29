@@ -41,5 +41,5 @@
 </div>
 <?php endforeach; ?>
 <div class="text-center">
-    <!-- <a href="javascript::" name="button" class="btn red mt-2" style="color: #fff;" onclick="location.reload();"><?php echo get_phrase("take_again"); ?></a> -->
+    <!-- <a href="javascript:;" name="button" class="btn red mt-2" style="color: #fff;" onclick="location.reload();"><?php echo get_phrase("take_again"); ?></a> -->
 </div>

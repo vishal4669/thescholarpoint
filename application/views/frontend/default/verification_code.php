@@ -58,7 +58,6 @@
     firebase.initializeApp(firebaseConfig);
     //firebase.analytics();
 </script>
-
 <script type="text/javascript">
 
 /*******FireBase Js*********************************************/

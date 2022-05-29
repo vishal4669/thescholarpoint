@@ -55,6 +55,14 @@ $course_details = $this->crud_model->get_course_by_id($course_id)->row_array();
                                         </li>
                                     <?php endif; ?>
 
+                                    <?php if (addon_status('assignment')) : ?>
+                                        <li class="nav-item">
+                                            <a href="#assignment" onclick="load_assignment_list()" data-toggle="tab" class="nav-link rounded-0 pt-2 pb-2">
+                                                <i class="dripicons-document"></i>
+                                                <span class="d-none d-sm-inline"><?php echo get_phrase('assignment'); ?></span>
+                                            </a>
+                                        </li>
+                                    <?php endif; ?>
 
                                     <?php if (addon_status('noticeboard')) : ?>
                                         <li class="nav-item">
@@ -157,6 +165,13 @@ $course_details = $this->crud_model->get_course_by_id($course_id)->row_array();
                                         </div>
                                     <?php endif; ?>
                                     <!-- LIVE CLASS CODE BASE -->
+
+                                    <!-- ASSIGNMENT CODE BASE -->
+                                    <?php if(addon_status('assignment')): ?>
+                                        <div class="tab-pane" id="assignment">
+                                            <?php include 'assignment.php'; ?>
+                                        </div>
+                                    <?php endif; ?>
 
                                     <!-- NOTICEBOARD CODE BASE -->
                                     <?php if (addon_status('noticeboard')) : ?>
@@ -287,14 +302,13 @@ $course_details = $this->crud_model->get_course_by_id($course_id)->row_array();
                                                         </select>
                                                     </div>
                                                 </div>
-
                                                 <div class="form-group row mb-3">
-                                                    <label class="col-md-2 col-form-label" for="course_launch_date"><?php echo get_phrase('course_launch_date'); ?></label>                                                
-                                                    <div class="col-md-10">
-                                                        <input type="text" class="form-control" id="course_launch_date" name = "course_launch_date" placeholder="<?php echo get_phrase('select_date'); ?>" value="<?php echo date("d/m/Y", strtotime($course_details['course_launch_date'])); ?>" required>                                                    
+                                                    <label class="col-md-2 col-form-label" for="enable_drip_content"><?php echo get_phrase('enable_drip_content'); ?></label>
+                                                    <div class="col-md-10 pt-2">
+                                                        <input type="checkbox" name="enable_drip_content" value="1" id="enable_drip_content" data-switch="primary" <?php if($course_details['enable_drip_content'] == 1) echo 'checked'; ?>>
+                                                        <label for="enable_drip_content" data-on-label="On" data-off-label="Off"></label>
                                                     </div>
                                                 </div>
-
                                                 <div class="form-group row mb-3">
                                                     <div class="offset-md-2 col-md-10">
                                                         <div class="custom-control custom-checkbox">
@@ -551,10 +565,10 @@ $course_details = $this->crud_model->get_course_by_id($course_id)->row_array();
 
                                     <ul class="list-inline mb-0 wizard text-center">
                                         <li class="previous list-inline-item">
-                                            <a href="javascript::" class="btn btn-info"> <i class="mdi mdi-arrow-left-bold"></i> </a>
+                                            <a href="javascript:;" class="btn btn-info"> <i class="mdi mdi-arrow-left-bold"></i> </a>
                                         </li>
                                         <li class="next list-inline-item">
-                                            <a href="javascript::" class="btn btn-info"> <i class="mdi mdi-arrow-right-bold"></i> </a>
+                                            <a href="javascript:;" class="btn btn-info"> <i class="mdi mdi-arrow-right-bold"></i> </a>
                                         </li>
                                     </ul>
 
@@ -662,12 +676,4 @@ $course_details = $this->crud_model->get_course_by_id($course_id)->row_array();
         var id = this.id;
         $('#widgets-of-' + id).hide();
     });
-
-    $(document).ready(function(){
-        $("#course_launch_date").datepicker({
-            minDate: 0
-        });
-    });
-
-
 </script>

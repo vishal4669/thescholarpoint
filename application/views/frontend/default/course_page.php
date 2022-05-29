@@ -1,9 +1,5 @@
 <?php
 $course_details = $this->crud_model->get_course_by_id($course_id)->row_array();
-
-//Apply the condition for the current date with course launch date...
-$is_course_launch = compare_course_launch_date($course_details['course_launch_date']);
-
 $instructor_details = $this->user_model->get_all_user($course_details['user_id'])->row_array();
 ?>
 <section class="course-header-area">
@@ -478,16 +474,13 @@ $instructor_details = $this->user_model->get_all_user($course_details['user_id']
               <?php endif; ?>
             </div>
 
-
-        <?php if($is_course_launch =='YES') : ?>
-
             <?php if (is_purchased($course_details['id'])) : ?>
               <div class="already_purchased">
                 <a href="<?php echo site_url('home/my_courses'); ?>"><?php echo site_phrase('already_purchased'); ?></a>
               </div>
             <?php else : ?>
 
-              <!-- WISHLIST BUTTON -->            
+              <!-- WISHLIST BUTTON -->
               <div class="buy-btns">
                 <button class="btn btn-add-wishlist <?php echo $this->crud_model->is_added_to_wishlist($course_details['id']) ? 'active' : ''; ?>" type="button" id="<?php echo $course_details['id']; ?>" onclick="handleAddToWishlist(this)">
                   <?php
@@ -521,11 +514,6 @@ $instructor_details = $this->user_model->get_all_user($course_details['user_id']
               <?php endif; ?>
             <?php endif; ?>
 
-        <?php else : ?>
-            <div class="buy-btns">              
-              <button class="btn btn-buy-now active" type="button" id="" ><?php echo $is_course_launch; ?></button>
-            </div>            
-        <?php endif; ?>
 
             <div class="includes">
               <div class="title"><b><?php echo site_phrase('includes'); ?>:</b></div>
@@ -543,13 +531,9 @@ $instructor_details = $this->user_model->get_all_user($course_details['user_id']
                   <li><i class="fas fa-mobile-alt"></i><?php echo site_phrase('access_on_laptop_and_tv'); ?></li>
                 <?php endif; ?>
                 <li><i class="far fa-compass"></i><?php echo site_phrase('full_lifetime_access'); ?></li>
-
-               <?php if($is_course_launch =='YES') : ?>
                 <li class="text-center pt-3">
                   <a class="badge-sub-warning text-decoration-none fw-600 hover-shadow-1 d-inline-block" href="<?php echo site_url('home/compare?course-1=' . rawurlencode(slugify($course_details['title'])) . '&&course-id-1=' . $course_details['id']); ?>"><i class="fas fa-balance-scale"></i> <?php echo site_phrase('compare_this_course_with_other'); ?></a>
                 </li>
-              <?php endif; ?>
-
               </ul>
             </div>
           </div>
@@ -582,7 +566,7 @@ $instructor_details = $this->user_model->get_all_user($course_details['user_id']
         <div class="modal-body">
           <div class="course-preview-video-wrap">
             <div class="embed-responsive embed-responsive-16by9">
-              <?php if ($course_details['course_overview_provider'] == 'youtube') : ?>
+              <?php if (strtolower(strtolower($provider)) == 'youtube') : ?>
                 <!------------- PLYR.IO ------------>
                 <link rel="stylesheet" href="<?php echo base_url(); ?>assets/global/plyr/plyr.css">
 

@@ -3,7 +3,7 @@ $total_price = 0;
 ?>
 <div class="icon">
 	<a href="<?php echo site_url('home/shopping_cart'); ?>"><i class="fas fa-shopping-cart"></i></a>
-	<span class="number"><?php echo count((is_countable($this->session->userdata('cart_items')) ? $this->session->userdata('cart_items'):[]) ); ?></span>
+	<span class="number"><?php echo sizeof($this->session->userdata('cart_items')); ?></span>
 </div>
 
 <!-- Cart Dropdown goes here -->

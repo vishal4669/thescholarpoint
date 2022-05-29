@@ -49,27 +49,11 @@ class Social_login_modal extends CI_Model
                 $query = $this->db->get_where('users', $credential);
                 if($query->num_rows() > 0){
                     $row = $query->row();
-                    $this->session->set_userdata('user_id', $row->id);
-                    $this->session->set_userdata('role_id', $row->role_id);
-                    $this->session->set_userdata('role', get_user_role('user_role', $row->id));
-                    $this->session->set_userdata('name', $row->first_name . ' ' . $row->last_name);
-                    $this->session->set_userdata('is_instructor', $row->is_instructor);
-                    $this->session->set_userdata('fb_login', 1);
-                    if ($row->role_id == 1) {
-                        $this->session->set_userdata('admin_login', '1');
-                    } else if ($row->role_id == 2) {
-                        $this->session->set_userdata('user_login', '1');
-                    }
-                    
-                    // //stored the fb social data
-                    // $social_login_data = json_encode(array('fb_user_id' => $fb_user_id, 'access_token' => $access_token));
-                    // $this->db->where('id', $row->id);
-                    // $this->db->update('users', array('social_login_data' => $social_login_data));
+
+                    // For device login tracker
+                    $this->user_model->new_device_login_tracker($row->id);
+                    $this->user_model->set_login_userdata($row->id);
                 }else{
-                    // //stored the fb social data
-                    // $social_login_data = json_encode(array('fb_user_id' => $fb_user_id, 'access_token' => $access_token));
-                    // $data['social_login_data'] = $social_login_data;
-                    
                     $data['first_name'] = $first_name;
                     $data['last_name']  = $last_name;
                     $data['email']  = $email;
@@ -78,7 +62,6 @@ class Social_login_modal extends CI_Model
             
             
                     $data['wishlist'] = json_encode(array());
-                    $data['watch_history'] = json_encode(array());
                     $data['date_added'] = strtotime(date("Y-m-d H:i:s"));
                     $social_links = array(
                         'facebook' => "",
@@ -97,18 +80,10 @@ class Social_login_modal extends CI_Model
                         $credential = array('email' => $email, 'status' => 1);
                         $query = $this->db->get_where('users', $credential);
                         $row = $query->row();
-                        $this->session->set_userdata('user_id', $row->id);
-                        $this->session->set_userdata('role_id', $row->role_id);
-                        $this->session->set_userdata('role', get_user_role('user_role', $row->id));
-                        $this->session->set_userdata('name', $row->first_name . ' ' . $row->last_name);
-                        $this->session->set_userdata('is_instructor', $row->is_instructor);
-                        $this->session->set_userdata('fb_login', 1);
-                        
-                        if ($row->role_id == 1) {
-                            $this->session->set_userdata('admin_login', '1');
-                        } else if ($row->role_id == 2) {
-                            $this->session->set_userdata('user_login', '1');
-                        }
+
+                        // For device login tracker
+                        $this->user_model->new_device_login_tracker($row->id);
+                        $this->user_model->set_login_userdata($row->id);
                     }else{
                         $this->session->set_flashdata('error_message', get_phrase('email_duplication'));
                         redirect(site_url('home/login'), 'refresh');

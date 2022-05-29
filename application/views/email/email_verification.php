@@ -438,7 +438,7 @@
                                               <hr style="border: 1px solid #fff; margin-bottom: 10px;">
                                               
                                               <h2 style="font-size: 20px;">Dear <?= $to_name; ?>,</h2>
-                                              <p>Welcome to <a title="<?= get_settings('system_name'); ?>" target="_blank" href="<?= site_url(); ?>"><?= get_settings('system_name'); ?></a>. We would love to make sure we have got the right email for you.</p>
+                                              <p>Welcome to <a title="<?= get_settings('system_name'); ?>" target="_blank" href="<?= site_url(); ?>"><?= get_settings('system_name'); ?></a>. We'd love to make sure we've got the right email for you.</p>
                                               <br>
                                               <p>Your verification code is <b style="cursor: pointer;" ><u><?= $verification_code; ?></u></b></p>
                                               <hr style="border: 1px solid #efefef; margin-top: 50px;">

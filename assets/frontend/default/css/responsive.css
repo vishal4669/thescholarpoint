@@ -9,9 +9,9 @@
 
 
 /*
-    menu resonsive for 768px+
+    menu resonsive for 992px+
 */
-@media (min-width:768px){
+@media (min-width:992px){
     .navbar-expand-lg {
 
         -webkit-box-orient: horizontal;
@@ -157,9 +157,9 @@
 
 
 /*
-    responsive mobile menu 767px-
+    responsive mobile menu 991px-
 */
-@media (max-width:767px){
+@media (max-width:991px){
     .navbar-brand {
         margin-right: auto;
         margin-left: auto;

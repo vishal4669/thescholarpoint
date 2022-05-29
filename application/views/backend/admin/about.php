@@ -13,7 +13,7 @@
   </div>
 
   <div class="row justify-content-center">
-    <div class="col-xl-8">
+    <div class="col-xl-9">
       <div class="card cta-box">
         <div class="card-body">
           <div class="media align-items-center">
@@ -48,15 +48,26 @@
                   <i class="mdi mdi-square"></i> <?php echo get_phrase('purchase_code'); ?>
                   <span class="float-right"><?php echo get_settings('purchase_code'); ?></span>
                 </p>
+
+                <p style="margin-top: 8px;">
+                  <i class="mdi mdi-square"></i> <?php echo get_phrase('product_license'); ?>
+                  <?php if($application_details['product_license'] == 'valid'): ?>
+                    <span class="float-right badge badge-success-lighten"><?php echo get_phrase($application_details['product_license']); ?></span>
+                  <?php else: ?>
+                    <span class="float-right badge badge-danger-lighten mt-1"><?php echo get_phrase($application_details['product_license']); ?></span>
+                    <button class="btn btn-primary float-right mr-2 py-0" onclick="showAjaxModal('<?php echo site_url('admin/save_valid_purchase_code'); ?>', '<?php echo get_phrase('enter_valid_purchase_code'); ?>');"><?php echo get_phrase('enter_valid_purchase_code'); ?></button>
+                  <?php endif; ?>
+                </p>
                 <p>
-                  <i class="mdi mdi-square"></i> <?php echo get_phrase('purchase_code_status'); ?>
+                  <i class="mdi mdi-square"></i> <?php echo get_phrase('customer_support_status'); ?>
                   <span class="float-right">
                     <?php if (strtolower($application_details['purchase_code_status']) == 'expired'): ?>
-                      <span class="badge badge-danger-lighten"><?php echo $application_details['purchase_code_status']; ?></span>
+                      <span class="badge badge-danger-lighten float-right mt-1"><?php echo get_phrase($application_details['purchase_code_status']); ?></span>
+                      <a href="https://codecanyon.net/item/academy-course-based-learning-management-system/22703468" target="_blank" class="btn btn-success float-right mr-2 py-0"><?php echo get_phrase('renew_support'); ?></a>
                     <?php elseif (strtolower($application_details['purchase_code_status']) == 'valid'): ?>
-                      <span class="badge badge-success-lighten"><?php echo $application_details['purchase_code_status']; ?></span>
+                      <span class="badge badge-success-lighten"><?php echo get_phrase($application_details['purchase_code_status']); ?></span>
                     <?php else: ?>
-                      <span class="badge badge-danger-lighten"><?php echo ucfirst($application_details['purchase_code_status']); ?></span>
+                      <span class="badge badge-danger-lighten"><?php echo get_phrase($application_details['purchase_code_status']); ?></span>
                     <?php endif; ?>
                   </span>
                 </p>

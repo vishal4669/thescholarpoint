@@ -201,10 +201,11 @@ class Api_instructor_model extends CI_Model
 		$this->db->select('user_id');
 		$this->db->select('status');
 
-		$this->db->where('user_id', $user_id);
 		if ($multi_instructor_course_ids && count($multi_instructor_course_ids)) {
-			$this->db->or_where_in('id', $multi_instructor_course_ids);
-		}
+			$this->db->where_in('id', $multi_instructor_course_ids);
+		}else{
+            $this->db->where('creator', $user_id);
+        }
 
 		$query = $this->db->get('course');
 		$total_course_number = $query->num_rows();
@@ -477,11 +478,12 @@ class Api_instructor_model extends CI_Model
 		$multi_instructor_course_ids = $this->crud_model->multi_instructor_course_ids_for_an_instructor($user_id);
 
 		$this->db->where('id', $course_id);
-		$this->db->where('user_id', $user_id);
 
 		if ($multi_instructor_course_ids && count($multi_instructor_course_ids)) {
-			$this->db->or_where_in('id', $multi_instructor_course_ids);
-		}
+			$this->db->where_in('id', $multi_instructor_course_ids);
+		}else{
+            $this->db->where('creator', $user_id);
+        }
 		
 		$query = $this->db->get('course');
 		if ($query->num_rows() > 0) {

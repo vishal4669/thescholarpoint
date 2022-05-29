@@ -151,14 +151,13 @@
                                                     </select>
                                                 </div>
                                             </div>
-
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-2 col-form-label" for="course_launch_date"><?php echo get_phrase('course_launch_date'); ?></label>                                                
-                                                    <div class="col-md-10">
-                                                        <input type="text" class="form-control" id="course_launch_date" name = "course_launch_date" placeholder="<?php echo get_phrase('select_date'); ?>" required>                                                    
-                                                    </div>
+                                                <label class="col-md-2 col-form-label" for="enable_drip_content"><?php echo get_phrase('enable_drip_content'); ?></label>
+                                                <div class="col-md-10 pt-2">
+                                                    <input type="checkbox" name="enable_drip_content" value="1" id="enable_drip_content" data-switch="primary">
+                                                    <label for="enable_drip_content" data-on-label="On" data-off-label="Off"></label>
+                                                </div>
                                             </div>
-
                                             <div class="form-group row mb-3">
                                                 <div class="offset-md-2 col-md-10">
                                                     <div class="custom-control custom-checkbox">
@@ -352,10 +351,10 @@
 
                                 <ul class="list-inline mb-0 wizard text-center">
                                     <li class="previous list-inline-item">
-                                        <a href="javascript::" class="btn btn-info"> <i class="mdi mdi-arrow-left-bold"></i> </a>
+                                        <a href="javascript:;" class="btn btn-info"> <i class="mdi mdi-arrow-left-bold"></i> </a>
                                     </li>
                                     <li class="next list-inline-item">
-                                        <a href="javascript::" class="btn btn-info"> <i class="mdi mdi-arrow-right-bold"></i> </a>
+                                        <a href="javascript:;" class="btn btn-info"> <i class="mdi mdi-arrow-right-bold"></i> </a>
                                     </li>
                                 </ul>
 
@@ -440,13 +439,6 @@ function calculateDiscountPercentage(discounted_price) {
     }
   }
 }
-
-
-$(document).ready(function(){
-    $("#course_launch_date").datepicker({
-        minDate: 0
-    });
-});
 
 </script>
 

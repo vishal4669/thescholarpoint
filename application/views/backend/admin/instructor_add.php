@@ -93,14 +93,14 @@
                             <div class="tab-pane" id="login_credentials">
                                 <div class="row">
                                     <div class="col-12">
-
-                                         <div class="form-group row mb-3">
+                                        
+                                        <div class="form-group row mb-3">
                                             <label class="col-md-3 col-form-label" for="mobile"><?php echo get_phrase('mobile'); ?><span class="required">*</span></label>
                                             <div class="col-md-9">
                                                 <input type="text" id="mobile" name="mobile" class="form-control" required>
                                             </div>
                                         </div>
-                                        
+
                                         <div class="form-group row mb-3">
                                             <label class="col-md-3 col-form-label" for="email"><?php echo get_phrase('email'); ?><span class="required">*</span></label>
                                             <div class="col-md-9">
@@ -215,10 +215,10 @@
 
                             <ul class="list-inline mb-0 wizard text-center">
                                 <li class="previous list-inline-item">
-                                    <a href="javascript::" class="btn btn-info"> <i class="mdi mdi-arrow-left-bold"></i> </a>
+                                    <a href="javascript:;" class="btn btn-info"> <i class="mdi mdi-arrow-left-bold"></i> </a>
                                 </li>
                                 <li class="next list-inline-item">
-                                    <a href="javascript::" class="btn btn-info"> <i class="mdi mdi-arrow-right-bold"></i> </a>
+                                    <a href="javascript:;" class="btn btn-info"> <i class="mdi mdi-arrow-right-bold"></i> </a>
                                 </li>
                             </ul>
 

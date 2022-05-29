@@ -80,9 +80,6 @@ $status_wise_courses = $this->crud_model->get_status_wise_courses();
 			</li>
 		<?php endif; ?>
 
-		
-
-		
 		<?php if (addon_status('ebook')) : ?>
 	        <li class="side-nav-item">
 	            <a href="javascript: void(0);"
@@ -270,6 +267,17 @@ $status_wise_courses = $this->crud_model->get_status_wise_courses();
 				<a href="<?php echo site_url('admin/message'); ?>" class="side-nav-link <?php if ($page_name == 'message' || $page_name == 'message_new' || $page_name == 'message_read') echo 'active'; ?>">
 					<i class="dripicons-message"></i>
 					<span><?php echo get_phrase('message'); ?></span>
+					<?php
+						$this->db->where('message_thread.receiver', $this->session->userdata('user_id'));
+						$this->db->where('message.sender !=', $this->session->userdata('user_id'));
+						$this->db->where('message.read_status', 0);
+			            $this->db->from('message_thread');
+			            $this->db->join('message', 'message_thread.message_thread_code = message.message_thread_code'); 
+						$unreaded_message = $this->db->get()->num_rows();
+					?>
+					<?php if($unreaded_message > 0): ?>
+						<span class="badge badge-danger-lighten float-right"><?php echo $unreaded_message; ?></span>
+					<?php endif; ?>
 				</a>
 			</li>
 		<?php endif; ?>
@@ -346,7 +354,7 @@ $status_wise_courses = $this->crud_model->get_status_wise_courses();
 		<?php endif; ?>
 
 		<?php if (has_permission('settings')) : ?>
-			<li class="side-nav-item  <?php if ($page_name == 'system_settings' || $page_name == 'frontend_settings' || $page_name == 'payment_settings' || $page_name == 'smtp_settings' || $page_name == 'manage_language' || $page_name == 'about' || $page_name == 'themes') : ?> active <?php endif; ?>">
+			<li class="side-nav-item  <?php if ($page_name == 'system_settings' || $page_name == 'frontend_settings' || $page_name == 'payment_settings' || $page_name == 'smtp_settings' || $page_name == 'manage_language' || $page_name == 'about' || $page_name == 'themes' || $page_name == 'custom_page') : ?> active <?php endif; ?>">
 				<a href="javascript: void(0);" class="side-nav-link">
 					<i class="dripicons-toggles"></i>
 					<span> <?php echo get_phrase('settings'); ?> </span>
@@ -359,6 +367,10 @@ $status_wise_courses = $this->crud_model->get_status_wise_courses();
 
 					<li class="<?php if ($page_name == 'frontend_settings') echo 'active'; ?>">
 						<a href="<?php echo site_url('admin/frontend_settings'); ?>"><?php echo get_phrase('website_settings'); ?></a>
+					</li>
+
+					<li class="<?php if ($page_name == 'drip_content_settings') echo 'active'; ?>">
+						<a href="<?php echo site_url('admin/drip_content_settings'); ?>"><?php echo get_phrase('drip_content_settings'); ?></a>
 					</li>
 
 					<?php if (addon_status('certificate')) : ?>
@@ -391,6 +403,11 @@ $status_wise_courses = $this->crud_model->get_status_wise_courses();
 					<li class="<?php if ($page_name == 'social_login') echo 'active'; ?>">
 						<a href="<?php echo site_url('admin/social_login_settings'); ?>"><?php echo get_phrase('social_login'); ?></a>
 					</li>
+
+					<li class="<?php if ($page_name == 'custom_page') echo 'active'; ?>">
+						<a href="<?php echo site_url('admin/custom_page'); ?>"><?php echo get_phrase('custom_page'); ?></a>
+					</li>
+
 					<li class="<?php if ($page_name == 'about') echo 'active'; ?>">
 						<a href="<?php echo site_url('admin/about'); ?>"><?php echo get_phrase('about'); ?></a>
 					</li>

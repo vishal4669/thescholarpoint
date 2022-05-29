@@ -136,24 +136,23 @@ class Email_model extends CI_Model {
 
 	public function notify_on_certificate_generate($user_id = "", $course_id = "") {
 		$checker = array(
-			'course_id' => $course_id,
-			'student_id' => $user_id
-		);
-		$result = $this->db->get_where('certificates', $checker)->row_array();
-		$certificate_link = site_url('certificate/'.$result['shareable_url']);
-		$course_details    = $this->crud_model->get_course_by_id($course_id)->row_array();
-		$user_details = $this->user_model->get_all_user($user_id)->row_array();
-		$email_msg	=	"<b>Congratulations!!</b> ". $user_details['first_name']." ".$user_details['last_name'].",";
-		$email_msg	.=	"<p>You have successfully completed the course named, <b>".$course_details['title'].".</b></p>";
-		$email_msg	.=	"<p>You can get your course completion certificate from here <b>".$certificate_link.".</b></p>";
-
-		$email_data['subject'] = 'Course Completion Notification';
-		$email_data['from'] = get_settings('system_email');
-		$email_data['to'] = $user_details['email'];
-		$email_data['to_name'] = $user_details['first_name'].' '.$user_details['last_name'];
-		$email_data['message'] = $student_msg;
-		$email_template = $this->load->view('email/common_template', $email_data, TRUE);
-		$this->send_smtp_mail($email_template, $email_data['subject'], $email_data['to'], $email_data['from']);
+            'course_id' => $course_id,
+            'student_id' => $user_id,
+        );
+        $result = $this->db->get_where('certificates', $checker)->row_array();
+        $certificate_link = site_url('certificate/' . $result['shareable_url']);
+        $course_details = $this->crud_model->get_course_by_id($course_id)->row_array();
+        $user_details = $this->user_model->get_all_user($user_id)->row_array();
+        $email_msg = "<b>Congratulations!!</b> " . $user_details['first_name'] . " " . $user_details['last_name'] . ",";
+        $email_msg .= "<p>You have successfully completed the course named, <b>" . $course_details['title'] . ".</b></p>";
+        $email_msg .= "<p>You can get your course completion certificate from here <b>" . $certificate_link . ".</b></p>";
+        $email_data['subject'] = 'Course Completion Notification';
+        $email_data['from'] = get_settings('system_email');
+        $email_data['to'] = $user_details['email'];
+        $email_data['to_name'] = $user_details['first_name'] . ' ' . $user_details['last_name'];
+        $email_data['message'] = $email_msg;
+        $email_template = $this->load->view('email/common_template', $email_data, true);
+        $this->send_smtp_mail($email_template, $email_data['subject'], $email_data['to'], $email_data['from']);
 	}
 
 	public function suspended_offline_payment($user_id = ""){
@@ -276,6 +275,56 @@ class Email_model extends CI_Model {
 		return true;
 	}
 
+	function new_device_login_alert($user_id = ""){
+		$this->load->library('user_agent');
+
+		if ($this->agent->is_browser())
+		{
+			$agent = $this->agent->browser().' '.$this->agent->version();
+		}
+		elseif ($this->agent->is_robot())
+		{
+			$agent = $this->agent->robot();
+		}
+		elseif ($this->agent->is_mobile())
+		{
+			$agent = $this->agent->mobile();
+		}
+		else
+		{
+			$agent = 'Unidentified User Agent';
+		}
+
+		$browser = $agent;
+		$device = $this->agent->platform();
+
+		if(!$this->session->userdata('new_device_verification_code')){
+			$new_device_verification_code = rand(100000, 999999);
+		}else{
+			$new_device_verification_code = $this->session->userdata('new_device_verification_code');
+		}
+		if($user_id == ""){
+			$user_id = $this->session->userdata('new_device_user_id');
+		}
+
+		$row = $this->db->get_where('users', array('id' => $user_id))->row_array();
+		$email_data['subject'] = "New device login alert";
+		$email_data['from'] = get_settings('system_email');
+		$email_data['to'] = $row['email'];
+		$email_data['to_name'] = $row['first_name'].' '.$row['last_name'];
+		$email_data['message'] = "Have you tried logging in with a different device? Confirm using the verification code.<br> Your verification code is <b>".$new_device_verification_code.'</b><br> Remember that you will lose access to your previous device after logging in to the new device('.$browser.' '.$device.').<p>Use the verification code within <b>10</b> minutes</p>';
+		$email_template = $this->load->view('email/common_template', $email_data, TRUE);
+		$this->send_smtp_mail($email_template, $email_data['subject'], $email_data['to'], $email_data['from']);
+
+		//600 seconds = 10 minutes
+		$this->session->set_userdata('new_device_code_expiration_time', (time()+600));
+		$this->session->set_userdata('new_device_user_email', $row['email']);
+		$this->session->set_userdata('new_device_user_id', $user_id);
+		$this->session->set_userdata('new_device_verification_code', $new_device_verification_code);
+
+		return true;
+	}
+
 	public function send_smtp_mail($msg=NULL, $sub=NULL, $to=NULL, $from=NULL, $email_type=NULL, $verification_code = null) {
 		//Load email library
 		$this->load->library('email');
@@ -290,17 +339,18 @@ class Email_model extends CI_Model {
 			'smtp_port' => get_settings('smtp_port'),
 			'smtp_user' => get_settings('smtp_user'),
 			'smtp_pass' => get_settings('smtp_pass'),
+			'smtp_crypto' => get_settings('smtp_crypto'), //can be 'ssl' or 'tls' for example
 			'mailtype'  => 'html',
-			'charset'   => 'utf-8'
+			'newline'   => "\r\n",
+			'charset'   => 'utf-8',
+            'smtp_timeout' => '10', //in seconds
 		);
 		$this->email->set_header('MIME-Version', 1.0);
 		$this->email->set_header('Content-type', 'text/html');
 		$this->email->set_header('charset', 'UTF-8');
 		
 		$this->email->initialize($config);
-		$this->email->set_mailtype("html");
-		$this->email->set_newline("\r\n");
-
+		
 		$this->email->to($to);
 		$this->email->from($from, get_settings('system_name'));
 		$this->email->subject($sub);

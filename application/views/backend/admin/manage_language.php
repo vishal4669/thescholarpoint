@@ -82,7 +82,7 @@
 												class="btn btn-info">
 												<?php echo get_phrase('edit_phrase');?>
 											</a>
-											<a href="javascript::" onclick="confirm_modal('<?php echo site_url('admin/manage_language/delete_language/'.$language);?>')" class="btn btn-danger">
+											<a href="javascript:;" onclick="confirm_modal('<?php echo site_url('admin/manage_language/delete_language/'.$language);?>')" class="btn btn-danger">
 												<?php echo get_phrase('delete_language');?>
 											</a>
 										</td>

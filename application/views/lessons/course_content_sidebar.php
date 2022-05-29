@@ -1,7 +1,20 @@
-<div class="col-lg-3 mt-5 order-md-2 course_col hidden" id="lesson_list_loader" style="text-align: center;">
+<?php
+    $is_allowed = 1;
+    $show_locked_message = 0;
+    $lesson_details = $this->crud_model->get_lessons('lesson', $lesson_id)->row_array();
+    $opened_section_id = $lesson_details['section_id'];
+    $completed_lesson_ids = json_decode($watch_history['completed_lesson'], true);
+    $course_instructor_ids = explode(',', $course_details['user_id']);
+    if(in_array($this->session->userdata('user_id'), $course_instructor_ids) || $this->session->userdata('admin_login')){
+        $is_course_owner = 1;
+    }else{
+        $is_course_owner = 0;
+    }
+?>
+<div class="col-lg-3 order-2 mt-5 course_col hidden" id="lesson_list_loader" style="text-align: center;">
     <img src="<?php echo base_url('assets/backend/images/loader.gif'); ?>" alt="" height="50" width="50">
 </div>
-<div class="col-lg-3  order-md-2 course_col" id = "lesson_list_area">
+<div class="col-lg-3  order-2 course_col" id = "lesson_list_area">
     <div class="text-center" style="margin: 12px 10px;">
         <h5><?php echo get_phrase('course_content'); ?></h5>
     </div>
@@ -9,12 +22,12 @@
         <div class="col-12">
             <ul class="nav nav-tabs" id="lessonTab" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link active" id="section_and_lessons-tab" data-bs-toggle="tab" href="#section_and_lessons" role="tab" aria-controls="section_and_lessons" aria-selected="true"><?php echo get_phrase('Lessons') ?></a>
+                    <a class="nav-link active text-muted" id="section_and_lessons-tab" data-bs-toggle="tab" href="#section_and_lessons" role="tab" aria-controls="section_and_lessons" aria-selected="true"><?php echo get_phrase('Lessons') ?></a>
                 </li>
                 <!-- ZOOM LIVE CLASS TAB STARTS -->
                 <?php if (addon_status('live-class') || addon_status('jitsi-live-class')): ?>
                     <li class="nav-item">
-                        <a class="nav-link" id="liveclass-tab" data-bs-toggle="tab" href="#liveclass" role="tab" aria-controls="liveclass" aria-selected="false">
+                        <a class="nav-link text-muted" id="liveclass-tab" data-bs-toggle="tab" href="#liveclass" role="tab" aria-controls="liveclass" aria-selected="false">
                             <?php echo get_phrase('live_class'); ?>
                         </a>
                     </li>
@@ -24,7 +37,7 @@
                 <!-- CERTIFICATE TAB -->
                 <?php if (addon_status('certificate')): ?>
                     <li class="nav-item">
-                        <a class="nav-link" id="certificate-tab" data-bs-toggle="tab" href="#certificate" role="tab" aria-controls="certificate" aria-selected="false" onclick="checkCertificateEligibility()"><?php echo get_phrase('certificate'); ?></a>
+                        <a class="nav-link text-muted" id="certificate-tab" data-bs-toggle="tab" href="#certificate" role="tab" aria-controls="certificate" aria-selected="false" onclick="checkCertificateEligibility()"><?php echo get_phrase('certificate'); ?></a>
                     </li>
                 <?php endif; ?>
                 <!-- CERTIFICATE TAB -->
@@ -71,10 +84,23 @@
                                                         <?php
                                                         $lesson_progress = lesson_progress($lesson['id']);
                                                         ?>
-                                                        <div class="form-group">
-                                                            <input type="checkbox" id="<?php echo $lesson['id']; ?>" onchange="markThisLessonAsCompleted(this.id);" value = 1 <?php if($lesson_progress == 1):?> checked <?php endif; ?>>
-                                                            <label for="<?php echo $lesson['id']; ?>"></label>
-                                                        </div>
+                                                        <?php if($course_details['enable_drip_content'] == 1 && $lesson['lesson_type'] == 'video' && $lesson['video_type'] != 'google_drive' || $is_allowed == 0 && $course_details['enable_drip_content'] == 1): ?>
+                                                            <?php if($is_allowed): ?>
+                                                                <?php if(is_array($completed_lesson_ids) && in_array($lesson['id'], $completed_lesson_ids)): ?>
+                                                                    <span data-toggle="tooltip" title="<?php echo site_phrase('completed'); ?>"><i class="far fa-check-square text-success text-14px"></i></span>
+                                                                <?php else: ?>
+                                                                    <span data-toggle="tooltip" title="<?php echo site_phrase('play'); ?>"><i class="far fa-play-circle text-muted text-14px"></i></span>
+                                                                <?php endif; ?>
+                                                            <?php else: ?>
+                                                                <?php if($lesson_id == $lesson['id']) $show_locked_message = 1; ?>
+                                                                <span data-toggle="tooltip" title="<?php echo site_phrase('watch_the_previous_lesson_to_unlock'); ?>"><i class="fas fa-lock text-muted text-14px"></i></span>
+                                                            <?php endif; ?>
+                                                        <?php else: ?>
+                                                            <div class="form-group">
+                                                                <input type="checkbox" id="<?php echo $lesson['id']; ?>" onchange="markThisLessonAsCompleted(this.id);" value = 1 <?php if($lesson_progress == 1):?> checked <?php endif; ?>>
+                                                                <label for="<?php echo $lesson['id']; ?>"></label>
+                                                            </div>
+                                                        <?php endif; ?>
 
                                                         <a href="<?= $lesson_url; ?>" id = "<?php echo $lesson['id']; ?>" style="color: #444549;font-size: 14px;font-weight: 400;">
                                                             <?php echo $key+1; ?>:
@@ -88,8 +114,7 @@
 
                                                         <div class="lesson_duration">
                                                             <?php if ($lesson['lesson_type'] == 'video' || $lesson['lesson_type'] == '' || $lesson['lesson_type'] == NULL): ?>
-                                                                <?php //echo $lesson['duration']; ?>
-                                                                <i class="far fa-play-circle"></i>
+                                                                <i class="far fa-clock"></i>
                                                                 <?php echo readable_time_for_humans($lesson['duration']); ?>
                                                             <?php elseif($lesson['lesson_type'] == 'quiz'): ?>
                                                                 <i class="far fa-question-circle"></i> <?php echo get_phrase('quiz'); ?>
@@ -119,6 +144,13 @@
                                                         </div>
                                                     </td>
                                                 </tr>
+                                                <?php
+                                                    if(is_array($completed_lesson_ids) && in_array($lesson['id'], $completed_lesson_ids) || $is_course_owner):
+                                                        $is_allowed = 1;
+                                                    else:
+                                                        $is_allowed = 0;
+                                                    endif;
+                                                ?>
                                             <?php endforeach; ?>
                                         </table>
                                     </div>
@@ -242,11 +274,6 @@
     </div>
 </div>
 <script type="text/javascript">
-
-$(document).ready(function() {
-    checkCertificateEligibility();
-});
-
 function toggleAccordionIcon(elem, section_id) {
     var accordion_section_ids = [];
     $(".accordion_icon").each(function(){ accordion_section_ids.push(this.id); });
@@ -307,7 +334,6 @@ function checkCourseProgression() {
 }
 
 function initProgressBar(dataPercent) {
-    console.log("Data Percent" + dataPercent);
     var totalProgress, progress;
     const circles = document.querySelectorAll('.circular-progress');
     for(var i = 0; i < circles.length; i++) {

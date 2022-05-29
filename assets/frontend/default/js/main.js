@@ -8,7 +8,7 @@ sendEvent = function (step) {
 moveElements();
 
 function moveElements() {
-	var desktop = checkWindowWidth(768);
+	var desktop = checkWindowWidth(992);
 	var signInBox = $(".sign-in-box");
 	var userDMenu = $("li.user-dropdown-menu-item");
 	var userdBox = $(".dropdown-user-info");
@@ -63,8 +63,9 @@ if ($("div").hasClass("course-sidebar")) {
 $(window).scroll(function () {
 	if (checkWindowWidth(1200)) {
 		var scrollTop = $(window).scrollTop();
-		var offsetBottom =
-			footer.offset().top - (margin * 2 + courseSidebar.height());
+		if(footer.height()){
+			var offsetBottom = footer.offset().top - (margin * 2 + courseSidebar.height());
+		}
 		if (scrollTop > offsetTop && courseSidebar.hasClass("natural")) {
 			courseSidebar.removeClass("natural").addClass("fixed").css("top", margin);
 			courseHeader
@@ -104,7 +105,7 @@ $(document).ready(function () {
 
 	//mobile - open lateral menu clicking on the menu icon
 	$(".mobile-nav-trigger").on("click", function (event) {
-		if (!checkWindowWidth(768)) event.preventDefault();
+		if (!checkWindowWidth(992)) event.preventDefault();
 		$(".mobile-main-nav").addClass("nav-is-visible");
 		toggleSearch("close");
 		$(".mobile-overlay").addClass("is-visible");

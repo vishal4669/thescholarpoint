@@ -14,14 +14,7 @@ class Blog extends CI_Controller
         $this->output->set_header('Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
         $this->output->set_header('Pragma: no-cache');
 
-        // SESSION DATA FOR CART
-        if (!$this->session->userdata('cart_items')) {
-            $this->session->set_userdata('cart_items', array());
-        }
-        // SESSION DATA FOR FRONTEND LANGUAGE
-        if (!$this->session->userdata('language')) {
-            $this->session->set_userdata('language', get_settings('language'));
-        }
+        $this->user_model->check_session_data();       
     }
 
     function index(){

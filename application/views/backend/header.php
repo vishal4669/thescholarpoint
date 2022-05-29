@@ -88,10 +88,22 @@
                 </span>
                 <span  style="color: #fff;">
                     <?php
-                    $logged_in_user_details = $this->user_model->get_all_user($this->session->userdata('user_id'))->row_array();;
+                    $logged_in_user_details = $this->user_model->get_all_user($this->session->userdata('user_id'))->row_array();
                     ?>
                     <span class="account-user-name"><?php echo $logged_in_user_details['first_name'].' '.$logged_in_user_details['last_name'];?></span>
-                    <span class="account-position"><?php echo strtolower($this->session->userdata('role')) == 'user' ? get_phrase('instructor') : get_phrase('admin'); ?></span>
+                    <span class="account-position">
+                        <?php
+                            if(strtolower($this->session->userdata('role')) == 'user'){
+                                if($this->session->userdata('is_instructor')){
+                                    echo get_phrase('instructor');
+                                }else{
+                                    echo get_phrase('student');
+                                }
+                            }else{
+                                echo get_phrase('admin');
+                            }
+                        ?>
+                    </span>
                 </span>
             </a>
             <div class="dropdown-menu dropdown-menu-right dropdown-menu-animated topbar-dropdown-menu profile-dropdown"
@@ -102,10 +114,17 @@
             </div>
 
             <!-- Account -->
-            <a href="<?php echo site_url(strtolower($this->session->userdata('role')).'/manage_profile'); ?>" class="dropdown-item notify-item">
-                <i class="mdi mdi-account-circle mr-1"></i>
-                <span><?php echo get_phrase('my_account'); ?></span>
-            </a>
+            <?php if($this->session->userdata('admin_login') == 1): ?>
+                <a href="<?php echo site_url(strtolower($this->session->userdata('role')).'/manage_profile'); ?>" class="dropdown-item notify-item">
+                    <i class="mdi mdi-account-circle mr-1"></i>
+                    <span><?php echo get_phrase('my_account'); ?></span>
+                </a>
+            <?php else: ?>
+                <a href="<?php echo site_url('home/profile/user_profile'); ?>" class="dropdown-item notify-item">
+                    <i class="mdi mdi-account-circle mr-1"></i>
+                    <span><?php echo get_phrase('my_account'); ?></span>
+                </a>
+            <?php endif; ?>
 
             <?php if (strtolower($this->session->userdata('role')) == 'admin'): ?>
                 <!-- settings-->

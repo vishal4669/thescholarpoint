@@ -83,7 +83,7 @@ function initSummerNote(ids) {
 			e.prototype.init = function() {
 				o(ids[i]).summernote({
 					placeholder: "",
-					height: 200,
+					height: 170,
 					callbacks: {
 						onInit: function(e) {
 							o(e.editor).find(".custom-control-description").addClass("custom-control-label").parent().removeAttr("for")

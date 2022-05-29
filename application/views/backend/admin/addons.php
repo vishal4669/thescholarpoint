@@ -51,7 +51,7 @@
                           <li><a class="dropdown-item" href="#" onclick="confirm_modal('<?php echo site_url('admin/addon/activate/' . $addon['id']); ?>');"><?php echo get_phrase('active'); ?></a></li>
                         <?php endif; ?>
                         <li><a class="dropdown-item" href="#" onclick="confirm_modal('<?php echo site_url('admin/addon/delete/' . $addon['id']); ?>');"><?php echo get_phrase('delete'); ?></a></li>
-                        <li><a class="dropdown-item" href="javascript::" onclick="showAjaxModal('<?php echo site_url('modal/popup/about_this_addon/' . $addon['id']); ?>', '<?php echo get_phrase('about_this_addon'); ?>')"><?php echo get_phrase('about_this_addon'); ?></a></li>
+                        <li><a class="dropdown-item" href="javascript:;" onclick="showAjaxModal('<?php echo site_url('modal/popup/about_this_addon/' . $addon['id']); ?>', '<?php echo get_phrase('about_this_addon'); ?>')"><?php echo get_phrase('about_this_addon'); ?></a></li>
                       </ul>
                     </div>
                   </td>

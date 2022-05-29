@@ -1,6 +1,5 @@
-<!-- <link rel="favicon" href="<?php //echo base_url().'assets/frontend/default/img/icons/favicon.ico' ?>">
-<link rel="apple-touch-icon" href="<?php //echo base_url().'assets/frontend/default/img/icons/icon.png'; ?>">
- -->
+<link rel="favicon" href="<?php echo base_url().'assets/frontend/default/img/icons/favicon.ico' ?>">
+<link rel="apple-touch-icon" href="<?php echo base_url().'assets/frontend/default/img/icons/icon.png'; ?>">
 <link rel="stylesheet" href="<?php echo base_url().'assets/frontend/default/css/jquery.webui-popover.min.css'; ?>">
 <link rel="stylesheet" href="<?php echo base_url().'assets/frontend/default/css/select2.min.css'; ?>">
 <link rel="stylesheet" href="<?php echo base_url().'assets/frontend/default/css/slick.css'; ?>">

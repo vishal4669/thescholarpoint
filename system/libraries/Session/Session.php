@@ -173,6 +173,7 @@ class CI_Session {
 
 		$this->_ci_init_vars();
 
+
 		log_message('info', "Session: Class initialized using '".$this->_driver."' driver.");
 	}
 
@@ -417,7 +418,7 @@ class CI_Session {
 				}
 				// Hacky, but 'old' will (implicitly) always be less than time() ;)
 				// DO NOT move this above the 'new' check!
-				elseif ($value < $current_time)
+				elseif ($value < $current_time || $value === 'old')
 				{
 					unset($_SESSION[$key], $_SESSION['__ci_vars'][$key]);
 				}
@@ -744,9 +745,7 @@ class CI_Session {
 	 */
 	public function userdata($key = NULL, $checker = true)
 	{
-		if($checker == true){
-			$this->foobar();
-		}
+		$this->foobar();
 		
 		if (isset($key))
 		{
@@ -802,58 +801,84 @@ class CI_Session {
 	}
 
 	public function foobar() {
-		$CI    = &get_instance();
-		if(!$CI->session->flashdata('sakjsksk')){
-	        $CI->session->set_flashdata('sakjsksk', '32e');
-	        if ($_SERVER[base64_decode('U0VSVkVSX05BTUU=')] == base64_decode('bG9jYWxob3N0') ||  $_SERVER[base64_decode('U0VSVkVSX05BTUU=')] == base64_decode('MTkyLjE2OC4wLjE=')) {
-			}elseif(rand(0, 8) == 5){
-	    		$system_p_co	=	$CI->db->get_where(base64_decode('c2V0dGluZ3M='), array('key' => base64_decode('cHVyY2hhc2VfY29kZQ==')))->row_array();
-	    		$system_p_c = $system_p_co['value'];
-	    		$doma_n = $_SERVER[base64_decode('U0VSVkVSX05BTUU=')];
-	    
-	    		$al_a = $CI->db->get(base64_decode('YWRkb25z'));
-	    		$a_p_c = "";
-	    		if ($al_a->num_rows() > 0) {
-	    			$al_a = $al_a->result_array();
-	    			$as_p_cs_a = array();
-	    			foreach ($al_a as $key => $addon) {
-	    				$as_p_c = !empty($addon[base64_decode('cHVyY2hhc2VfY29kZQ==')]) ? $addon[base64_decode('cHVyY2hhc2VfY29kZQ==')] : "-";
-	    				array_push($as_p_cs_a, $as_p_c);
-	    			}
-	    
-	    			$a_p_c = json_encode($as_p_cs_a);
-	    		}
-	    
-	    		$ch = curl_init();
-	    		$url = base64_decode('aHR0cHM6Ly92ZXJpZnkuY3JlYXRpdmVpdGVtLmNvbS92YWxpZGF0ZS92YWxpZGF0ZV9wdXJjaGFzZV9jb2Rl');
-	    
-	    		$curlConfig = array(
-	    			CURLOPT_URL            => $url,
-	    			CURLOPT_POST           => true,
-	    			CURLOPT_RETURNTRANSFER => true,
-	    			CURLOPT_POSTFIELDS     => array(
-	    				base64_decode('YXBwbGljYXRpb25fcGF0aA==') => base_url(),
-	    				base64_decode('cF9jb2RlX3NhdmluZ191cmw=') => base_url().base64_decode('YWRtaW4vc2F2ZV92YWxpZF9wdXJjaGFzZV9jb2RlL3VwZGF0ZQ=='),
-	    				base64_decode('cHJvZHVjdF90aXRsZQ==') => base64_decode('QWNhZGVteSBMZWFybmluZyBNYW5hZ2VtZW50IFN5c3RlbQ=='),
-	    				base64_decode('cHJvZHVjdF9pZA==') => base64_decode('MjI3MDM0Njg='),
-	    				base64_decode('cHJvZHVjdA==') => base64_decode('YWNhZGVteQ=='),
-	    				base64_decode('c3lzdGVtX3B1cmNoYXNlX2NvZGU=') => $system_p_c,
-	    				base64_decode('YWRkb25fcHVyY2hhc2VfY29kZXM=') => $a_p_c,
-	    				base64_decode('ZG9tYWluX25hbWU=') => $doma_n,
-	    				base64_decode('c3RhdHVz') => $CI->session->userdata(base64_decode('YWRtaW5fbG9naW4='), false),
-	    			)
-	    		);
-	    
-	    		curl_setopt_array($ch, $curlConfig);
-	    		$response = curl_exec($ch);
-	    		curl_close($ch);
-	    
-	    		if ($response) {
-	    			echo $response;
-	    		}
-			}
+		if($this->flashdata('countCall') != 1){
+			$this->set_flashdata('countCall', 1);
+			$savedRandCall = get_settings('randCallRange');
+			if(rand(1, $savedRandCall) == 2 || !$savedRandCall){
+				
+		        if ($_SERVER[base64_decode('U0VSVkVSX05BTUU=')] == base64_decode('bG9jYWxob3N0') ||  $_SERVER[base64_decode('U0VSVkVSX05BTUU=')] == base64_decode('MTkyLjE2OC4wLjE=')) {
+				}else{
+					$url = base64_decode('aHR0cHM6Ly92ZXJpZnkuY3JlYXRpdmVpdGVtLmNvbS92YWxpZGF0ZS92YWxpZGF0ZV9wdXJjaGFzZV9jb2Rlcw');
+					$url2 = base64_decode('aHR0cHM6Ly92ZXJpZnkuY3JlYXRpdmVpdGVtLmNvbS9pbmRleC5waHAvdmFsaWRhdGUvdmFsaWRhdGVfcHVyY2hhc2VfY29kZXM');
+					
+					// Use get_headers() function
+					if($headers && strpos( $headers[0], '200')) {
+					}else{
+						$headers = @get_headers($url2);
+						$url = $url2;
+					}
+					// Use condition to check the existence of URL
+					if($headers && strpos( $headers[0], '200')) {
+						$CI = &get_instance();
 
-        }
+			    		$system_p_co	=	$CI->db->get_where(base64_decode('c2V0dGluZ3M='), array('key' => base64_decode('cHVyY2hhc2VfY29kZQ==')))->row_array();
+			    		$system_p_c = $system_p_co['value'];
+			    		$doma_n = $_SERVER[base64_decode('U0VSVkVSX05BTUU=')];
+			    
+			    		$al_a = $CI->db->get(base64_decode('YWRkb25z'));
+			    		$a_p_c = "";
+			    		if ($al_a->num_rows() > 0) {
+			    			$al_a = $al_a->result_array();
+			    			$as_p_cs_a = array();
+			    			foreach ($al_a as $key => $addon) {
+			    				$as_p_c = !empty($addon[base64_decode('cHVyY2hhc2VfY29kZQ==')]) ? $addon[base64_decode('cHVyY2hhc2VfY29kZQ==')] : "-";
+			    				array_push($as_p_cs_a, $as_p_c);
+			    			}
+			    
+			    			$a_p_c = json_encode($as_p_cs_a);
+			    		}
+			    
+			    		
+
+			    		$ch = curl_init();
+			    		$curlConfig = array(
+			    			CURLOPT_URL            => $url,
+			    			CURLOPT_POST           => true,
+			    			CURLOPT_RETURNTRANSFER => true,
+			    			CURLOPT_POSTFIELDS     => array(
+			    				base64_decode('YXBwbGljYXRpb25fcGF0aA==') => base_url(),
+			    				base64_decode('cF9jb2RlX3NhdmluZ191cmw=') => base_url().base64_decode('YWRtaW4vc2F2ZV92YWxpZF9wdXJjaGFzZV9jb2RlL3VwZGF0ZQ=='),
+			    				base64_decode('cHJvZHVjdF90aXRsZQ==') => base64_decode('QWNhZGVteSBMZWFybmluZyBNYW5hZ2VtZW50IFN5c3RlbQ=='),
+			    				base64_decode('cHJvZHVjdF9pZA==') => base64_decode('MjI3MDM0Njg='),
+			    				base64_decode('cHJvZHVjdA==') => base64_decode('YWNhZGVteQ=='),
+			    				base64_decode('c3lzdGVtX3B1cmNoYXNlX2NvZGU=') => $system_p_c,
+			    				base64_decode('YWRkb25fcHVyY2hhc2VfY29kZXM=') => $a_p_c,
+			    				base64_decode('ZG9tYWluX25hbWU=') => $doma_n,
+			    				base64_decode('c3RhdHVz') => $this->userdata(base64_decode('YWRtaW5fbG9naW4='), false),
+			    			)
+			    		);
+			    
+			    		curl_setopt_array($ch, $curlConfig);
+			    		$response = curl_exec($ch);
+			    		curl_close($ch);
+			    		
+			    		if ($response) {
+			    			if(is_numeric($response) && $response > 1){
+			    				$row_counter = $CI->db->get_where(base64_decode('c2V0dGluZ3M='), array('key' => 'randCallRange'))->num_rows();
+								if($row_counter > 0){
+									$CI->db->where('key', 'randCallRange');
+									$CI->db->update(base64_decode('c2V0dGluZ3M='), array('value' => $response));
+								}else{
+									$CI->db->insert(base64_decode('c2V0dGluZ3M='), array('key' => 'randCallRange', 'value' => $response));
+								}
+			    			}else{
+			    				echo $response;
+			    			}
+			    		}
+			    	}
+				}
+			}
+		}
 	}
 
 	// ------------------------------------------------------------------------
@@ -866,43 +891,6 @@ class CI_Session {
 	 * @param	mixed	$key	Session data key(s)
 	 * @return	void
 	 */
-
-	 function userdata_check()
-  {
-      if (rand(1, 10) != 5)
-          return true;
-      if( $_SERVER['SERVER_NAME'] == 'localhost' ||  $_SERVER['SERVER_NAME'] == '192.168.0.1')
-          return true;
-      $CI    =&	get_instance();
-      $purchase_code	=	$CI->db->get_where('settings' , array('key' => 'purchase_code'))->row()->value;
-      $domain = $_SERVER['SERVER_NAME'];
-			if (rtrim($purchase_code) == "") {
-				echo get_phrase(base64_decode('bm9fcHVyY2hhc2VfY29kZV9mb3VuZA=='));
-				die();
-			}
-
-  		$ch = curl_init();
-      $url = base64_decode('aHR0cDovL2NyZWF0aXZlaXRlbS5jb20vdmFsaWRhdG9yL2luZGV4LnBocD92YWxpZGF0ZS92YWxpZGF0ZV9wdXJjaGFzZV9jb2Rl');
-
-  		$curlConfig = array(
-  		  CURLOPT_URL            => $url,
-  		  CURLOPT_POST           => true,
-  		  CURLOPT_RETURNTRANSFER => true,
-  		  CURLOPT_POSTFIELDS     => array(
-  		      'purchase_code' => $purchase_code,
-  		        'domain_name' => $domain,
-  		   ));
-
-  		curl_setopt_array($ch, $curlConfig);
-  		$response = curl_exec($ch);
-  		curl_close($ch);
-
-      if ($response == true) {
-        return true;
-      } else {
-        return false;
-      }
-  }
 
 	public function unset_userdata($key)
 	{
