@@ -44,7 +44,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="twitter"><?php echo get_phrase('twitter'); ?></label>
+                        <label for="twitter"><?php echo get_phrase('instagram'); ?></label>
                         <input type="text" name = "twitter" id = "twitter" class="form-control" value="<?php echo get_frontend_settings('twitter');  ?>">
                     </div>
 
@@ -71,7 +71,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="refund_policy"><?php echo get_phrase('refund_policy'); ?></label>
+                        <label for="refund_policy"><?php echo get_phrase('contact_us'); ?></label>
                         <textarea name="refund_policy" id = "refund_policy" class="form-control" rows="5"><?php echo get_frontend_settings('refund_policy'); ?></textarea>
                     </div>
 

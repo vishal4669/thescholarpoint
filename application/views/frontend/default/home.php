@@ -113,6 +113,7 @@
                         $cart_items = $this->session->userdata('cart_items');
                         foreach ($top_courses as $top_course) : ?>
                             <?php
+                            $is_course_launch = compare_course_launch_date($top_course['course_launch_date']);
                                 $lessons = $this->crud_model->get_lessons('course', $top_course['id']);
                                 $course_duration = $this->crud_model->get_total_duration_of_lesson_by_course_id($top_course['id']);
                             ?>
@@ -161,9 +162,11 @@
                                                 <div class="col-6">
                                                     <span class="badge badge-sub-warning text-11px"><?php echo site_phrase($top_course['level']); ?></span>
                                                 </div>
+                                                 <?php if($is_course_launch =='YES') : ?>
                                                 <div class="col-6 text-end">
                                                     <button class="brn-compare-sm" onclick="return check_action(this, '<?php echo site_url('home/compare?course-1=' . rawurlencode(slugify($top_course['title'])) . '&&course-id-1=' . $top_course['id']); ?>');"><i class="fas fa-balance-scale"></i> <?php echo site_phrase('compare'); ?></button>
                                                 </div>
+                                                 <?php endif;?>
                                             </div>
 
                                             <hr class="divider-1">
@@ -236,7 +239,7 @@
                                         <div class="popover-btns">
                                             <?php if (is_purchased($top_course['id'])) : ?>
                                                 <div class="purchased">
-                                                    <a href="<?php echo site_url('home/my_courses'); ?>"><?php echo site_phrase('already_purchased'); ?></a>
+                                                    <a href="<?php echo site_url('home/lesson/'.rawurlencode(slugify($top_course['title'])).'/'.$top_course['id']); ?>"><?php echo site_phrase('start_session'); ?></a>
                                                 </div>
                                             <?php else : ?>
                                                 <?php if ($top_course['is_free_course'] == 1) :
@@ -247,14 +250,23 @@
                                                     } ?>
                                                     <a href="<?php echo $url; ?>" class="btn green radius-10" onclick="handleEnrolledButton()"><?php echo site_phrase('get_enrolled'); ?></a>
                                                 <?php else : ?>
+                                                    
+                                                <?php if($is_course_launch =='YES') : ?>
                                                     <button type="button" class="btn red add-to-cart-btn <?php if (in_array($top_course['id'], $cart_items)) echo 'addedToCart'; ?> big-cart-button-<?php echo $top_course['id']; ?>" id="<?php echo $top_course['id']; ?>" onclick="handleCartItems(this)">
-                                                        <?php
-                                                        if (in_array($top_course['id'], $cart_items))
-                                                            echo site_phrase('added_to_cart');
-                                                        else
-                                                            echo site_phrase('add_to_cart');
-                                                        ?>
-                                                    </button>
+                                                    <?php
+                                                    if (in_array($top_course['id'], $cart_items))
+                                                        echo site_phrase('added_to_cart');
+                                                    else
+                                                        echo site_phrase('add_to_cart');
+                                                    ?>
+                                                </button>
+                                                <?php else : ?>
+                                                <button type="button" class="btn red add-to-cart-btn" id="">
+                                                        <?php echo $is_course_launch;?>
+                                                </button>
+                                                <?php endif;?>
+
+
                                                 <?php endif; ?>
                                                 <button type="button" class="wishlist-btn <?php if ($this->crud_model->is_added_to_wishlist($top_course['id'])) echo 'active'; ?>" title="Add to wishlist" onclick="handleWishList(this)" id="<?php echo $top_course['id']; ?>"><i class="fas fa-heart"></i></button>
                                             <?php endif; ?>
@@ -407,7 +419,7 @@
                                         <div class="popover-btns">
                                             <?php if (is_purchased($latest_course['id'])) : ?>
                                                 <div class="purchased">
-                                                    <a href="<?php echo site_url('home/my_courses'); ?>"><?php echo site_phrase('already_purchased'); ?></a>
+                                                    <a href="<?php echo site_url('home/lesson/'.rawurlencode(slugify($latest_course['title'])).'/'.$latest_course['id']); ?>"><?php echo site_phrase('start_session'); ?></a>
                                                 </div>
                                             <?php else : ?>
                                                 <?php if ($latest_course['is_free_course'] == 1) :

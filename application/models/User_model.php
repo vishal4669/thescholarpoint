@@ -43,6 +43,7 @@ class User_model extends CI_Model
             $data['first_name'] = html_escape($this->input->post('first_name'));
             $data['last_name'] = html_escape($this->input->post('last_name'));
             $data['email'] = html_escape($this->input->post('email'));
+            $data['mobile'] = html_escape($this->input->post('mobile'));
             $data['password'] = sha1(html_escape($this->input->post('password')));
             $social_link['facebook'] = html_escape($this->input->post('facebook_link'));
             $social_link['twitter'] = html_escape($this->input->post('twitter_link'));
@@ -218,6 +219,9 @@ class User_model extends CI_Model
 
             if (isset($_POST['email'])) {
                 $data['email'] = html_escape($this->input->post('email'));
+            }
+            if (isset($_POST['mobile'])) {
+                $data['mobile'] = html_escape($this->input->post('mobile'));
             }
             $social_link['facebook'] = html_escape($this->input->post('facebook_link'));
             $social_link['twitter'] = html_escape($this->input->post('twitter_link'));

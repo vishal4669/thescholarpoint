@@ -14,20 +14,20 @@
 <div class="col-lg-3 order-2 mt-5 course_col hidden" id="lesson_list_loader" style="text-align: center;">
     <img src="<?php echo base_url('assets/backend/images/loader.gif'); ?>" alt="" height="50" width="50">
 </div>
-<div class="col-lg-3  order-2 course_col" id = "lesson_list_area">
+<div class="col-lg-12  order-2 course_col" id = "lesson_list_area">
     <div class="text-center" style="margin: 12px 10px;">
-        <h5><?php echo get_phrase('course_content'); ?></h5>
+        <h5><?php echo get_phrase('course_live_session'); ?></h5>
     </div>
     <div class="row" style="margin: 12px -1px">
         <div class="col-12">
             <ul class="nav nav-tabs" id="lessonTab" role="tablist">
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a class="nav-link active text-muted" id="section_and_lessons-tab" data-bs-toggle="tab" href="#section_and_lessons" role="tab" aria-controls="section_and_lessons" aria-selected="true"><?php echo get_phrase('Lessons') ?></a>
-                </li>
+                </li> -->
                 <!-- ZOOM LIVE CLASS TAB STARTS -->
                 <?php if (addon_status('live-class') || addon_status('jitsi-live-class')): ?>
                     <li class="nav-item">
-                        <a class="nav-link text-muted" id="liveclass-tab" data-bs-toggle="tab" href="#liveclass" role="tab" aria-controls="liveclass" aria-selected="false">
+                        <a class="nav-link text-muted" id="liveclass-tab" data-bs-toggle="tab" href="#liveclass" role="tab" aria-controls="liveclass" aria-selected="true">
                             <?php echo get_phrase('live_class'); ?>
                         </a>
                     </li>
@@ -43,7 +43,7 @@
                 <!-- CERTIFICATE TAB -->
             </ul>
             <div class="tab-content" id="lessonTabContent">
-                <div class="tab-pane fade show active" id="section_and_lessons" role="tabpanel" aria-labelledby="section_and_lessons-tab">
+                <div class="tab-pane fade" id="section_and_lessons" role="tabpanel" aria-labelledby="section_and_lessons-tab" style="display: none;">
                     <!-- Lesson Content starts from here -->
                     <div class="accordion" id="accordionExample">
                         <?php
@@ -163,7 +163,7 @@
 
                 <!-- ZOOM LIVE CLASS TAB STARTS-->
                 
-                    <div class="tab-pane fade" id="liveclass" role="tabpanel" aria-labelledby="liveclass-tab" style="text-align: center;">
+                    <div class="tab-pane fade show active" id="liveclass" role="tabpanel" aria-labelledby="liveclass-tab" style="text-align: center;">
                         <?php if (addon_status('live-class')): ?>
                             <?php
                             $live_class = $this->db->get_where('live_class', array('course_id' => $course_id));

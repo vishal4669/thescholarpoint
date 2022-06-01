@@ -76,6 +76,8 @@ $route['ebook/buy/(:any)'] = "addons/ebook/buy/$1";
 $route['home/my_ebooks'] = "addons/ebook/my_ebooks";
 //end ebook
 
+$route['home/contact_us'] = "home/contact_us";
+
 //BLog
 $route['blogs'] = "blog/blogs";
 $route['blogs/(:any)'] = "blog/blogs/$1";

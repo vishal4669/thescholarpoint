@@ -25,7 +25,7 @@ $course_details_url = site_url("home/course/".slugify($course_details['title']).
                     $completed_lesson_id_rr = json_decode($watch_history['completed_lesson'], true);
                 }
             ?>
-            <span class="d-inline-block ml-auto"><?php echo $watch_history['course_progress'].'% '.site_phrase('completed'); ?>(<?php echo count($completed_lesson_id_rr); ?>/<?php echo $this->crud_model->get_lessons('course', $course_details['id'])->num_rows(); ?>)</span>
+           <!--  <span class="d-inline-block ml-auto" style="display:none;"><?php //echo $watch_history['course_progress'].'% '.site_phrase('completed'); ?>(<?php //echo count($completed_lesson_id_rr); ?>/<?php //echo $this->crud_model->get_lessons('course', $course_details['id'])->num_rows(); ?>)</span> -->
         </div>
         <div class="col-md-12 col-lg-5 col-xl-3 course_header_col text-right">
             <a href="javascript:;" class="course_btn" onclick="toggle_lesson_view()"><i class="fa fa-arrows-alt-h"></i></a>
@@ -43,7 +43,7 @@ $course_details_url = site_url("home/course/".slugify($course_details['title']).
 
         <?php if (isset($lesson_id) == true || isset($scorm_curriculum) == true): ?>
             <!-- Course content, video, quizes, files starts-->
-            <?php include $course_details['course_type'].'_course_content_body.php'; ?>
+            <?php //include $course_details['course_type'].'_course_content_body.php'; ?>
             <!-- Course content, video, quizes, files ends-->
         <?php endif; ?>
 

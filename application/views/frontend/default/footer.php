@@ -39,7 +39,7 @@
           <li class="mb-2"><a class="link-secondary footer-hover-link" href="<?php echo site_url('home/about_us'); ?>"><?php echo site_phrase('about_us'); ?></a></li>
           <li class="mb-2"><a class="link-secondary footer-hover-link" href="<?php echo site_url('home/privacy_policy'); ?>"><?php echo site_phrase('privacy_policy'); ?></a></li>
           <li class="mb-2"><a class="link-secondary footer-hover-link" href="<?php echo site_url('home/terms_and_condition'); ?>"><?php echo site_phrase('terms_and_condition'); ?></a></li>
-          <li class="mb-2"><a class="link-secondary footer-hover-link" href="<?php echo site_url('home/refund_policy'); ?>"><?php echo site_phrase('refund_policy'); ?></a></li>
+          <li class="mb-2"><a class="link-secondary footer-hover-link" href="<?php echo site_url('home/contact_us'); ?>"><?php echo site_phrase('contact_us'); ?></a></li>
         </ul>
       </div>
       <div class="<?php if($course_accessibility){echo 'col-md-3';}else{echo 'col-md-6';} ?> col-sm-12 order-sm-first">
@@ -57,7 +57,7 @@
           <?php endif; ?>
           <?php if($twitter): ?>
             <li class="mb-1">
-              <a href="<?php echo $twitter; ?>"><i class="fab fa-twitter"></i></a>
+              <a href="<?php echo $twitter; ?>"><i class="fab fa-instagram"></i></a>
             </li>
           <?php endif; ?>
           <?php if($linkedin): ?>

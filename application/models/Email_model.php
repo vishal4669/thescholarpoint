@@ -339,7 +339,7 @@ class Email_model extends CI_Model {
 			'smtp_port' => get_settings('smtp_port'),
 			'smtp_user' => get_settings('smtp_user'),
 			'smtp_pass' => get_settings('smtp_pass'),
-			'smtp_crypto' => get_settings('smtp_crypto'), //can be 'ssl' or 'tls' for example
+			//'smtp_crypto' => get_settings('smtp_crypto'), //can be 'ssl' or 'tls' for example
 			'mailtype'  => 'html',
 			'newline'   => "\r\n",
 			'charset'   => 'utf-8',
@@ -358,7 +358,7 @@ class Email_model extends CI_Model {
 
 		//Send email
 		$this->email->send();
-		// echo $this->email->print_debugger();
-		// die();
+		//echo $this->email->print_debugger();
+		//die();
 	}
 }

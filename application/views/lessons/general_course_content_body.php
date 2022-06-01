@@ -10,13 +10,15 @@
             $lesson_thumbnail_url = $this->crud_model->get_lesson_thumbnail_url($lesson_id);
             // If the lesson type is video
             // i am checking the null and empty values because of the existing users does not have video in all video lesson as type
+
             if($lesson_details['lesson_type'] == 'video' || $lesson_details['lesson_type'] == '' || $lesson_details['lesson_type'] == NULL):
                 $video_url = $lesson_details['video_url'];
                 $provider = $lesson_details['video_type'];
+                parse_str( parse_url($lesson_details['video_url'], PHP_URL_QUERY ), $youtube_var);                
                 ?>
 
                 <!-- If the video is youtube video -->
-                <?php if (strtolower($provider) == 'youtube'): ?>
+                <?php if ($youtube_var['v'] != ""): ?>
                     <!------------- PLYR.IO ------------>
                     <link rel="stylesheet" href="<?php echo base_url();?>assets/global/plyr/plyr.css">
 

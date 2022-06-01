@@ -247,15 +247,31 @@ class Home extends CI_Controller
             $this->user_model->update_account_settings($this->session->userdata('user_id'));
             redirect(site_url('home/profile/user_credentials'), 'refresh');
         } elseif ($param1 == "update_photo") {
+
             if (isset($_FILES['user_image']) && $_FILES['user_image']['name'] != "") {
+
+                // Get image file extension
+                $file_extension = pathinfo($_FILES["user_image"]["name"], PATHINFO_EXTENSION);            
+                $allowed_image_extension = array("png","jpg","jpeg");
+
+                if(! in_array($file_extension, $allowed_image_extension)){
+                     $this->session->set_flashdata('error_message', site_phrase('please_enter_valid_image_extension_such_as_.png_.jpg_.jpeg'));
+                     redirect(site_url('home/profile/user_photo'), 'refresh');
+                }
+
                 unlink('uploads/user_image/' . $this->db->get_where('users', array('id' => $this->session->userdata('user_id')))->row('image') . '.jpg');
                 $data['image'] = md5(rand(10000, 10000000));
                 $this->db->where('id', $this->session->userdata('user_id'));
                 $this->db->update('users', $data);
                 $this->user_model->upload_user_image($data['image']);
+
+                $this->session->set_flashdata('flash_message', site_phrase('updated_successfully'));
+
+            }else{
+                $this->session->set_flashdata('error_message', site_phrase('please_select_your_profile_image'));
             }
-            $this->session->set_flashdata('flash_message', site_phrase('updated_successfully'));
             redirect(site_url('home/profile/user_photo'), 'refresh');
+
         }
     }
 
@@ -689,6 +705,13 @@ class Home extends CI_Controller
     {
         $page_data['page_name'] = 'refund_policy';
         $page_data['page_title'] = site_phrase('refund_policy');
+        $this->load->view('frontend/' . get_frontend_settings('theme') . '/index', $page_data);
+    }
+
+     public function contact_us()
+    {
+        $page_data['page_name'] = 'contact_us';
+        $page_data['page_title'] = site_phrase('contact_us');
         $this->load->view('frontend/' . get_frontend_settings('theme') . '/index', $page_data);
     }
 

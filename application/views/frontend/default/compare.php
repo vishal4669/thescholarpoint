@@ -108,7 +108,18 @@
                                         <a href="<?php echo site_url('home/get_enrolled_to_free_course/' . $course_1_details['id']); ?>" class="btn red radius-10 mt-3 py-2"><?php echo site_phrase('get_enrolled'); ?></a>
                                     <?php endif; ?>
                                 <?php else : ?>
-                                    <a href="javascript:;" class="btn red radius-10 mt-3 py-2" id="course_<?php echo $course_1_details['id']; ?>" onclick="handleBuyNow(this)"><?php echo site_phrase('buy_now'); ?></a>
+
+                                <?php 
+                                    $is_course_launch = compare_course_launch_date($course_1_details['course_launch_date']);
+                                        if($is_course_launch =='YES') :
+                                    ?>
+                                    <a href="javascript::" class="btn red radius-10 mt-3 py-2" id="course_<?php echo $course_1_details['id']; ?>" onclick="handleBuyNow(this)"><?php echo site_phrase('buy_now'); ?></a>
+
+                                <?php else: ?>
+                                    <a href="javascript::" class="btn red radius-10 mt-3 py-2"><?php echo $is_course_launch;?></a>
+
+                                <?php endif;?>
+
                                 <?php endif; ?>
                             <?php endif; ?>
 
@@ -146,8 +157,19 @@
                                     <?php else : ?>
                                         <a href="<?php echo site_url('home/get_enrolled_to_free_course/' . $course_2_details['id']); ?>" class="btn red radius-10 mt-3 py-2"><?php echo site_phrase('get_enrolled'); ?></a>
                                     <?php endif; ?>
-                                <?php else : ?>
-                                    <a href="javascript:;" class="btn red radius-10 mt-3 py-2" id="course_<?php echo $course_2_details['id']; ?>" onclick="handleBuyNow(this)"><?php echo site_phrase('buy_now'); ?></a>
+                                <?php else : ?>                                 
+
+                                    <?php $is_course_launch = compare_course_launch_date($course_2_details['course_launch_date']);
+                                        if($is_course_launch =='YES') :
+                                    ?>
+                                    <a href="javascript::" class="btn red radius-10 mt-3 py-2" id="course_<?php echo $course_2_details['id']; ?>" onclick="handleBuyNow(this)"><?php echo site_phrase('buy_now'); ?></a>
+
+                                    <?php else: ?>
+                                        <a href="javascript::" class="btn red radius-10 mt-3 py-2" id="">
+                                        <?php echo $is_course_launch;?> 
+                                        </a>
+                                    <?php endif;?>
+
                                 <?php endif; ?>
                             <?php endif; ?>
                             <br>
@@ -184,8 +206,18 @@
                                     <?php else : ?>
                                         <a href="<?php echo site_url('home/get_enrolled_to_free_course/' . $course_3_details['id']); ?>" class="btn red radius-10 mt-3 py-2"><?php echo site_phrase('get_enrolled'); ?></a>
                                     <?php endif; ?>
-                                <?php else : ?>
-                                    <a href="javascript:;" class="btn red radius-10 mt-3 py-2" id="course_<?php echo $course_3_details['id']; ?>" onclick="handleBuyNow(this)"><?php echo site_phrase('buy_now'); ?></a>
+                                <?php else : ?>                                                                
+
+                                     <?php 
+                                    $is_course_launch = compare_course_launch_date($course_3_details['course_launch_date']);
+
+                                    if($is_course_launch =='YES') : 
+                                    ?>
+                                    <a href="javascript::" class="btn red radius-10 mt-3 py-2" id="course_<?php echo $course_3_details['id']; ?>" onclick="handleBuyNow(this)"><?php echo site_phrase('buy_now'); ?></a>
+                                <?php else: ?>
+                                    <a href="javascript::" class="btn red radius-10 mt-3 py-2" id=""><?php echo $is_course_launch; ?></a>
+                                <?php endif;?>
+                                
                                 <?php endif; ?>
                             <?php endif; ?>
                             <br>
