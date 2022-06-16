@@ -873,10 +873,10 @@
     "pay_by_paypal": "Pay by paypal",
     "pay_with_stripe": "Pay with stripe",
     "pay_by_razorpay": "Pay by razorpay",
-    "pay_by_paytm": "Pay by paytm",
+    "pay_by_paytm": "Pay Now",
     "paytm_checkout": "Paytm checkout",
     "amount_to_pay": "Amount to pay",
-    "pay_via_paytm": "Pay via paytm",
+    "pay_via_paytm": "Proceed For Payment",
     "please_do_not_refresh_this_page": "Please do not refresh this page",
     "payment_successfully_done": "Payment successfully done",
     "an_error_occurred_during_payment": "An error occurred during payment",
@@ -893,5 +893,8 @@
     "lesson_not_found": "Lesson not found",
     "course_live_session": "Course live session",
     "1refund_policy": "1refund policy",
-    "contact_us": "Contact us"
+    "contact_us": "Contact us",
+    "the_verification_code_is_wrong": "The verification code is wrong",
+    "for_more_details_check_out_our": "For more details check out our",
+    "website": "Website"
 }

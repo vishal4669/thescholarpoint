@@ -12,7 +12,10 @@
           <form action="javascript:;" method="post" id="email_verification">
             <div class="form-group">                
 
-                <input type="hidden" id="mobile" name="mobile" value="+91<?php echo $mobile = $this->session->userdata('mobile'); ?>">               
+                <input type="hidden" id="mobile" name="mobile" value="+91<?php echo $mobile = $this->session->userdata('mobile'); ?>"> 
+
+                <input type="hidden" id="is_otp_sent" name="is_otp_sent" value="0">               
+
                 <div id="recaptcha-container"></div>
               <label for="verification_code"><?php echo site_phrase('verification_code'); ?></label>
               <div class="input-group">
@@ -70,7 +73,8 @@ window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-contai
     });
 
 $(document).ready(function() {
-    phoneAuth();
+    phoneAuth(); 
+
 });
 
 function phoneAuth() {
@@ -105,11 +109,13 @@ function codeverify() {
           url: '<?php echo site_url('login/verify_email_address/'); ?>',
           data: {verification_code : code, email : email},
           success: function(response){
+
             if(response){
-              console.log(response);
-              window.location.replace(response);
+              console.log(response);              
+               window.location.replace(response);              
             }else{
-              location.reload();
+              window.location.replace('<?php echo site_url('home/'); ?>');
+              //location.reload();
             }
           }
         });
@@ -119,6 +125,5 @@ function codeverify() {
     });
 
 }
-
 
 </script>

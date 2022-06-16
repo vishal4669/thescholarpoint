@@ -295,8 +295,8 @@ class Login extends CI_Controller
             $this->session->set_userdata('user_login', '1');
 
             //redirect(site_url('home'), 'refresh');
-
-            echo site_url('home');
+            echo $this->session->userdata('url_history');
+            
         } else {
             $this->session->set_flashdata('error_message', get_phrase('the_verification_code_is_wrong') . '.');
             echo false;
