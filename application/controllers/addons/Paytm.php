@@ -26,6 +26,13 @@ class Paytm extends CI_Controller
 
         // CHECK IF THE ADDON IS ACTIVE OR NOT
         $this->check_addon_status();
+
+        header("Pragma: no-cache");
+        header("Cache-Control: no-cache");
+        header("Expires: 0");
+        // following files need to be included
+        require_once(APPPATH . "/libraries/Paytm/config_paytm.php");
+        require_once(APPPATH . "/libraries/Paytm/encdec_paytm.php");
     }
 
     function admin_login_check()
@@ -89,12 +96,12 @@ class Paytm extends CI_Controller
     public function payThroughPaytm()
     {
 
-        header("Pragma: no-cache");
-        header("Cache-Control: no-cache");
-        header("Expires: 0");
-        // following files need to be included
-        require_once(APPPATH . "/libraries/Paytm/config_paytm.php");
-        require_once(APPPATH . "/libraries/Paytm/encdec_paytm.php");
+        // header("Pragma: no-cache");
+        // header("Cache-Control: no-cache");
+        // header("Expires: 0");
+        // // following files need to be included
+        // require_once(APPPATH . "/libraries/Paytm/config_paytm.php");
+        // require_once(APPPATH . "/libraries/Paytm/encdec_paytm.php");
 
         $paytm_keys = get_settings('paytm_keys');
         $paytm_keys = json_decode($paytm_keys, true);
@@ -120,6 +127,23 @@ class Paytm extends CI_Controller
         $payment_request = $this->input->post('payment_request');
 
         // Create an array having all required parameters for creating checksum.
+
+
+
+        $cart_items = $this->session->userdata('cart_items');
+
+
+        $payment_info = array($cart_items, $user_id, $TXN_AMOUNT);
+        //print_r($payment_info);
+
+        $payment_info = json_encode($payment_info);
+        //echo $payment_info;
+
+        $payment_info = base64_encode($payment_info);
+        $payment_info = str_replace("=","",$payment_info);
+
+
+
         $paramList["MID"] = PAYTM_MERCHANT_MID;
         $paramList["ORDER_ID"] = $ORDER_ID;
         $paramList["CUST_ID"] = $CUST_ID;
@@ -127,7 +151,7 @@ class Paytm extends CI_Controller
         $paramList["CHANNEL_ID"] = $CHANNEL_ID;
         $paramList["TXN_AMOUNT"] = $TXN_AMOUNT;
         $paramList["WEBSITE"] = PAYTM_MERCHANT_WEBSITE;
-        $paramList["CALLBACK_URL"] = site_url("addons/paytm/pgResponse/" . $payment_request);
+        $paramList["CALLBACK_URL"] = site_url("addons/paytm/pgResponse/" . $payment_request.'/'.$payment_info);
 
         //Here checksum string will return by getChecksumFromArray() function.
         $checkSum = getChecksumFromArray($paramList, PAYTM_MERCHANT_KEY);
@@ -137,34 +161,29 @@ class Paytm extends CI_Controller
         $this->load->view('payment/paytm_merchant_checkout', $page_data);
     }
 
-    public function pgResponse($payment_request)
+    public function pgResponse($payment_request, $payment_info = "")
     {
 
-        header("Pragma: no-cache");
-        header("Cache-Control: no-cache");
-        header("Expires: 0");
-
-        // following files need to be included
-        require_once(APPPATH . "/libraries/Paytm/config_paytm.php");
-        require_once(APPPATH . "/libraries/Paytm/encdec_paytm.php");
 
         $paytmChecksum = "";
         $paramList = array();
         $isValidChecksum = "FALSE";
-
         $paramList = $_POST;
         $paytmChecksum = isset($_POST["CHECKSUMHASH"]) ? $_POST["CHECKSUMHASH"] : ""; //Sent by Paytm pg
 
         //Verify all parameters received from Paytm pg to your application. Like MID received from paytm pg is same as your application�s MID, TXN_AMOUNT and ORDER_ID are same as what was sent by you to Paytm PG for initiating transaction etc.
         $isValidChecksum = verifychecksum_e($paramList, PAYTM_MERCHANT_KEY, $paytmChecksum); //will return TRUE or FALSE string.
 
-        $user_id = $this->session->userdata('user_id');
+        $this->checkLogin($payment_info);
+
 
         if ($this->session->userdata('total_price_of_checking_out') == $this->input->post('amount_to_pay')) :
             $amount_paid = $this->input->post('amount_to_pay');
         else :
             $amount_paid = $this->session->userdata('total_price_of_checking_out');
         endif;
+
+        $user_id = $this->session->userdata('user_id');
 
         if ($isValidChecksum == "TRUE") {
             if ($_POST["STATUS"] == "TXN_SUCCESS") {
@@ -197,6 +216,40 @@ class Paytm extends CI_Controller
             redirect('home', 'refresh');
         }
     }
+
+    function checkLogin($payment_info){
+        if($this->session->userdata('user_id') > 0 && $this->session->userdata('total_price_of_checking_out') > 0)
+        {
+
+        }else{
+
+            $payment_info = base64_decode($payment_info);
+            $payment_info = json_decode($payment_info, true);
+            $this->session->set_userdata('cart_items', $payment_info[0]);
+            $user_id = $payment_info[1];
+            $this->session->set_userdata('total_price_of_checking_out', $payment_info[2]);
+
+            $credential = array('id' => $user_id, 'status' => 1);
+
+            // Checking login credential for admin
+            $query = $this->db->get_where('users', $credential);
+
+            if ($query->num_rows() > 0) {
+                $row = $query->row();
+                $this->session->set_userdata('user_id', $row->id);
+                $this->session->set_userdata('role_id', $row->role_id);
+                $this->session->set_userdata('role', get_user_role('user_role', $row->id));
+                $this->session->set_userdata('name', $row->first_name . ' ' . $row->last_name);
+                $this->session->set_userdata('is_instructor', $row->is_instructor);
+                if ($row->role_id == 1) {
+                    $this->session->set_userdata('admin_login', '1');
+                } else if ($row->role_id == 2) {
+                    $this->session->set_userdata('user_login', '1');
+                }
+            }
+        }
+    }
+
 
 
     // CHECK IF THE ADDON IS ACTIVE OR NOT. IF NOT REDIRECT TO DASHBOARD
@@ -273,6 +326,25 @@ class Paytm extends CI_Controller
         //MOBILE APP VARIABLE
         $payment_request = $this->input->post('payment_request');
 
+
+
+
+
+        $bundle_id = $this->session->userdata('checkout_bundle_id');
+        $payment_info = array($bundle_id, $user_id, $TXN_AMOUNT);
+        //print_r($payment_info);
+
+        $payment_info = json_encode($payment_info);
+        //echo $payment_info;
+
+        $payment_info = base64_encode($payment_info);
+        $payment_info = str_replace("=","",$payment_info);
+
+
+
+
+
+
         // Create an array having all required parameters for creating checksum.
         $paramList["MID"] = PAYTM_MERCHANT_MID;
         $paramList["ORDER_ID"] = $ORDER_ID;
@@ -281,7 +353,7 @@ class Paytm extends CI_Controller
         $paramList["CHANNEL_ID"] = $CHANNEL_ID;
         $paramList["TXN_AMOUNT"] = $TXN_AMOUNT;
         $paramList["WEBSITE"] = PAYTM_MERCHANT_WEBSITE;
-        $paramList["CALLBACK_URL"] = site_url("addons/paytm/bundlePgResponse/" . $payment_request);
+        $paramList["CALLBACK_URL"] = site_url("addons/paytm/bundlePgResponse/" . $payment_request.'/'.$payment_info);
 
         //Here checksum string will return by getChecksumFromArray() function.
         $checkSum = getChecksumFromArray($paramList, PAYTM_MERCHANT_KEY);
@@ -291,12 +363,9 @@ class Paytm extends CI_Controller
         $this->load->view('bundle_payment/paytm/paytm_merchant_checkout', $page_data);
     }
 
-    public function bundlePgResponse($payment_request)
+    public function bundlePgResponse($payment_request, $payment_info)
     {
-
-        header("Pragma: no-cache");
-        header("Cache-Control: no-cache");
-        header("Expires: 0");
+        $this->load->model('addons/course_bundle_model');
 
         // following files need to be included
         require_once(APPPATH . "/libraries/Paytm/config_paytm.php");
@@ -311,6 +380,11 @@ class Paytm extends CI_Controller
 
         //Verify all parameters received from Paytm pg to your application. Like MID received from paytm pg is same as your application�s MID, TXN_AMOUNT and ORDER_ID are same as what was sent by you to Paytm PG for initiating transaction etc.
         $isValidChecksum = verifychecksum_e($paramList, PAYTM_MERCHANT_KEY, $paytmChecksum); //will return TRUE or FALSE string.
+
+
+        $this->checkLoginForBundle($payment_info);
+
+
 
         $user_id = $this->session->userdata('user_id');
 
@@ -346,6 +420,42 @@ class Paytm extends CI_Controller
         }else{
             $this->session->set_flashdata('error_message', site_phrase('Checksum_mismatched'));
             redirect('home', 'refresh');
+        }
+    }
+
+    function checkLoginForBundle($payment_info){
+
+        if($this->session->userdata('user_id') > 0 && $this->session->userdata('checkout_bundle_price') > 0)
+        {
+
+        }else{
+             //checking price
+            $TXN_AMOUNT = $this->session->userdata('checkout_bundle_price');
+
+            $payment_info = base64_decode($payment_info);
+            $payment_info = json_decode($payment_info, true);
+            $this->session->set_userdata('checkout_bundle_id', $payment_info[0]);
+            $user_id = $payment_info[1];
+            $this->session->set_userdata('checkout_bundle_price', $payment_info[2]);
+
+            $credential = array('id' => $user_id, 'status' => 1);
+
+            // Checking login credential for admin
+            $query = $this->db->get_where('users', $credential);
+
+            if ($query->num_rows() > 0) {
+                $row = $query->row();
+                $this->session->set_userdata('user_id', $row->id);
+                $this->session->set_userdata('role_id', $row->role_id);
+                $this->session->set_userdata('role', get_user_role('user_role', $row->id));
+                $this->session->set_userdata('name', $row->first_name . ' ' . $row->last_name);
+                $this->session->set_userdata('is_instructor', $row->is_instructor);
+                if ($row->role_id == 1) {
+                    $this->session->set_userdata('admin_login', '1');
+                } else if ($row->role_id == 2) {
+                    $this->session->set_userdata('user_login', '1');
+                }
+            }
         }
     }
 }

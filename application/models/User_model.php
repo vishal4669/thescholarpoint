@@ -34,26 +34,6 @@ class User_model extends CI_Model
         return $this->db->get('users');
     }
 
-     //Get the stream value from database.
-    public function get_stream($id = 0)
-    {
-    
-        if ($id > 0) {
-            $this->db->where('id', $id);
-        }
-        $this->db->where('is_active', 1);
-        return  $this->db->get('streams'); 
-    }
-
-    public function get_user_referrals($referral_code = '')
-    {   
-        if(!$referral_code)
-            return false;     
-        $this->db->where('role_id', 2);
-        $this->db->where('referral_from', $referral_code);
-        return $this->db->get('users');
-    }
-
     public function add_user($is_instructor = false, $is_admin = false)
     {
         $validity = $this->check_duplication('on_create', $this->input->post('email'));
@@ -80,7 +60,6 @@ class User_model extends CI_Model
 
             $data['date_added'] = strtotime(date("Y-m-d H:i:s"));
             $data['wishlist'] = json_encode(array());
-            $data['watch_history'] = json_encode(array());
             $data['status'] = 1;
             $data['image'] = md5(rand(10000, 10000000));
 
@@ -142,7 +121,6 @@ class User_model extends CI_Model
             $data['role_id'] = 2;
             $data['date_added'] = strtotime(date("Y-m-d H:i:s"));
             $data['wishlist'] = json_encode(array());
-            $data['watch_history'] = json_encode(array());
             $data['status'] = 1;
             $data['image'] = md5(rand(10000, 10000000));
 
@@ -204,7 +182,7 @@ class User_model extends CI_Model
         }
     }
 
-    /** Check the duplication mobile****/
+     /** Check the duplication mobile****/
     public function check_duplication_mobile($action = "", $mobile = "", $user_id = "")
     {
         $duplicate_mobile_check = $this->db->get_where('users', array('mobile' => $mobile));
@@ -231,7 +209,7 @@ class User_model extends CI_Model
             }
         }
     }
-    
+
     public function edit_user($user_id = "")
     { // Admin does this editing
         $validity = $this->check_duplication('on_update', $this->input->post('email'), $user_id);
@@ -642,4 +620,221 @@ class User_model extends CI_Model
         $this->db->where_in('id', $instructor_ids);
         return $this->db->get('users')->result_array();
     }
+
+    function quiz_submission_checker($quiz_id = ""){
+        $quiz_details = $this->crud_model->get_lessons('lesson', $quiz_id)->row_array();
+        $total_quiz_seconds = time_to_seconds($quiz_details['duration']);
+
+        $this->db->where('quiz_id', $quiz_id);
+        $this->db->where('user_id', $this->session->userdata('user_id'));
+        $query = $this->db->get('quiz_results');
+        if($query->num_rows() > 0){
+            $row = $query->row_array();
+            if(($total_quiz_seconds + $row['date_added']) < time() || $row['is_submitted'] == 1){
+
+                if($row['is_submitted'] != 1){
+                    $this->db->where('quiz_id', $quiz_id);
+                    $this->db->where('user_id', $this->session->userdata('user_id'));
+                    $this->db->update('quiz_results', array('is_submitted' => 1));
+                }
+
+                return 'submitted';
+            }else{
+                return 'on_progress';
+            }
+        }else{
+            return 'no_data';
+        }
+    }
+
+
+
+/*START LOGIN LOGOUT AND DEVICE ALLOW SECTION*/
+    // For device login tracker
+    public function new_device_login_tracker($user_id = "", $is_verified = '')
+    {
+        $pre_sessions = array();
+        $updated_session_arr = array();
+        $current_session_id = session_id();
+        $this->db->where('id', $user_id);
+        $sessions = $this->db->get('users');
+
+        if($sessions->row('role_id') == 1){
+            return;
+        }
+
+        $pre_sessions = json_decode($sessions->row('sessions'));
+
+        if(is_array($pre_sessions)){
+            // if($is_verified == true && !in_array($current_session_id, $pre_sessions)){
+            //     foreach($pre_sessions as $key => $pre_session){
+            //         if($key == 0){
+            //             $this->db->where('id', $pre_session);
+            //             $this->db->delete('ci_sessions');
+            //         }else{
+            //             array_push($updated_session_arr, $pre_session);
+            //         }
+            //     }
+            //     array_push($updated_session_arr, $current_session_id);
+            // }else{
+            //     if(!in_array($current_session_id, $pre_sessions)){
+            //         if(count($pre_sessions) >= get_settings('allowed_device_number_of_loging')){
+            //             $this->email_model->new_device_login_alert($user_id);
+            //             redirect(site_url('login/new_login_confirmation'), 'refresh');
+            //         }else{
+            //             $updated_session_arr = $pre_sessions;
+            //             array_push($updated_session_arr, $current_session_id);
+            //         }
+            //     }
+            // }
+
+            if(!in_array($current_session_id, $pre_sessions)){
+                $allowed_device = get_settings('allowed_device_number_of_loging');
+                $previous_tatal_device = count($pre_sessions);
+
+                if($previous_tatal_device >= $allowed_device){
+                    $removeable_device = $previous_tatal_device - $allowed_device;
+                }else{
+                    $removeable_device = -1;
+                }
+
+                foreach($pre_sessions as $key => $pre_session){
+                    if($removeable_device >= 0 && $key <= $removeable_device){
+                        $this->db->where('id', $pre_session);
+                        $this->db->delete('ci_sessions');
+                    }else{
+                        array_push($updated_session_arr, $pre_session);
+                    }
+                }
+                array_push($updated_session_arr, $current_session_id);
+            }
+        }else{
+            $updated_session_arr = [$current_session_id];
+        }
+
+        if(count($updated_session_arr) > 0){
+            $data['sessions'] = json_encode($updated_session_arr);
+            $this->db->where('id', $user_id);
+            $this->db->update('users', $data);
+        }
+    }
+
+    function set_login_userdata($user_id = ""){
+        // Checking login credential for admin
+        $query = $this->db->get_where('users', array('id' => $user_id));
+
+        if ($query->num_rows() > 0) {
+            $row = $query->row();
+            //604800s == 7 days
+            $this->session->set_userdata('custom_session_limit', (time()+604800));
+            $this->session->set_userdata('user_id', $row->id);
+            $this->session->set_userdata('role_id', $row->role_id);
+            $this->session->set_userdata('role', get_user_role('user_role', $row->id));
+            $this->session->set_userdata('name', $row->first_name . ' ' . $row->last_name);
+            $this->session->set_userdata('name', $row->first_name . ' ' . $row->last_name);
+            $this->session->set_userdata('mobile', $row->mobile);
+            $this->session->set_userdata('is_instructor', $row->is_instructor);
+            $this->session->set_flashdata('flash_message', get_phrase('welcome') . ' ' . $row->first_name . ' ' . $row->last_name);
+            if ($row->role_id == 1) {
+                $this->session->set_userdata('admin_login', '1');
+                redirect(site_url('admin/dashboard'), 'refresh');
+            } else if ($row->role_id == 2) {
+                $this->session->set_userdata('user_login', '1');
+                if($this->session->userdata('url_history')){
+                    redirect($this->session->userdata('url_history'), 'refresh');
+                }
+                redirect(site_url('home'), 'refresh');
+            }
+        } else {
+            $this->session->set_flashdata('error_message', get_phrase('invalid_login_credentials'));
+            redirect(site_url('home/login'), 'refresh');
+        }
+    }
+
+    function check_session_data($user_type = ""){
+        if (!$this->session->userdata('cart_items')) {
+            $this->session->set_userdata('cart_items', array());
+        }
+
+        if (!$this->session->userdata('language')) {
+            $this->session->set_userdata('language', get_settings('language'));
+        }
+
+        if($user_type == 'admin'){
+            if($this->session->userdata('custom_session_limit') >= time()){
+                $this->session->set_userdata('custom_session_limit', (time()+604800));
+            }else{
+                $this->session_destroy();
+                redirect(site_url('login'), 'refresh');
+            }
+
+            if ($this->session->userdata('admin_login') != true) {
+                redirect(site_url('login'), 'refresh');
+            }
+        }elseif($user_type == 'user'){
+            if($this->session->userdata('custom_session_limit') >= time()){
+                $this->session->set_userdata('custom_session_limit', (time()+604800));
+            }else{
+                $this->session_destroy();
+                redirect(site_url('login'), 'refresh');
+            }
+
+            if ($this->session->userdata('user_login') != true) {
+                redirect(site_url('login'), 'refresh');
+            }
+        }elseif($user_type == 'login'){
+            if ($this->session->userdata('admin_login')) {
+                redirect(site_url('admin'), 'refresh');
+            } elseif ($this->session->userdata('user_login')) {
+                redirect(site_url('home/my_courses'), 'refresh');
+            }
+        }
+    }
+
+    public function session_destroy()
+    {
+        $logged_in_user_id = $this->session->userdata('user_id');
+        if($logged_in_user_id > 0 && $this->session->userdata('user_login') == 1){
+            $pre_sessions = array();
+            $updated_session_arr = array();
+            $current_session_id = session_id();
+
+            $this->db->where('id', $logged_in_user_id);
+            $sessions = $this->db->get('users')->row('sessions');
+            $pre_sessions = json_decode($sessions);
+            if(is_array($pre_sessions)){
+                foreach($pre_sessions as $key => $pre_session){
+                    if($pre_session != $current_session_id){
+                        array_push($updated_session_arr, $pre_session);                        
+                    }else{
+                        $this->db->where('id', $pre_session);
+                        $this->db->delete('ci_sessions');
+                    }
+                }
+                $data['sessions'] = json_encode($updated_session_arr);
+                $this->db->where('id', $logged_in_user_id);
+                $this->db->update('users', $data);
+            }
+        }
+
+        $this->session->unset_userdata('admin_login');
+        $this->session->unset_userdata('user_login');
+        $this->session->unset_userdata('custom_session_limit');
+        $this->session->unset_userdata('user_id');
+        $this->session->unset_userdata('role_id');
+        $this->session->unset_userdata('role');
+        $this->session->unset_userdata('name');
+        $this->session->unset_userdata('is_instructor');
+        $this->session->unset_userdata('url_history');
+        $this->session->unset_userdata('app_url');
+        $this->session->unset_userdata('total_price_of_checking_out');
+        $this->session->unset_userdata('register_email');
+        $this->session->unset_userdata('applied_coupon');
+        $this->session->unset_userdata('new_device_code_expiration_time');
+        $this->session->unset_userdata('new_device_user_email');
+        $this->session->unset_userdata('new_device_user_id');
+        $this->session->unset_userdata('new_device_verification_code');
+
+    }
+    /*END LOGIN LOGOUT AND DEVICE ALLOW SECTION*/
 }

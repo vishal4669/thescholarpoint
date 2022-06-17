@@ -85,25 +85,6 @@
                                 <span class="input-group-text"><i class="fab fa-linkedin"></i></span>
                                 <input type="text" class="form-control" maxlength="60" name = "linkedin_link" placeholder="<?php echo site_phrase('linkedin_link'); ?>" value="<?php echo $social_links['linkedin']; ?>">
                             </div>
-
-                            <label class="text-dark fw-600"><?php echo site_phrase('referral_code'); ?></label>
-                            <div class="input-group mb-3">
-                                <span class="input-group-text"><i class="fa fa-user-plus"></i></span>
-                                <input type="text" class="form-control" name = "referral_code" id="referral_code" placeholder="<?php echo site_phrase('referral_code'); ?>" value="<?php echo (isset($user_details['referral_code'])) ? $user_details['referral_code'] : ''; ?>" readonly>
-                                <div class="input-group-append">
-                                <span class="input-group-text" style="cursor:pointer" onclick="copyTo()">Copy</span>
-                              </div>
-
-                            </div>
-
-                            <?php if(isset($user_details['referral_code']) && !empty($user_details['referral_code'])){?>
-                            <div class=" col-md-6">
-                                        <label for="referral_code"></label>
-                                        <a  href="https://web.whatsapp.com/send?text=<?php echo base_url()?>home/sign_up?referral_code=<?php echo $user_details['referral_code']; ?>"data-action="share/whatsapp/share" target="_blank"><i class="fab fa-whatsapp"></i>&nbsp;Invite On Whatsapp</a>
-                                    </div>
-                                <?php }?>
-
-
                         </div>
 
                         <div class="col-12 pt-4">
@@ -122,17 +103,4 @@
     $(function(){
         $(".bootstrap-tag-input").tagsinput('items');
     });
-
-    function copyTo() {
-  /* Get the text field */
-  var copyText = document.getElementById("referral_code");
-
-  /* Select the text field */
-  copyText.select();
-  copyText.setSelectionRange(0, 99999); /* For mobile devices */
-
-   /* Copy the text inside the text field */
-  navigator.clipboard.writeText(copyText.value);
-}
-
 </script>

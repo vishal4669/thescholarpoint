@@ -1,10 +1,6 @@
-/*This css file added academy version 5.4*/
-
-@font-face {
-    font-family: 'Kommon Grotesk Normal' !important;
-    src: url('../fonts/KommonGrotesk-Normal.ttf') format('truetype') !important; /* Chrome 4+, Firefox 3.5, Opera 10+, Safari 3—5 */
-}  
-
+body, div, ul, li, a, button, td, span{
+    font-family: 'Open Sans', sans-serif !important;
+}
 a{
     text-decoration: none;
 }

@@ -1,82 +1,125 @@
 <?php
-$quiz_questions = $this->crud_model->get_quiz_questions($lesson_details['id']);
+    $user_id = $this->session->userdata('user_id');
+    $is_course_instructor = $this->crud_model->is_course_instructor($course_details['id'], $user_id);
+    if($this->session->userdata('admin_login')){
+        $is_course_instructor = 1;
+    }
+    $quiz_submission_checker = $this->user_model->quiz_submission_checker($lesson_details['id']);
+    $quiz_questions = $this->crud_model->get_quiz_questions($lesson_details['id']);
+
+
+    if($is_course_instructor == true){
+        $quiz_results = $this->db->get_where('quiz_results', array('quiz_id' => $lesson_details['id']));
+    }else{
+        $quiz_results = $this->db->get_where('quiz_results', array('quiz_id' => $lesson_details['id'], 'user_id' => $user_id));
+    }
+
+    if($quiz_results->num_rows() > 0 && $is_course_instructor == 0){
+        $available_time = (time_to_seconds($lesson_details['duration']) + $quiz_results->row('date_added')) - time();
+    }else{
+        $available_time = time_to_seconds($lesson_details['duration']);
+    }
 ?>
-<div id="quiz-body" class="text-center">
-    <div class="" id="quiz-header">
 
-        <?php $previous_result = $this->crud_model->get_quiz_score($lesson_details['course_id'], $lesson_details['id']); ?>
-        <?php if($previous_result !== 'no_result'): ?>
-            <p class="card-text mb-5"><b><?php echo get_phrase('your_previous_score_was').' '.$previous_result; ?></b></p>
-        <?php endif; ?>
 
-        <?php echo get_phrase("quiz_title"); ?> : <strong><?php echo $lesson_details['title']; ?></strong><br>
-        <?php echo get_phrase("number_of_questions"); ?> : <strong><?php echo count($quiz_questions->result_array()); ?></strong><br>
-        <?php if (count($quiz_questions->result_array()) > 0): ?>
-            <button type="button" name="button" class="btn red mt-2" style="color: #fff;" onclick="getStarted(1)"><?php echo get_phrase("get_started"); ?></button>
-        <?php endif; ?>
+<link rel="stylesheet" type="text/css" href="<?php echo site_url('assets/lessons/flipclock-timer/flipclock.css'); ?>">
+<script type="text/javascript" src="<?php echo site_url('assets/lessons/flipclock-timer/flipclock.min.js'); ?>"></script>
+
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-8">
+                <h5 class="d-md-flex w-100"><?php echo $lesson_details['title']; ?></h5>
+            </div>
+            <div class="col-md-4 fw-bold text-md-end">
+                <span class="text-muted"><?php echo get_phrase('total_questions').': '.$quiz_questions->num_rows(); ?></span>
+                <span class="text-muted">|</span>
+                <span class="text-muted"><?php echo get_phrase('total_marks').': '.json_decode($lesson_details['attachment'], true)['total_marks']; ?></span>
+            </div>
+        </div>
     </div>
-
-    <form class="" id = "quiz_form" action="" method="post">
-        <?php if (count($quiz_questions->result_array()) > 0): ?>
-            <?php foreach ($quiz_questions->result_array() as $key => $quiz_question):
-                $options = json_decode($quiz_question['options']);
-            ?>
-                <input type="hidden" name="course_id" value="<?php echo $lesson_details['course_id']; ?>">
-                <input type="hidden" name="lesson_id" value="<?php echo $lesson_details['id']; ?>">
-                <div class="hidden" id = "question-number-<?php echo $key+1; ?>">
-                    <div class="row justify-content-center">
-                        <div class="col-lg-8">
-                            <div class="card text-left quiz-card">
-                                <div class="card-body">
-                                    <h6 class="card-title"><?php echo get_phrase("question").' '.($key+1); ?> : <strong><?php echo $quiz_question['title']; ?></strong></h6>
-                                </div>
-                                <ul class="list-group list-group-flush">
-                                    <?php
-                                    foreach ($options as $key2 => $option): ?>
-                                    <li class="list-group-item quiz-options text-start">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="<?php echo $quiz_question['id']; ?>[]" value="<?php echo $key2+1; ?>" id="quiz-id-<?php echo $quiz_question['id']; ?>-option-id-<?php echo $key2+1; ?>" onclick="enableNextButton('<?php echo $quiz_question['id'];?>')">
-                                            <label class="form-check-label" for="quiz-id-<?php echo $quiz_question['id']; ?>-option-id-<?php echo $key2+1; ?>">
-                                                <?php echo $option; ?>
-                                            </label>
-                                        </div>
-                                    </li>
-                                    <?php endforeach; ?>
-                                </ul>
-                            </div>
+    <div class="card-body">
+        <div class="row justify-content-center">
+            
+            <?php if($quiz_submission_checker == 'submitted'): ?>
+                    <?php include 'quiz_result.php'; ?>
+            <?php else: ?>
+                <div class="col-12">
+                    <h5 class="w-100 mb-4 text-center"><?php echo get_phrase('quize_time'); ?></h5>
+                </div>
+                <div class="col-auto" style="position: sticky; top: -12px; z-index: 99;">
+                    <div class="clock"></div>
+                </div>
+                <div class="col-12"></div>
+                <?php if($is_course_instructor == 1): ?>
+                    <div class="col-md-6 mt-4">
+                        <p class="text-center fw-bold text-danger"><?php echo get_phrase('total_participant_students'); ?> : <?php echo $quiz_results->num_rows(); ?></p>
+                        <div class="form-group">
+                            <span class="text-muted"><?php echo site_phrase('participant_students'); ?></span>
+                            <select onchange="viewAnswerSheet(this.value, )" class="form-control" name="participant_students">
+                                <option value=""><?php echo site_phrase('select_student'); ?></option>
+                                <?php
+                                foreach($quiz_results->result_array() as $participant_student):
+                                    $student_details = $this->user_model->get_all_user($participant_student['id'])->row_array();
+                                ?>
+                                    <option value="<?php echo $participant_student['quiz_result_id']; ?>"><?php echo $student_details['first_name'].' '.$student_details['last_name']; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <small class="text-muted"><?php echo site_phrase('select_a_student_to_view_the_answer_sheet'); ?></small>
                         </div>
                     </div>
-                    <button type="button" name="button" class="btn red mt-2 mb-2" id = "next-btn-<?php echo $quiz_question['id'];?>" style="color: #fff;" <?php if(count($quiz_questions->result_array()) == $key+1):?>onclick="submitQuiz()"<?php else: ?>onclick="showNextQuestion('<?php echo $key+2; ?>')"<?php endif; ?> disabled><?php echo count($quiz_questions->result_array()) == $key+1 ? get_phrase("check_result") : get_phrase("submit_and_next"); ?></button>
-                </div>
-            <?php endforeach; ?>
-        <?php endif; ?>
-    </form>
+                    <div class="col-12 pt-4" id="viewAnswerSheet"></div>
+                <?php else: ?>
+                    <div class="col-12 text-center pt-3">
+                        <?php if($quiz_submission_checker == 'on_progress'): ?>
+                            <script type="text/javascript">setTimeout(function(){startQuiz();}, 1500);</script>
+                        <?php else: ?>
+                            <button class="btn red" id="quiz-start-brn" onclick="startQuiz(this)"><?php echo get_phrase('start_quiz'); ?></button>
+                        <?php endif; ?>
+                    </div>
+                    <div class="col-12" id="quiz_answer_sheet"></div>
+                <?php endif; ?>
+            <?php endif; ?>
+        </div>
+    </div>
 </div>
-<div id="quiz-result" class="text-left">
 
-</div>
 <script type="text/javascript">
-function getStarted(first_quiz_question) {
-    $('#quiz-header').hide();
-    $('#lesson-summary').hide();
-    $('#question-number-'+first_quiz_question).show();
-}
-function showNextQuestion(next_question) {
-    $('#question-number-'+(next_question-1)).hide();
-    $('#question-number-'+next_question).show();
-}
-function submitQuiz() {
-    $.ajax({
-        url: '<?php echo site_url('home/submit_quiz'); ?>',
-        type: 'post',
-        data: $('form#quiz_form').serialize(),
-        success: function(response) {
-            $('#quiz-body').hide();
-            $('#quiz-result').html(response);
+    var clock = $('.clock').FlipClock({
+        clockFace: 'HourlyCounter',
+        autoStart: false,
+        callbacks: {
+          stop: function() {
+            $('#quizSubmissionBtn').click();
+          }
         }
     });
-}
-function enableNextButton(quizID) {
-    $('#next-btn-'+quizID).prop('disabled', false);
-}
+    // set time
+    clock.setTime("<?php echo $available_time; ?>");
+    // countdown mode
+    clock.setCountdown(true);
+
+    function startQuiz(e){
+        $.ajax({
+            url: "<?php echo site_url('user/start_quiz/'.$lesson_details['id']); ?>",
+            type: 'post',
+            success: function(response){
+                $('#quiz_answer_sheet').html(response);
+            }
+        });
+        // start the clock
+        clock.start();
+        $(e).hide();
+    }
+
+    function viewAnswerSheet(quiz_result_id){
+        $.ajax({
+            url: "<?php echo site_url('home/view_answer_sheet/'); ?>/"+quiz_result_id,
+            type: 'post',
+            success: function(response){
+                $('#viewAnswerSheet').html(response);
+            }
+        });
+    }
 </script>

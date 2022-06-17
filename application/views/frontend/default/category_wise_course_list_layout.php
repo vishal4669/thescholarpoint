@@ -1,9 +1,10 @@
 <ul>
     <?php foreach ($courses as $course) :
+
         $instructor_details = $this->user_model->get_all_user($course['user_id'])->row_array();
         $is_course_launch = compare_course_launch_date($course['course_launch_date']);
 
-        ?>
+         ?>
         <li>
             <div class="course-box-2">
                 <div class="course-image">
@@ -37,7 +38,7 @@
 
                                 <?php if($is_course_launch =='YES') : ?>
                                     <button class="brn-compare-sm" onclick="event.stopPropagation(); $(location).attr('href', '<?php echo site_url('home/compare?course-1=' . rawurlencode(slugify($course['title'])) . '&&course-id-1=' . $course['id']); ?>');"><i class="fas fa-balance-scale"></i> <?php echo site_phrase('compare'); ?></button>
-                                <?php endif;?>
+                                <?php endif;?>                               
                             </div>
                         </div>
 

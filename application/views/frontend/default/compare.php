@@ -31,30 +31,42 @@
                 <form action="<?php echo site_url('home/compare'); ?>" method="get" class="comparison-form">
                     <div class="row">
                         <div class="col-md-2 text-center fw-700 text-15px"></div>
-                        <div class="col-md-3 text-center fw-500 text-14px">
+                        <div class="col-md-3 text-center fw-500 text-14px mb-3">
                             <select class="form-select compare-select-box" name="" onchange="compareCourses(this.value, 1)">
                                 <option value=""><?php echo site_phrase('choose_a_course_to_compare'); ?></option>
                                 <?php foreach ($courses as $key => $course) : ?>
+
+                                    <?php if(isset($course_2_details['id']) && $course['id'] == $course_2_details['id']) continue; ?>
+                                    <?php if(isset($course_3_details['id']) && $course['id'] == $course_3_details['id']) continue; ?>
+
                                     <option value="<?php echo slugify($course['title']) . '_' . $course['id']; ?>" <?php if (isset($course_1_details['id']) && slugify($course_1_details['title']) . '_' . $course_1_details['id'] == slugify($course['title']) . '_' . $course['id']) echo 'selected'; ?>><?php echo $course['title']; ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <input type="hidden" name="course-1" id="course-1" value="<?php echo isset($course_1_details['id']) ? slugify($course_1_details['title']) : ''; ?>">
                             <input type="hidden" name="course-id-1" id="course-id-1" value="<?php echo isset($course_1_details['id']) ? slugify($course_1_details['id']) : ''; ?>">
                         </div>
-                        <div class="col-md-3 text-center fw-500 text-14px">
+                        <div class="col-md-3 text-center fw-500 text-14px mb-3">
                             <select class="form-select compare-select-box" name="" onchange="compareCourses(this.value, 2)">
                                 <option value=""><?php echo site_phrase('choose_a_course_to_compare'); ?></option>
                                 <?php foreach ($courses as $key => $course) : ?>
+
+                                    <?php if(isset($course_1_details['id']) && $course['id'] == $course_1_details['id']) continue; ?>
+                                    <?php if(isset($course_3_details['id']) && $course['id'] == $course_3_details['id']) continue; ?>
+
                                     <option value="<?php echo slugify($course['title']) . '_' . $course['id']; ?>" <?php if (isset($course_2_details['id']) && slugify($course_2_details['title']) . '_' . $course_2_details['id'] == slugify($course['title']) . '_' . $course['id']) echo 'selected'; ?>><?php echo $course['title']; ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <input type="hidden" name="course-2" id="course-2" value="<?php echo isset($course_2_details['id']) ? slugify($course_2_details['title']) : ''; ?>">
                             <input type="hidden" name="course-id-2" id="course-id-2" value="<?php echo isset($course_2_details['id']) ? slugify($course_2_details['id']) : ''; ?>">
                         </div>
-                        <div class="col-md-3 text-center fw-500 text-14px">
+                        <div class="col-md-3 text-center fw-500 text-14px mb-3">
                             <select class="form-select compare-select-box" name="" onchange="compareCourses(this.value, 3)">
                                 <option value=""><?php echo site_phrase('choose_a_course_to_compare'); ?></option>
                                 <?php foreach ($courses as $key => $course) : ?>
+
+                                    <?php if(isset($course_1_details['id']) && $course['id'] == $course_1_details['id']) continue; ?>
+                                    <?php if(isset($course_2_details['id']) && $course['id'] == $course_2_details['id']) continue; ?>
+
                                     <option value="<?php echo slugify($course['title']) . '_' . $course['id']; ?>" <?php if (isset($course_3_details['id']) && slugify($course_3_details['title']) . '_' . $course_3_details['id'] == slugify($course['title']) . '_' . $course['id']) echo 'selected'; ?>><?php echo $course['title']; ?></option>
                                 <?php endforeach; ?>
                             </select>
@@ -87,7 +99,7 @@
                             <br>
 
                             <?php if (is_purchased($course_1_details['id'])) : ?>
-                                <a href="javascript::" class="btn red radius-10 mt-3 py-2"><?php echo site_phrase('already_purchased'); ?></a>
+                                <a href="javascript:;" class="btn red radius-10 mt-3 py-2"><?php echo site_phrase('already_purchased'); ?></a>
                             <?php else : ?>
                                 <?php if ($course_1_details['is_free_course'] == 1) : ?>
                                     <?php if ($this->session->userdata('user_login') != 1) : ?>
@@ -107,6 +119,7 @@
                                     <a href="javascript::" class="btn red radius-10 mt-3 py-2"><?php echo $is_course_launch;?></a>
 
                                 <?php endif;?>
+
                                 <?php endif; ?>
                             <?php endif; ?>
 
@@ -136,7 +149,7 @@
                             <br>
 
                             <?php if (is_purchased($course_2_details['id'])) : ?>
-                                <a href="javascript::" class="btn red radius-10 mt-3 py-2"><?php echo site_phrase('already_purchased'); ?></a>
+                                <a href="javascript:;" class="btn red radius-10 mt-3 py-2"><?php echo site_phrase('already_purchased'); ?></a>
                             <?php else : ?>
                                 <?php if ($course_2_details['is_free_course'] == 1) : ?>
                                     <?php if ($this->session->userdata('user_login') != 1) : ?>
@@ -144,7 +157,7 @@
                                     <?php else : ?>
                                         <a href="<?php echo site_url('home/get_enrolled_to_free_course/' . $course_2_details['id']); ?>" class="btn red radius-10 mt-3 py-2"><?php echo site_phrase('get_enrolled'); ?></a>
                                     <?php endif; ?>
-                                <?php else : ?>
+                                <?php else : ?>                                 
 
                                     <?php $is_course_launch = compare_course_launch_date($course_2_details['course_launch_date']);
                                         if($is_course_launch =='YES') :
@@ -185,7 +198,7 @@
                             <br>
 
                             <?php if (is_purchased($course_3_details['id'])) : ?>
-                                <a href="javascript::" class="btn red radius-10 mt-3 py-2"><?php echo site_phrase('already_purchased'); ?></a>
+                                <a href="javascript:;" class="btn red radius-10 mt-3 py-2"><?php echo site_phrase('already_purchased'); ?></a>
                             <?php else : ?>
                                 <?php if ($course_3_details['is_free_course'] == 1) : ?>
                                     <?php if ($this->session->userdata('user_login') != 1) : ?>
@@ -193,9 +206,9 @@
                                     <?php else : ?>
                                         <a href="<?php echo site_url('home/get_enrolled_to_free_course/' . $course_3_details['id']); ?>" class="btn red radius-10 mt-3 py-2"><?php echo site_phrase('get_enrolled'); ?></a>
                                     <?php endif; ?>
-                                <?php else : ?>
+                                <?php else : ?>                                                                
 
-                                    <?php 
+                                     <?php 
                                     $is_course_launch = compare_course_launch_date($course_3_details['course_launch_date']);
 
                                     if($is_course_launch =='YES') : 
@@ -204,7 +217,7 @@
                                 <?php else: ?>
                                     <a href="javascript::" class="btn red radius-10 mt-3 py-2" id=""><?php echo $is_course_launch; ?></a>
                                 <?php endif;?>
-
+                                
                                 <?php endif; ?>
                             <?php endif; ?>
                             <br>

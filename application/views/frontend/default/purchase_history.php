@@ -47,8 +47,8 @@ $purchase_history = $this->db->get('payment',$per_page, $this->uri->segment(3));
                                     <div class="col-4 payment-type">
                                         <?php echo ucfirst($each_purchase['payment_type']); ?>
                                     </div>
-                                    <div class="col-3 text-center">
-                                        <a href="<?php echo site_url('home/invoice/'.$each_purchase['id']); ?>" target="_blank" class="btn btn-receipt"><?php echo site_phrase('invoice'); ?></a>
+                                    <div class="col-3">
+                                        <a href="<?php echo site_url('home/invoice/'.$each_purchase['id']); ?>" target="_blank" class="ms-2 btn btn-receipt"><?php echo site_phrase('invoice'); ?></a>
                                     </div>
                                 </div>
                             </div>

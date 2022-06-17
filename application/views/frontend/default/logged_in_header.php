@@ -13,11 +13,10 @@ $user_details = $this->user_model->get_user($this->session->userdata('user_id'))
             <a href="<?php echo site_url(''); ?>" class="navbar-brand" href="#">
                 <img src="<?php echo base_url('uploads/system/' . get_frontend_settings('dark_logo')); ?>" alt="" height="35">
             </a>
-
+            
             <?php include 'menu.php'; ?>
 
-
-            <form class="inline-form" action="<?php echo site_url('home/search'); ?>" method="get" style="width: 100%;">
+            <form class="inline-form me-2" action="<?php echo site_url('home/search'); ?>" method="get" style="width: 100%;">
                 <div class="input-group search-box mobile-search">
                     <input type="text" name='query' class="form-control" placeholder="<?php echo site_phrase('search_for_courses'); ?>">
                     <div class="input-group-append">
@@ -26,17 +25,22 @@ $user_details = $this->user_model->get_user($this->session->userdata('user_id'))
                 </div>
             </form>
 
+            <?php $custom_page_menus = $this->crud_model->get_custom_pages('', 'header'); ?>
+            <?php foreach($custom_page_menus->result_array() as $custom_page_menu): ?>
+                <a class="navbar-brand btn-hover-gray text-14px ms-2 me-0 <?php if(isset($page_url) && $custom_page_menu['page_url'] == $page_url) echo 'active'; ?>" style="border: 1px solid transparent; margin: 0px; padding: 0px 8px; width: max-content; border-radius: 5px; height: 40px; line-height: 40px;" href="<?php echo site_url('page/'.$custom_page_menu['page_url']); ?>"><?php echo $custom_page_menu['button_title']; ?></a></li>
+            <?php endforeach; ?>
+
             <?php if (get_settings('allow_instructor') == 1) : ?>
-                <div class="instructor-box menu-icon-box ms-md-4">
+                <div class="instructor-box menu-icon-box ms-md-3">
                     <div class="icon">
-                        <a href="<?php echo site_url('user'); ?>" style="border: 1px solid transparent; margin: 0px;     padding: 0px 10px; font-size: 14px; width: max-content; border-radius: 5px; height: 40px; line-height: 40px;"><?php echo site_phrase('instructor'); ?></a>
+                        <a href="<?php echo site_url('user'); ?>" style="border: 1px solid transparent; margin: 0px; padding: 0px 10px; font-size: 14px; width: max-content; border-radius: 5px; height: 40px; line-height: 40px;"><?php echo site_phrase('instructor'); ?></a>
                     </div>
                 </div>
             <?php endif; ?>
 
             <div class="instructor-box menu-icon-box">
                 <div class="icon">
-                    <a href="<?php echo site_url('home/my_courses'); ?>" style="border: 1px solid transparent; margin: 0px;     padding: 0px 10px; font-size: 14px; width: max-content; border-radius: 5px; height: 40px; line-height: 40px;"><?php echo site_phrase('my_courses'); ?></a>
+                    <a href="<?php echo site_url('home/my_courses'); ?>" style="border: 1px solid transparent; margin: 0px; padding: 0px 10px; font-size: 14px; width: max-content; border-radius: 5px; height: 40px; line-height: 40px;"><?php echo site_phrase('my_courses'); ?></a>
                 </div>
             </div>
 
@@ -52,7 +56,7 @@ $user_details = $this->user_model->get_user($this->session->userdata('user_id'))
 
             <div class="user-box menu-icon-box">
                 <div class="icon">
-                    <a href="javascript::">
+                    <a href="javascript:;">
                         <img src="<?php echo $this->user_model->get_user_image_url($this->session->userdata('user_id')); ?>" alt="" class="img-fluid">
                     </a>
                 </div>
@@ -87,8 +91,6 @@ $user_details = $this->user_model->get_user($this->session->userdata('user_id'))
                         <?php if (addon_status('customer_support')) : ?>
                             <li class="user-dropdown-menu-item"><a href="<?php echo site_url('addons/customer_support/user_tickets'); ?>"><i class="fas fa-life-ring"></i><?php echo site_phrase('support'); ?></a></li>
                         <?php endif; ?>
-
-                        <li class="user-dropdown-menu-item"><a href="<?php echo site_url('home/my_referrals'); ?>"><i class="fa fa-user-plus"></i><?php echo site_phrase('my_referrals'); ?></a></li>
 
                         <li class="dropdown-user-logout user-dropdown-menu-item radius-bottom-10"><a class="radius-bottom-10 py-3" href="<?php echo site_url('login/logout'); ?>"><i class="fas fa-sign-out-alt"></i> <?php echo site_phrase('log_out'); ?></a></li>
                     </ul>

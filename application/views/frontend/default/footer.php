@@ -1,28 +1,36 @@
 <footer class="footer-area d-print-none bg-gray mt-5 pt-5">
   <div class="container-xl">
     <div class="row mb-3">
-      <div class="col-6 col-sm-6 col-md-3">
-        <h5 class="text-muted mb-3"><?php echo site_phrase('top_categories'); ?></h5>
-        <ul class="list-unstyled text-small">
-          <?php $top_10_categories = $this->crud_model->get_top_categories(6, 'sub_category_id'); ?>
-          <?php foreach($top_10_categories as $top_10_category): ?>
-            <?php $category_details = $this->crud_model->get_category_details_by_id($top_10_category['sub_category_id'])->row_array(); ?>
-            <li class="mb-2">
-              <a class="link-secondary footer-hover-link" href="<?php echo site_url('home/courses?category='.$category_details['slug']); ?>">
-                <?php echo $category_details['name']; ?>
-                <!-- <span class="fw-700 text-end">(<?php //echo $top_10_category['course_number']; ?>)</span> -->
-              </a>
-            </li>
-          <?php endforeach; ?>
-        </ul>
-      </div>
+      <?php if($course_accessibility): ?>
+        <div class="col-6 col-sm-6 col-md-3">
+          <h5 class="text-muted mb-3"><?php echo site_phrase('top_categories'); ?></h5>
+          <ul class="list-unstyled text-small">
+            <?php $top_10_categories = $this->crud_model->get_top_categories(6, 'sub_category_id'); ?>
+            <?php foreach($top_10_categories as $top_10_category): ?>
+              <?php $category_details = $this->crud_model->get_category_details_by_id($top_10_category['sub_category_id'])->row_array(); ?>
+              <li class="mb-2">
+                <a class="link-secondary footer-hover-link" href="<?php echo site_url('home/courses?category='.$category_details['slug']); ?>">
+                  <?php echo $category_details['name']; ?>
+                  <!-- <span class="fw-700 text-end">(<?php //echo $top_10_category['course_number']; ?>)</span> -->
+                </a>
+              </li>
+            <?php endforeach; ?>
+          </ul>
+        </div>
+      <?php endif; ?>
       <div class="col-6 col-sm-6 col-md-3">
         <h5 class="text-muted mb-3"><?php echo site_phrase('useful_links'); ?></h5>
         <ul class="list-unstyled text-small">
           <li class="mb-2"><a class="link-secondary footer-hover-link" href="<?php echo site_url('blog'); ?>"><?php echo site_phrase('blog'); ?></a></li>
-          <li class="mb-2"><a class="link-secondary footer-hover-link" href="<?php echo site_url('home/courses'); ?>"><?php echo site_phrase('all_courses'); ?></a></li>
+          <?php if($course_accessibility): ?>
+            <li class="mb-2"><a class="link-secondary footer-hover-link" href="<?php echo site_url('home/courses'); ?>"><?php echo site_phrase('all_courses'); ?></a></li>
+          <?php endif; ?>
           <li class="mb-2"><a class="link-secondary footer-hover-link" href="<?php echo site_url('home/sign_up'); ?>"><?php echo site_phrase('sign_up'); ?></a></li>
-          <li class="mb-2"><a class="link-secondary footer-hover-link" href="<?php echo site_url('home/login'); ?>"><?php echo site_phrase('login'); ?></a></li>
+
+          <?php $custom_page_menus = $this->crud_model->get_custom_pages('', 'footer'); ?>
+          <?php foreach($custom_page_menus->result_array() as $custom_page_menu): ?>
+            <li class="mb-2"><a class="link-secondary footer-hover-link" href="<?php echo site_url('page/'.$custom_page_menu['page_url']); ?>"><?php echo $custom_page_menu['button_title']; ?></a></li>
+          <?php endforeach; ?>
         </ul>
       </div>
       <div class="col-6 col-sm-6 col-md-3">
@@ -31,10 +39,10 @@
           <li class="mb-2"><a class="link-secondary footer-hover-link" href="<?php echo site_url('home/about_us'); ?>"><?php echo site_phrase('about_us'); ?></a></li>
           <li class="mb-2"><a class="link-secondary footer-hover-link" href="<?php echo site_url('home/privacy_policy'); ?>"><?php echo site_phrase('privacy_policy'); ?></a></li>
           <li class="mb-2"><a class="link-secondary footer-hover-link" href="<?php echo site_url('home/terms_and_condition'); ?>"><?php echo site_phrase('terms_and_condition'); ?></a></li>
-          <li class="mb-2"><a class="link-secondary footer-hover-link" href="<?php echo site_url('home/refund_policy'); ?>"><?php echo site_phrase('refund_policy'); ?></a></li>
+          <li class="mb-2"><a class="link-secondary footer-hover-link" href="<?php echo site_url('home/contact_us'); ?>"><?php echo site_phrase('contact_us'); ?></a></li>
         </ul>
       </div>
-      <div class="col-sm-12 col-md-3 order-sm-first">
+      <div class="<?php if($course_accessibility){echo 'col-md-3';}else{echo 'col-md-6';} ?> col-sm-12 order-sm-first">
         <img src="<?php echo base_url('uploads/system/'.get_frontend_settings('dark_logo')); ?>" width="130">
         <span class="d-block mb-1 mt-2 fw-600" style="font-size: 14.5px; line-height: 28px"><?php echo get_settings('website_description'); ?></span>
 
@@ -49,7 +57,7 @@
           <?php endif; ?>
           <?php if($twitter): ?>
             <li class="mb-1">
-              <a href="<?php echo $twitter; ?>"><i class="fab fa-twitter"></i></a>
+              <a href="<?php echo $twitter; ?>"><i class="fab fa-instagram"></i></a>
             </li>
           <?php endif; ?>
           <?php if($linkedin): ?>

@@ -2,6 +2,8 @@
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <?php endif; ?>
 
+
+
 <section class="category-course-list-area">
     <div class="container">
         <div class="row mb-5 mt-3">
@@ -37,7 +39,7 @@
                 <div class="form-group">
                   <label for="registration-email"><?php echo site_phrase('email'); ?></label>
                   <div class="input-group">
-                    <span class="input-group-text bg-white" for="email"><i class="fas fa-user"></i></span>
+                    <span class="input-group-text bg-white" for="email"><i class="fas fa-envelope"></i></span>
                     <input type="email" name="email" class="form-control" placeholder="<?php echo site_phrase('email'); ?>" aria-label="<?php echo site_phrase('email'); ?>" aria-describedby="<?php echo site_phrase('email'); ?>" id="registration-email" required>
                   </div>
                 </div>
@@ -45,21 +47,20 @@
                 <div class="form-group">
                   <label for="registration-password"><?php echo site_phrase('password'); ?></label>
                   <div class="input-group">
-                    <span class="input-group-text bg-white" for="password"><i class="fas fa-user"></i></span>
+                    <span class="input-group-text bg-white" for="password"><i class="fas fa-key"></i></span>
                     <input type="password" name="password" class="form-control" placeholder="<?php echo site_phrase('password'); ?>" aria-label="<?php echo site_phrase('password'); ?>" aria-describedby="<?php echo site_phrase('password'); ?>" id="registration-password" required>
                   </div>
                 </div>
 
-                  <div class="form-group">
+                 <div class="form-group">
                       <label for="registration-mobile"><span class="input-field-icon"><i class="fas fa-mobile-alt"></i></span> <?php echo site_phrase('mobile'); ?>:</label>
                       <input type="text" class="form-control" name = "mobile" id="registration-mobile" placeholder="<?php echo site_phrase('mobile number'); ?>" value="" required>
                   </div>
 
-                  <div class="form-group">
+                  <div class="form-group" style="display: none;">
                       <label for="referral_code"><span class="input-field-icon"><i class="fas fa-mobile-alt"></i></span> <?php echo site_phrase('referral_from'); ?>:</label>
                       <input type="text" class="form-control" name = "referral_from" id="referral_from" placeholder="<?php echo site_phrase('referral_from'); ?>" value="<?php echo (isset($_GET['referral_code'])) ? $_GET['referral_code'] : '';?>">
                   </div>
-                                  
 
                 <?php if(get_frontend_settings('recaptcha_status')): ?>
                   <div class="form-group mt-4 mb-0">

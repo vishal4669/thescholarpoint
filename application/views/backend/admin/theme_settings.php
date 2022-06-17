@@ -59,14 +59,14 @@ $uninstalled_themes = $this->crud_model->get_uninstalled_themes();
                           <h5 class="card-title"><?php echo ucfirst($installed_theme); ?></h5>
                           <div class="">
                             <?php if (get_frontend_settings('theme') == $installed_theme) : ?>
-                              <a href="javascript::" class="btn btn-icon btn-success col" id="" style="" style="margin-right:5px;">
+                              <a href="javascript:;" class="btn btn-icon btn-success col" id="" style="" style="margin-right:5px;">
                                 <i class="mdi mdi-home"></i> <?php echo get_phrase('active_theme'); ?>
                               </a>
                             <?php else : ?>
-                              <a href="javascript::" class="btn btn-icon btn-secondary col-5" id="" style="" style="margin-right:5px;" onclick="activate_theme('<?php echo $installed_theme; ?>')">
+                              <a href="javascript:;" class="btn btn-icon btn-secondary col-5" id="" style="" style="margin-right:5px;" onclick="activate_theme('<?php echo $installed_theme; ?>')">
                                 <i class="mdi mdi-shield-check"></i> <?php echo get_phrase('activate'); ?>
                               </a>
-                              <a href="javascript::" class="btn btn-icon btn-secondary float-right col-5" id="" style="" style="margin-right:5px;" onclick="confirm_modal('<?php echo site_url('admin/theme_actions/remove/' . $installed_theme); ?>');">
+                              <a href="javascript:;" class="btn btn-icon btn-secondary float-right col-5" id="" style="" style="margin-right:5px;" onclick="confirm_modal('<?php echo site_url('admin/theme_actions/remove/' . $installed_theme); ?>');">
                                 <i class="mdi mdi-alert-octagram"></i> <?php echo get_phrase('remove'); ?>
                               </a>
                             <?php endif; ?>

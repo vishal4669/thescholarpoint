@@ -53,7 +53,7 @@
                                                 <?php echo $user_data['first_name'].' '.$user_data['last_name']; ?>
                                             </td>
                                             <td>
-                                                <a href="javascript::" class="btn btn-primary" onclick="showAjaxModal('<?php echo site_url('modal/popup/application_details/'.$pending_application['id']); ?>', '<?php echo get_phrase('applicant_details'); ?>')">
+                                                <a href="javascript:;" class="btn btn-primary" onclick="showAjaxModal('<?php echo site_url('modal/popup/application_details/'.$pending_application['id']); ?>', '<?php echo get_phrase('applicant_details'); ?>')">
                                                     <i class="fa fa-info-circle"></i> <?php echo get_phrase('application_details'); ?>
                                                 </a>
                                             </td>
@@ -119,7 +119,7 @@
                                                 <?php echo $user_data['first_name'].' '.$user_data['last_name']; ?>
                                             </td>
                                             <td>
-                                                <a href="javascript::" class="btn btn-primary" onclick="showAjaxModal('<?php echo site_url('modal/popup/application_details/'.$approved_application['id']); ?>', '<?php echo get_phrase('applicant_details'); ?>')">
+                                                <a href="javascript:;" class="btn btn-primary" onclick="showAjaxModal('<?php echo site_url('modal/popup/application_details/'.$approved_application['id']); ?>', '<?php echo get_phrase('applicant_details'); ?>')">
                                                     <i class="fa fa-info-circle"></i> <?php echo get_phrase('application_details'); ?>
                                                 </a>
                                             </td>

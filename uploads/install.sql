@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Dec 22, 2021 at 12:09 PM
+-- Generation Time: May 26, 2022 at 12:30 PM
 -- Server version: 5.7.24
 -- PHP Version: 7.4.1
 
@@ -19,7 +19,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `academy_5.5`
+-- Database: `academy_5.8`
 --
 
 -- --------------------------------------------------------
@@ -67,6 +67,7 @@ CREATE TABLE `blogs` (
   `blog_category_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `title` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `keywords` text COLLATE utf8_unicode_ci NOT NULL,
   `description` longtext COLLATE utf8_unicode_ci NOT NULL,
   `thumbnail` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
   `banner` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
@@ -204,6 +205,7 @@ CREATE TABLE `course` (
   `meta_description` longtext COLLATE utf8_unicode_ci,
   `is_free_course` int(11) DEFAULT NULL,
   `multi_instructor` int(11) NOT NULL DEFAULT '0',
+  `enable_drip_content` int(11) NOT NULL,
   `creator` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -227,118 +229,186 @@ CREATE TABLE `currency` (
 --
 
 INSERT INTO `currency` (`id`, `name`, `code`, `symbol`, `paypal_supported`, `stripe_supported`) VALUES
-(1, 'Leke', 'ALL', 'Lek', 0, 1),
-(2, 'Dollars', 'USD', '$', 1, 1),
-(3, 'Afghanis', 'AFN', '؋', 0, 1),
-(4, 'Pesos', 'ARS', '$', 0, 1),
-(5, 'Guilders', 'AWG', 'ƒ', 0, 1),
-(6, 'Dollars', 'AUD', '$', 1, 1),
-(7, 'New Manats', 'AZN', 'ман', 0, 1),
-(8, 'Dollars', 'BSD', '$', 0, 1),
-(9, 'Dollars', 'BBD', '$', 0, 1),
-(10, 'Rubles', 'BYR', 'p.', 0, 0),
-(11, 'Euro', 'EUR', '€', 1, 1),
-(12, 'Dollars', 'BZD', 'BZ$', 0, 1),
-(13, 'Dollars', 'BMD', '$', 0, 1),
-(14, 'Bolivianos', 'BOB', '$b', 0, 1),
-(15, 'Convertible Marka', 'BAM', 'KM', 0, 1),
-(16, 'Pula', 'BWP', 'P', 0, 1),
-(17, 'Leva', 'BGN', 'лв', 0, 1),
-(18, 'Reais', 'BRL', 'R$', 1, 1),
-(19, 'Pounds', 'GBP', '£', 1, 1),
-(20, 'Dollars', 'BND', '$', 0, 1),
-(21, 'Riels', 'KHR', '៛', 0, 1),
-(22, 'Dollars', 'CAD', '$', 1, 1),
-(23, 'Dollars', 'KYD', '$', 0, 1),
-(24, 'Pesos', 'CLP', '$', 0, 1),
-(25, 'Yuan Renminbi', 'CNY', '¥', 0, 1),
-(26, 'Pesos', 'COP', '$', 0, 1),
-(27, 'Colón', 'CRC', '₡', 0, 1),
-(28, 'Kuna', 'HRK', 'kn', 0, 1),
-(29, 'Pesos', 'CUP', '₱', 0, 0),
-(30, 'Koruny', 'CZK', 'Kč', 1, 1),
-(31, 'Kroner', 'DKK', 'kr', 1, 1),
-(32, 'Pesos', 'DOP ', 'RD$', 0, 1),
-(33, 'Dollars', 'XCD', '$', 0, 1),
-(34, 'Pounds', 'EGP', '£', 0, 1),
-(35, 'Colones', 'SVC', '$', 0, 0),
-(36, 'Pounds', 'FKP', '£', 0, 1),
-(37, 'Dollars', 'FJD', '$', 0, 1),
-(38, 'Cedis', 'GHC', '¢', 0, 0),
-(39, 'Pounds', 'GIP', '£', 0, 1),
-(40, 'Quetzales', 'GTQ', 'Q', 0, 1),
-(41, 'Pounds', 'GGP', '£', 0, 0),
-(42, 'Dollars', 'GYD', '$', 0, 1),
-(43, 'Lempiras', 'HNL', 'L', 0, 1),
-(44, 'Dollars', 'HKD', '$', 1, 1),
-(45, 'Forint', 'HUF', 'Ft', 1, 1),
-(46, 'Kronur', 'ISK', 'kr', 0, 1),
-(47, 'Rupees', 'INR', 'Rp', 1, 1),
-(48, 'Rupiahs', 'IDR', 'Rp', 0, 1),
-(49, 'Rials', 'IRR', '﷼', 0, 0),
-(50, 'Pounds', 'IMP', '£', 0, 0),
-(51, 'New Shekels', 'ILS', '₪', 1, 1),
-(52, 'Dollars', 'JMD', 'J$', 0, 1),
-(53, 'Yen', 'JPY', '¥', 1, 1),
-(54, 'Pounds', 'JEP', '£', 0, 0),
-(55, 'Tenge', 'KZT', 'лв', 0, 1),
-(56, 'Won', 'KPW', '₩', 0, 0),
-(57, 'Won', 'KRW', '₩', 0, 1),
-(58, 'Soms', 'KGS', 'лв', 0, 1),
-(59, 'Kips', 'LAK', '₭', 0, 1),
-(60, 'Lati', 'LVL', 'Ls', 0, 0),
-(61, 'Pounds', 'LBP', '£', 0, 1),
-(62, 'Dollars', 'LRD', '$', 0, 1),
-(63, 'Switzerland Francs', 'CHF', 'CHF', 1, 1),
-(64, 'Litai', 'LTL', 'Lt', 0, 0),
-(65, 'Denars', 'MKD', 'ден', 0, 1),
-(66, 'Ringgits', 'MYR', 'RM', 1, 1),
-(67, 'Rupees', 'MUR', '₨', 0, 1),
-(68, 'Pesos', 'MXN', '$', 1, 1),
-(69, 'Tugriks', 'MNT', '₮', 0, 1),
-(70, 'Meticais', 'MZN', 'MT', 0, 1),
-(71, 'Dollars', 'NAD', '$', 0, 1),
-(72, 'Rupees', 'NPR', '₨', 0, 1),
-(73, 'Guilders', 'ANG', 'ƒ', 0, 1),
-(74, 'Dollars', 'NZD', '$', 1, 1),
-(75, 'Cordobas', 'NIO', 'C$', 0, 1),
-(76, 'Nairas', 'NGN', '₦', 0, 1),
-(77, 'Krone', 'NOK', 'kr', 1, 1),
-(78, 'Rials', 'OMR', '﷼', 0, 0),
-(79, 'Rupees', 'PKR', '₨', 0, 1),
-(80, 'Balboa', 'PAB', 'B/.', 0, 1),
-(81, 'Guarani', 'PYG', 'Gs', 0, 1),
-(82, 'Nuevos Soles', 'PEN', 'S/.', 0, 1),
-(83, 'Pesos', 'PHP', 'Php', 1, 1),
-(84, 'Zlotych', 'PLN', 'zł', 1, 1),
-(85, 'Rials', 'QAR', '﷼', 0, 1),
-(86, 'New Lei', 'RON', 'lei', 0, 1),
-(87, 'Rubles', 'RUB', 'руб', 1, 1),
-(88, 'Pounds', 'SHP', '£', 0, 1),
-(89, 'Riyals', 'SAR', '﷼', 0, 1),
-(90, 'Dinars', 'RSD', 'Дин.', 0, 1),
-(91, 'Rupees', 'SCR', '₨', 0, 1),
-(92, 'Dollars', 'SGD', '$', 1, 1),
-(93, 'Dollars', 'SBD', '$', 0, 1),
-(94, 'Shillings', 'SOS', 'S', 0, 1),
-(95, 'Rand', 'ZAR', 'R', 0, 1),
-(96, 'Rupees', 'LKR', '₨', 0, 1),
-(97, 'Kronor', 'SEK', 'kr', 1, 1),
-(98, 'Dollars', 'SRD', '$', 0, 1),
-(99, 'Pounds', 'SYP', '£', 0, 0),
-(100, 'New Dollars', 'TWD', 'NT$', 1, 1),
-(101, 'Baht', 'THB', '฿', 1, 1),
-(102, 'Dollars', 'TTD', 'TT$', 0, 1),
-(103, 'Lira', 'TRY', 'TL', 0, 1),
-(104, 'Liras', 'TRL', '£', 0, 0),
-(105, 'Dollars', 'TVD', '$', 0, 0),
-(106, 'Hryvnia', 'UAH', '₴', 0, 1),
-(107, 'Pesos', 'UYU', '$U', 0, 1),
-(108, 'Sums', 'UZS', 'лв', 0, 1),
-(109, 'Bolivares Fuertes', 'VEF', 'Bs', 0, 0),
-(110, 'Dong', 'VND', '₫', 0, 1),
-(111, 'Rials', 'YER', '﷼', 0, 1),
-(112, 'Zimbabwe Dollars', 'ZWD', 'Z$', 0, 0);
+(1, 'US Dollar', 'USD', '$', 1, 1),
+(2, 'Albanian Lek', 'ALL', 'Lek', 0, 1),
+(3, 'Algerian Dinar', 'DZD', 'دج', 1, 1),
+(4, 'Angolan Kwanza', 'AOA', 'Kz', 1, 1),
+(5, 'Argentine Peso', 'ARS', '$', 1, 1),
+(6, 'Armenian Dram', 'AMD', '֏', 1, 1),
+(7, 'Aruban Florin', 'AWG', 'ƒ', 1, 1),
+(8, 'Australian Dollar', 'AUD', '$', 1, 1),
+(9, 'Azerbaijani Manat', 'AZN', 'm', 1, 1),
+(10, 'Bahamian Dollar', 'BSD', 'B$', 1, 1),
+(11, 'Bahraini Dinar', 'BHD', '.د.ب', 1, 1),
+(12, 'Bangladeshi Taka', 'BDT', '৳', 1, 1),
+(13, 'Barbadian Dollar', 'BBD', 'Bds$', 1, 1),
+(14, 'Belarusian Ruble', 'BYR', 'Br', 0, 0),
+(15, 'Belgian Franc', 'BEF', 'fr', 1, 1),
+(16, 'Belize Dollar', 'BZD', '$', 1, 1),
+(17, 'Bermudan Dollar', 'BMD', '$', 1, 1),
+(18, 'Bhutanese Ngultrum', 'BTN', 'Nu.', 1, 1),
+(19, 'Bitcoin', 'BTC', '฿', 1, 1),
+(20, 'Bolivian Boliviano', 'BOB', 'Bs.', 1, 1),
+(21, 'Bosnia', 'BAM', 'KM', 1, 1),
+(22, 'Botswanan Pula', 'BWP', 'P', 1, 1),
+(23, 'Brazilian Real', 'BRL', 'R$', 1, 1),
+(24, 'British Pound Sterling', 'GBP', '£', 1, 1),
+(25, 'Brunei Dollar', 'BND', 'B$', 1, 1),
+(26, 'Bulgarian Lev', 'BGN', 'Лв.', 1, 1),
+(27, 'Burundian Franc', 'BIF', 'FBu', 1, 1),
+(28, 'Cambodian Riel', 'KHR', 'KHR', 1, 1),
+(29, 'Canadian Dollar', 'CAD', '$', 1, 1),
+(30, 'Cape Verdean Escudo', 'CVE', '$', 1, 1),
+(31, 'Cayman Islands Dollar', 'KYD', '$', 1, 1),
+(32, 'CFA Franc BCEAO', 'XOF', 'CFA', 1, 1),
+(33, 'CFA Franc BEAC', 'XAF', 'FCFA', 1, 1),
+(34, 'CFP Franc', 'XPF', '₣', 1, 1),
+(35, 'Chilean Peso', 'CLP', '$', 1, 1),
+(36, 'Chinese Yuan', 'CNY', '¥', 1, 1),
+(37, 'Colombian Peso', 'COP', '$', 1, 1),
+(38, 'Comorian Franc', 'KMF', 'CF', 1, 1),
+(39, 'Congolese Franc', 'CDF', 'FC', 1, 1),
+(40, 'Costa Rican ColÃ³n', 'CRC', '₡', 1, 1),
+(41, 'Croatian Kuna', 'HRK', 'kn', 1, 1),
+(42, 'Cuban Convertible Peso', 'CUC', '$, CUC', 1, 1),
+(43, 'Czech Republic Koruna', 'CZK', 'Kč', 1, 1),
+(44, 'Danish Krone', 'DKK', 'Kr.', 1, 1),
+(45, 'Djiboutian Franc', 'DJF', 'Fdj', 1, 1),
+(46, 'Dominican Peso', 'DOP', '$', 1, 1),
+(47, 'East Caribbean Dollar', 'XCD', '$', 1, 1),
+(48, 'Egyptian Pound', 'EGP', 'ج.م', 1, 1),
+(49, 'Eritrean Nakfa', 'ERN', 'Nfk', 1, 1),
+(50, 'Estonian Kroon', 'EEK', 'kr', 1, 1),
+(51, 'Ethiopian Birr', 'ETB', 'Nkf', 1, 1),
+(52, 'Euro', 'EUR', '€', 1, 1),
+(53, 'Falkland Islands Pound', 'FKP', '£', 1, 1),
+(54, 'Fijian Dollar', 'FJD', 'FJ$', 1, 1),
+(55, 'Gambian Dalasi', 'GMD', 'D', 1, 1),
+(56, 'Georgian Lari', 'GEL', 'ლ', 1, 1),
+(57, 'German Mark', 'DEM', 'DM', 1, 1),
+(58, 'Ghanaian Cedi', 'GHS', 'GH₵', 1, 1),
+(59, 'Gibraltar Pound', 'GIP', '£', 1, 1),
+(60, 'Greek Drachma', 'GRD', '₯, Δρχ, Δρ', 1, 1),
+(61, 'Guatemalan Quetzal', 'GTQ', 'Q', 1, 1),
+(62, 'Guinean Franc', 'GNF', 'FG', 1, 1),
+(63, 'Guyanaese Dollar', 'GYD', '$', 1, 1),
+(64, 'Haitian Gourde', 'HTG', 'G', 1, 1),
+(65, 'Honduran Lempira', 'HNL', 'L', 1, 1),
+(66, 'Hong Kong Dollar', 'HKD', '$', 1, 1),
+(67, 'Hungarian Forint', 'HUF', 'Ft', 1, 1),
+(68, 'Icelandic KrÃ³na', 'ISK', 'kr', 1, 1),
+(69, 'Indian Rupee', 'INR', '₹', 1, 1),
+(70, 'Indonesian Rupiah', 'IDR', 'Rp', 1, 1),
+(71, 'Iranian Rial', 'IRR', '﷼', 1, 1),
+(72, 'Iraqi Dinar', 'IQD', 'د.ع', 1, 1),
+(73, 'Israeli New Sheqel', 'ILS', '₪', 1, 1),
+(74, 'Italian Lira', 'ITL', 'L,£', 1, 1),
+(75, 'Jamaican Dollar', 'JMD', 'J$', 1, 1),
+(76, 'Japanese Yen', 'JPY', '¥', 1, 1),
+(77, 'Jordanian Dinar', 'JOD', 'ا.د', 1, 1),
+(78, 'Kazakhstani Tenge', 'KZT', 'лв', 1, 1),
+(79, 'Kenyan Shilling', 'KES', 'KSh', 1, 1),
+(80, 'Kuwaiti Dinar', 'KWD', 'ك.د', 1, 1),
+(81, 'Kyrgystani Som', 'KGS', 'лв', 1, 1),
+(82, 'Laotian Kip', 'LAK', '₭', 1, 1),
+(83, 'Latvian Lats', 'LVL', 'Ls', 0, 0),
+(84, 'Lebanese Pound', 'LBP', '£', 1, 1),
+(85, 'Lesotho Loti', 'LSL', 'L', 1, 1),
+(86, 'Liberian Dollar', 'LRD', '$', 1, 1),
+(87, 'Libyan Dinar', 'LYD', 'د.ل', 1, 1),
+(88, 'Lithuanian Litas', 'LTL', 'Lt', 0, 0),
+(89, 'Macanese Pataca', 'MOP', '$', 1, 1),
+(90, 'Macedonian Denar', 'MKD', 'ден', 1, 1),
+(91, 'Malagasy Ariary', 'MGA', 'Ar', 1, 1),
+(92, 'Malawian Kwacha', 'MWK', 'MK', 1, 1),
+(93, 'Malaysian Ringgit', 'MYR', 'RM', 1, 1),
+(94, 'Maldivian Rufiyaa', 'MVR', 'Rf', 1, 1),
+(95, 'Mauritanian Ouguiya', 'MRO', 'MRU', 1, 1),
+(96, 'Mauritian Rupee', 'MUR', '₨', 1, 1),
+(97, 'Mexican Peso', 'MXN', '$', 1, 1),
+(98, 'Moldovan Leu', 'MDL', 'L', 1, 1),
+(99, 'Mongolian Tugrik', 'MNT', '₮', 1, 1),
+(100, 'Moroccan Dirham', 'MAD', 'MAD', 1, 1),
+(101, 'Mozambican Metical', 'MZM', 'MT', 1, 1),
+(102, 'Myanmar Kyat', 'MMK', 'K', 1, 1),
+(103, 'Namibian Dollar', 'NAD', '$', 1, 1),
+(104, 'Nepalese Rupee', 'NPR', '₨', 1, 1),
+(105, 'Netherlands Antillean Guilder', 'ANG', 'ƒ', 1, 1),
+(106, 'New Taiwan Dollar', 'TWD', '$', 1, 1),
+(107, 'New Zealand Dollar', 'NZD', '$', 1, 1),
+(108, 'Nicaraguan CÃ³rdoba', 'NIO', 'C$', 1, 1),
+(109, 'Nigerian Naira', 'NGN', '₦', 1, 1),
+(110, 'North Korean Won', 'KPW', '₩', 0, 0),
+(111, 'Norwegian Krone', 'NOK', 'kr', 1, 1),
+(112, 'Omani Rial', 'OMR', '.ع.ر', 0, 0),
+(113, 'Pakistani Rupee', 'PKR', '₨', 1, 1),
+(114, 'Panamanian Balboa', 'PAB', 'B/.', 1, 1),
+(115, 'Papua New Guinean Kina', 'PGK', 'K', 1, 1),
+(116, 'Paraguayan Guarani', 'PYG', '₲', 1, 1),
+(117, 'Peruvian Nuevo Sol', 'PEN', 'S/.', 1, 1),
+(118, 'Philippine Peso', 'PHP', '₱', 1, 1),
+(119, 'Polish Zloty', 'PLN', 'zł', 1, 1),
+(120, 'Qatari Rial', 'QAR', 'ق.ر', 1, 1),
+(121, 'Romanian Leu', 'RON', 'lei', 1, 1),
+(122, 'Russian Ruble', 'RUB', '₽', 1, 1),
+(123, 'Rwandan Franc', 'RWF', 'FRw', 1, 1),
+(124, 'Salvadoran ColÃ³n', 'SVC', '₡', 0, 0),
+(125, 'Samoan Tala', 'WST', 'SAT', 1, 1),
+(126, 'Saudi Riyal', 'SAR', '﷼', 1, 1),
+(127, 'Serbian Dinar', 'RSD', 'din', 1, 1),
+(128, 'Seychellois Rupee', 'SCR', 'SRe', 1, 1),
+(129, 'Sierra Leonean Leone', 'SLL', 'Le', 1, 1),
+(130, 'Singapore Dollar', 'SGD', '$', 1, 1),
+(131, 'Slovak Koruna', 'SKK', 'Sk', 1, 1),
+(132, 'Solomon Islands Dollar', 'SBD', 'Si$', 1, 1),
+(133, 'Somali Shilling', 'SOS', 'Sh.so.', 1, 1),
+(134, 'South African Rand', 'ZAR', 'R', 1, 1),
+(135, 'South Korean Won', 'KRW', '₩', 1, 1),
+(136, 'Special Drawing Rights', 'XDR', 'SDR', 1, 1),
+(137, 'Sri Lankan Rupee', 'LKR', 'Rs', 1, 1),
+(138, 'St. Helena Pound', 'SHP', '£', 1, 1),
+(139, 'Sudanese Pound', 'SDG', '.س.ج', 1, 1),
+(140, 'Surinamese Dollar', 'SRD', '$', 1, 1),
+(141, 'Swazi Lilangeni', 'SZL', 'E', 1, 1),
+(142, 'Swedish Krona', 'SEK', 'kr', 1, 1),
+(143, 'Swiss Franc', 'CHF', 'CHf', 1, 1),
+(144, 'Syrian Pound', 'SYP', 'LS', 0, 0),
+(145, 'São Tomé and Príncipe Dobra', 'STD', 'Db', 1, 1),
+(146, 'Tajikistani Somoni', 'TJS', 'SM', 1, 1),
+(147, 'Tanzanian Shilling', 'TZS', 'TSh', 1, 1),
+(148, 'Thai Baht', 'THB', '฿', 1, 1),
+(149, 'Tongan pa\'anga', 'TOP', '$', 1, 1),
+(150, 'Trinidad & Tobago Dollar', 'TTD', '$', 1, 1),
+(151, 'Tunisian Dinar', 'TND', 'ت.د', 1, 1),
+(152, 'Turkish Lira', 'TRY', '₺', 1, 1),
+(153, 'Turkmenistani Manat', 'TMT', 'T', 1, 1),
+(154, 'Ugandan Shilling', 'UGX', 'USh', 1, 1),
+(155, 'Ukrainian Hryvnia', 'UAH', '₴', 1, 1),
+(156, 'United Arab Emirates Dirham', 'AED', 'إ.د', 1, 1),
+(157, 'Uruguayan Peso', 'UYU', '$', 1, 1),
+(158, 'Afghan Afghani', 'AFA', '؋', 1, 1),
+(159, 'Uzbekistan Som', 'UZS', 'лв', 1, 1),
+(160, 'Vanuatu Vatu', 'VUV', 'VT', 1, 1),
+(161, 'Venezuelan BolÃvar', 'VEF', 'Bs', 0, 0),
+(162, 'Vietnamese Dong', 'VND', '₫', 1, 1),
+(163, 'Yemeni Rial', 'YER', '﷼', 1, 1),
+(164, 'Zambian Kwacha', 'ZMK', 'ZK', 1, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `custom_page`
+--
+
+CREATE TABLE `custom_page` (
+  `custom_page_id` int(11) NOT NULL,
+  `page_title` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `page_content` longtext COLLATE utf8_unicode_ci NOT NULL,
+  `page_url` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `button_title` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `button_position` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `status` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -456,10 +526,10 @@ CREATE TABLE `log` (
 
 CREATE TABLE `message` (
   `message_id` int(11) NOT NULL,
-  `message_thread_code` longtext CHARACTER SET latin1,
-  `message` longtext CHARACTER SET latin1,
-  `sender` longtext CHARACTER SET latin1,
-  `timestamp` longtext CHARACTER SET latin1,
+  `message_thread_code` longtext COLLATE utf8_unicode_ci,
+  `message` longtext COLLATE utf8_unicode_ci,
+  `sender` longtext COLLATE utf8_unicode_ci,
+  `timestamp` longtext COLLATE utf8_unicode_ci,
   `read_status` int(11) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -547,6 +617,24 @@ CREATE TABLE `question` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `quiz_results`
+--
+
+CREATE TABLE `quiz_results` (
+  `quiz_result_id` int(11) NOT NULL,
+  `quiz_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `user_answers` longtext COLLATE utf8_unicode_ci NOT NULL,
+  `correct_answers` longtext COLLATE utf8_unicode_ci NOT NULL COMMENT 'question_id',
+  `total_obtained_marks` double NOT NULL,
+  `date_added` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `date_updated` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `is_submitted` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `rating`
 --
 
@@ -616,12 +704,12 @@ INSERT INTO `settings` (`id`, `key`, `value`) VALUES
 (2, 'system_name', 'Academy LMS'),
 (3, 'system_title', 'Academy Learning Club'),
 (4, 'system_email', 'academy@example.com'),
-(5, 'address', 'Sydeny, Australia'),
+(5, 'address', 'Sydney, Australia'),
 (6, 'phone', '+143-52-9933631'),
 (7, 'purchase_code', 'your-purchase-code'),
 (8, 'paypal', '[{\"active\":\"1\",\"mode\":\"sandbox\",\"sandbox_client_id\":\"AfGaziKslex-scLAyYdDYXNFaz2aL5qGau-SbDgE_D2E80D3AFauLagP8e0kCq9au7W4IasmFbirUUYc\",\"sandbox_secret_key\":\"EMa5pCTuOpmHkhHaCGibGhVUcKg0yt5-C3CzJw-OWJCzaXXzTlyD17SICob_BkfM_0Nlk7TWnN42cbGz\",\"production_client_id\":\"1234\",\"production_secret_key\":\"12345\"}]'),
 (9, 'stripe_keys', '[{\"active\":\"1\",\"testmode\":\"on\",\"public_key\":\"pk_test_CAC3cB1mhgkJqXtypYBTGb4f\",\"secret_key\":\"sk_test_iatnshcHhQVRXdygXw3L2Pp2\",\"public_live_key\":\"pk_live_xxxxxxxxxxxxxxxxxxxxxxxx\",\"secret_live_key\":\"sk_live_xxxxxxxxxxxxxxxxxxxxxxxx\"}]'),
-(10, 'youtube_api_key', 'AIzaSyDthDJK7F5kKCDIcZeSFxU4rx9s3DSaBAU'),
+(10, 'youtube_api_key', 'youtube-api-key'),
 (11, 'vimeo_api_key', 'vimeo-api-key'),
 (12, 'slogan', 'A course based video CMS'),
 (13, 'text_align', NULL),
@@ -637,18 +725,22 @@ INSERT INTO `settings` (`id`, `key`, `value`) VALUES
 (23, 'footer_text', ''),
 (24, 'footer_link', 'http://creativeitem.com/'),
 (25, 'protocol', 'smtp'),
-(26, 'smtp_host', 'ssl://smtp.gmail.com'),
+(26, 'smtp_host', 'smtp.gmail.com'),
 (27, 'smtp_port', '465'),
-(28, 'smtp_user', 'pollobtesting@gmail.com'),
-(29, 'smtp_pass', 'creativeitemtesting32'),
-(30, 'version', '5.5'),
-(31, 'student_email_verification', 'enable'),
+(28, 'smtp_user', 'your email address'),
+(29, 'smtp_pass', 'your email password'),
+(30, 'version', '5.8'),
+(31, 'student_email_verification', 'disable'),
 (32, 'instructor_application_note', 'Fill all the fields carefully and share if you want to share any document with us it will help us to evaluate you as an instructor.'),
 (33, 'razorpay_keys', '[{\"active\":\"1\",\"key\":\"rzp_test_J60bqBOi1z1aF5\",\"secret_key\":\"uk935K7p4j96UCJgHK8kAU4q\",\"theme_color\":\"#c7a600\"}]'),
 (34, 'razorpay_currency', 'USD'),
-(35, 'fb_app_id', 'App-id'),
-(36, 'fb_app_secret', 'App-secret-key'),
-(37, 'fb_social_login', '0');
+(35, 'fb_app_id', 'facebook-app-id'),
+(36, 'fb_app_secret', 'facebook-app-secret-key'),
+(37, 'fb_social_login', '0'),
+(38, 'drip_content_settings', '{\"lesson_completion_role\":\"percentage\",\"minimum_duration\":10,\"minimum_percentage\":\"50\",\"locked_lesson_message\":\"&lt;h3 xss=&quot;removed&quot; style=&quot;text-align: center; &quot;&gt;&lt;span xss=&quot;removed&quot;&gt;&lt;strong&gt;Permission denied!&lt;\\/strong&gt;&lt;\\/span&gt;&lt;\\/h3&gt;&lt;p xss=&quot;removed&quot; style=&quot;text-align: center; &quot;&gt;&lt;span xss=&quot;removed&quot;&gt;This course supports drip content, so you must complete the previous lessons.&lt;\\/span&gt;&lt;\\/p&gt;\"}'),
+(41, 'course_accessibility', 'publicly'),
+(42, 'smtp_crypto', 'ssl'),
+(43, 'allowed_device_number_of_loging', '1');
 
 -- --------------------------------------------------------
 
@@ -683,14 +775,28 @@ CREATE TABLE `users` (
   `role_id` int(11) DEFAULT NULL,
   `date_added` int(11) DEFAULT NULL,
   `last_modified` int(11) DEFAULT NULL,
-  `watch_history` longtext COLLATE utf8_unicode_ci,
   `wishlist` longtext COLLATE utf8_unicode_ci,
   `title` longtext COLLATE utf8_unicode_ci,
   `payment_keys` longtext COLLATE utf8_unicode_ci NOT NULL,
   `verification_code` longtext COLLATE utf8_unicode_ci,
   `status` int(11) DEFAULT NULL,
   `is_instructor` int(11) DEFAULT '0',
-  `image` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL
+  `image` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `sessions` longtext COLLATE utf8_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `watched_duration`
+--
+
+CREATE TABLE `watched_duration` (
+  `watched_id` int(11) UNSIGNED NOT NULL,
+  `watched_student_id` int(11) DEFAULT NULL,
+  `watched_course_id` int(11) DEFAULT NULL,
+  `watched_lesson_id` int(11) DEFAULT NULL,
+  `watched_counter` longtext COLLATE utf8_unicode_ci
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -703,6 +809,8 @@ CREATE TABLE `watch_histories` (
   `watch_history_id` int(11) NOT NULL,
   `course_id` int(11) NOT NULL,
   `student_id` int(11) NOT NULL,
+  `completed_lesson` longtext COLLATE utf8_unicode_ci NOT NULL,
+  `course_progress` int(11) NOT NULL,
   `watching_lesson_id` int(11) NOT NULL,
   `quiz_result` longtext COLLATE utf8_unicode_ci NOT NULL,
   `date_added` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -775,6 +883,12 @@ ALTER TABLE `currency`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `custom_page`
+--
+ALTER TABLE `custom_page`
+  ADD PRIMARY KEY (`custom_page_id`);
+
+--
 -- Indexes for table `enrol`
 --
 ALTER TABLE `enrol`
@@ -836,6 +950,12 @@ ALTER TABLE `question`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `quiz_results`
+--
+ALTER TABLE `quiz_results`
+  ADD PRIMARY KEY (`quiz_result_id`);
+
+--
 -- Indexes for table `rating`
 --
 ALTER TABLE `rating`
@@ -870,6 +990,12 @@ ALTER TABLE `tag`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `watched_duration`
+--
+ALTER TABLE `watched_duration`
+  ADD PRIMARY KEY (`watched_id`);
 
 --
 -- Indexes for table `watch_histories`
@@ -939,7 +1065,13 @@ ALTER TABLE `course`
 -- AUTO_INCREMENT for table `currency`
 --
 ALTER TABLE `currency`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=113;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=165;
+
+--
+-- AUTO_INCREMENT for table `custom_page`
+--
+ALTER TABLE `custom_page`
+  MODIFY `custom_page_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `enrol`
@@ -1002,6 +1134,12 @@ ALTER TABLE `question`
   MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `quiz_results`
+--
+ALTER TABLE `quiz_results`
+  MODIFY `quiz_result_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `rating`
 --
 ALTER TABLE `rating`
@@ -1023,7 +1161,7 @@ ALTER TABLE `section`
 -- AUTO_INCREMENT for table `settings`
 --
 ALTER TABLE `settings`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
 -- AUTO_INCREMENT for table `tag`
@@ -1036,6 +1174,12 @@ ALTER TABLE `tag`
 --
 ALTER TABLE `users`
   MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `watched_duration`
+--
+ALTER TABLE `watched_duration`
+  MODIFY `watched_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `watch_histories`

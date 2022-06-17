@@ -1,4 +1,12 @@
 <script type="text/javascript">
+
+  function set_js_flashdata(url){
+    $.ajax({
+      url: url,
+      success: function(){}
+    });
+  }
+
   function togglePriceFields(elem) {
     if($("#"+elem).is(':checked')){
       $('.paid-course-stuffs').slideUp();
@@ -54,32 +62,3 @@
       });
   }
 </script>
-
-<?php if ($page_name == 'student_test_master_add' || $page_name == 'student_test_master_edit' ): ?>
-<script type="text/javascript">
-function get_students(stream_id, student_id = ''){
-   $.ajax({
-           type: "POST",
-           url: "<?php echo site_url(strtolower($this->session->userdata('role')).'/ajax_student_test_master') ?>",
-           data: {action:'get_students', current_stream_id :stream_id, selected_student_id:student_id }, 
-           beforeSend: function(){
-               //$("#loader").show();
-            },
-           success: function(data)
-           {
-              //console.log(data);
-              var $student_list = $('#student_id');
-              $student_list.empty();
-              $student_list.append(data);  
-                
-           },
-            complete: function(){
-                //Completed console.
-
-            }
-         });
-
-}
-
-  </script>
-<?php endif; ?>

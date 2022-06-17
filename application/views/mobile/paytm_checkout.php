@@ -5,9 +5,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
-    <!-- <link rel="favicon" href="<?php //echo base_url().'assets/frontend/default/img/icons/favicon.ico' ?>"> -->
-
+    <link rel="favicon" href="<?php echo base_url().'assets/frontend/default/img/icons/favicon.ico' ?>">
     <link rel="stylesheet" href="<?php echo base_url().'assets/frontend/default/css/bootstrap.min.css'; ?>">
     <link rel="stylesheet" href="<?php echo base_url().'assets/frontend/default/css/responsive.css'; ?>">
     <script src="<?php echo base_url('assets/backend/js/jquery-3.3.1.min.js'); ?>"></script>

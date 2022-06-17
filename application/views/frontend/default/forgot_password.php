@@ -17,7 +17,7 @@
               <div class="form-group">
                 <label for="forgot-password-email"><?php echo site_phrase('your_email'); ?></label>
                 <div class="input-group">
-                  <span class="input-group-text bg-white" for="forgot-password-email"><i class="fas fa-user"></i></span>
+                  <span class="input-group-text bg-white" for="forgot-password-email"><i class="fas fa-envelope"></i></span>
                   <input type="email" name="email" class="form-control" placeholder="<?php echo site_phrase('email'); ?>" aria-label="<?php echo site_phrase('email'); ?>" aria-describedby="<?php echo site_phrase('email'); ?>" id="forgot-password-email" required>
                 </div>
               </div>

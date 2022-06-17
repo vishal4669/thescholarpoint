@@ -317,6 +317,28 @@ class Api_model extends CI_Model
 		return $userdata;
 	}
 
+	// // For single device Login mechanism
+	// public function login_get($session_id = "")
+	// {
+	// 	$userdata = array();
+	// 	$credential = array('email' => $_GET['email'], 'password' => sha1($_GET['password']), 'status' => 1);
+	// 	$query = $this->db->get_where('users', $credential);
+	// 	if ($query->num_rows() > 0) {
+	// 		$row = $query->row_array();
+	// 		$userdata['user_id'] = $row['id'];
+	// 		$userdata['first_name'] = $row['first_name'];
+	// 		$userdata['last_name'] = $row['last_name'];
+	// 		$userdata['email'] = $row['email'];
+	// 		$userdata['role'] = strtolower(get_user_role('user_role', $row['id']));
+			
+	// 		$userdata['session_id'] = $session_id;
+	// 		$userdata['validity'] = 1;
+	// 	} else {
+	// 		$userdata['validity'] = 0;
+	// 	}
+	// 	return $userdata;
+	// }
+
 	// Signup mechanism
 	public function signup_post()
 	{
@@ -336,7 +358,6 @@ class Api_model extends CI_Model
         }
 
         $data['wishlist'] = json_encode(array());
-        $data['watch_history'] = json_encode(array());
         $data['date_added'] = strtotime(date("Y-m-d H:i:s"));
         $social_links = array(
             'facebook' => "",
@@ -539,10 +560,14 @@ class Api_model extends CI_Model
 			$response[$key]['video_url_web'] = $lesson['video_url'];
 			$response[$key]['video_type_web'] = $lesson['video_type'];
 			$response[$key]['lesson_type'] = $lesson['lesson_type'];
-			$response[$key]['attachment'] = $lesson['attachment'];
-			$response[$key]['attachment_url'] = base_url() . 'uploads/lesson_files/' . $lesson['attachment'];
-			$response[$key]['attachment_type'] = $lesson['attachment_type'];
-			$response[$key]['summary'] = $lesson['summary'];
+			if($lesson['lesson_type'] == 'text'){
+                $response[$key]['attachment'] = remove_js(htmlspecialchars_decode($lesson['attachment']));
+            }else{
+                $response[$key]['attachment'] = $lesson['attachment'];
+            }
+            $response[$key]['attachment_url'] = base_url() . 'uploads/lesson_files/' . $lesson['attachment'];
+            $response[$key]['attachment_type'] = $lesson['attachment_type'];
+            $response[$key]['summary'] = remove_js(htmlspecialchars_decode($lesson['summary']));
 			if ($user_id > 0) {
 				$response[$key]['is_completed'] = lesson_progress($lesson['id'], $user_id);
 			} else {
@@ -680,38 +705,8 @@ class Api_model extends CI_Model
 	function save_course_progress_get($user_id = "")
 	{
 		$lesson_id = $_GET['lesson_id'];
-		$progress = $_GET['progress'];
-		$user_details  = $this->user_model->get_all_user($user_id)->row_array();
-		$watch_history = $user_details['watch_history'];
-		$watch_history_array = array();
-		if ($watch_history == '') {
-			array_push($watch_history_array, array('lesson_id' => $lesson_id, 'progress' => $progress));
-		} else {
-			$founder = false;
-			$watch_history_array = json_decode($watch_history, true);
-			for ($i = 0; $i < count($watch_history_array); $i++) {
-				$watch_history_for_each_lesson = $watch_history_array[$i];
-				if ($watch_history_for_each_lesson['lesson_id'] == $lesson_id) {
-					$watch_history_for_each_lesson['progress'] = $progress;
-					$watch_history_array[$i]['progress'] = $progress;
-					$founder = true;
-				}
-			}
-			if (!$founder) {
-				array_push($watch_history_array, array('lesson_id' => $lesson_id, 'progress' => $progress));
-			}
-		}
-		$data['watch_history'] = json_encode($watch_history_array);
-		$this->db->where('id', $user_id);
-		$this->db->update('users', $data);
-
-		// CHECK IF THE USER IS ELIGIBLE FOR CERTIFICATE
-		if (addon_status('certificate')) {
-			$this->load->model('addons/Certificate_model', 'certificate_model');
-			$this->certificate_model->check_certificate_eligibility("lesson", $lesson_id, $user_id);
-		}
-
 		$lesson_details = $this->crud_model->get_lessons('lesson', $lesson_id)->row_array();
+		$this->crud_model->update_watch_history_manually($lesson_id, $lesson_details['course_id']);
 		return $this->course_completion_data($lesson_details['course_id'], $user_id);
 	}
 
@@ -857,7 +852,6 @@ class Api_model extends CI_Model
 	}
 	
 
-
 	function forgot_password_post(){
     	$email = $this->input->post('email');
         $verification_code = str_replace('=', '', base64_encode($email.'_Uh6#@#6hU_'.rand(111111, 9999999)));
@@ -867,8 +861,6 @@ class Api_model extends CI_Model
         $this->email_model->password_reset_email($verification_code, $email);
         return true;
     }
-
-
 
 
 

@@ -3,7 +3,7 @@
   margin-bottom: 15px;
 }
 
-.form-group input {
+.form-group input:not(.form-group > [type=radio]){
   padding: 0;
   height: initial;
   width: initial;
@@ -17,7 +17,7 @@
   cursor: pointer;
 }
 
-.form-group label:before {
+.form-group label:not(label.radio):before {
   content:'';
   -webkit-appearance: none;
   background-color: transparent;
@@ -31,7 +31,8 @@
   margin-right: 5px;
 }
 
-.form-group input:checked + label:after {
+
+.form-group input:checked + label:not(label.radio):after {
   content: '';
   display: block;
   position: absolute;
@@ -98,4 +99,8 @@
 }
 .text-mute{
   color: #afafaf;
+}
+.bd-primary-to-success{
+    background: rgb(187,183,255) !important;
+    background: linear-gradient(360deg, rgba(187,183,255,1) 0%, rgba(163,202,255,1) 11%, rgba(58,208,181,1) 25%, rgba(47,177,132,1) 44%, rgba(25,184,137,1) 62%, rgba(20,169,107,1) 82%, rgba(0,131,75,1) 100%) !important;
 }

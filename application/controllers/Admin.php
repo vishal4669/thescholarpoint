@@ -9,18 +9,14 @@ class Admin extends CI_Controller
 
         $this->load->database();
         $this->load->library('session');
-        chk_user_token_session(); //Prevention the multi login for admin
         /*cache control*/
         $this->output->set_header('Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
         $this->output->set_header('Pragma: no-cache');
-        if (!$this->session->userdata('cart_items')) {
-            $this->session->set_userdata('cart_items', array());
-        }
 
-        if ($this->session->userdata('admin_login') != true) {
-            redirect(site_url('login'), 'refresh');
-        }
+        $this->user_model->check_session_data('admin');
     }
+
+
 
 
     public function index()
@@ -605,285 +601,6 @@ class Admin extends CI_Controller
         }
     }
 
-      /**Subject Master functions***/
-
-    public function subject_master(){
-
-        if ($this->session->userdata('admin_login') != true) {
-            redirect(site_url('login'), 'refresh');
-        }
-
-        // Test Master query 
-        $page_data['subject_master']         = $this->get_subject_master();
-        $page_data['page_name']              = 'subject_master';
-        $page_data['categories']             = $this->crud_model->get_categories();
-        $page_data['page_title']             = 'Test Master';
-
-        $this->load->view('backend/index', $page_data); 
-    }
-
-    public function get_subject_master($id=0){
-        if ($id > 0) {
-            $this->db->where('id', $id);
-        }
-        return  $this->db->get('subject_master'); 
-    }
-
-    public function subject_form($param1 = "", $param2 = "")
-    {
-
-        if ($this->session->userdata('admin_login') != true) {
-            redirect(site_url('login'), 'refresh');
-        }
-
-        // CHECK ACCESS PERMISSION
-        check_permission('course');
-
-        if ($param1 == 'subject_master_add') {
-
-            $page_data['languages'] = $this->crud_model->get_all_languages();
-            $page_data['categories'] = $this->crud_model->get_categories();
-            $page_data['page_name'] = 'subject_master_add';
-            $page_data['page_title'] = get_phrase('add_subject');
-            $this->load->view('backend/index', $page_data);
-
-        }  elseif ($param1 == 'subject_master_edit') {
-           // $this->is_drafted_course($param2);
-            $page_data['page_name'] = 'subject_master_edit';
-            $page_data['subject_id'] =  $param2;
-            $page_data['page_title'] = get_phrase('edit_subject');
-            $page_data['languages'] = $this->crud_model->get_all_languages();
-            $page_data['categories'] = $this->crud_model->get_categories();
-            $this->load->view('backend/index', $page_data);
-        }
-    }
-
-    public function subject_actions($param1 = "", $param2 = "")
-    {
-        if ($this->session->userdata('admin_login') != true) {
-            redirect(site_url('login'), 'refresh');
-        }
-        // CHECK ACCESS PERMISSION
-        check_permission('course');
-
-        if ($param1 == "add") {
-            $subject_id = $this->crud_model->add_subject();
-            redirect(site_url('admin/subject_form/subject_master_edit/' . $subject_id), 'refresh');
-        } elseif ($param1 == "edit") {
-            $this->crud_model->update_subject($param2);
-            // CHECK IF LIVE CLASS ADDON EXISTS, ADD OR UPDATE IT TO ADDON MODEL
-            redirect(site_url('admin/subject_form/subject_master_edit/' . $param2));
-        } elseif ($param1 == 'delete') {
-            $this->crud_model->delete_subject($param2);
-            redirect(site_url('admin/subject_master'), 'refresh');
-        }
-    }
-
-
-    /**student_test_master**/
-
-     public function student_test_master()
-    {
-        if ($this->session->userdata('admin_login') != true) {
-            redirect(site_url('login'), 'refresh');
-        }
-
-        $page_data['selected_category_id']   = isset($_GET['category_id']) ? $_GET['category_id'] : "all";
-        $page_data['selected_instructor_id'] = isset($_GET['instructor_id']) ? $_GET['instructor_id'] : "all";
-        $page_data['selected_price']         = isset($_GET['price']) ? $_GET['price'] : "all";
-        $page_data['selected_status']        = isset($_GET['status']) ? $_GET['status'] : "all";
-
-        // Test Master query 
-        $page_data['student_test_master']    = $this->get_student_test_master();
-
-        $page_data['page_name']              = 'student_test_master';
-
-        $page_data['categories']             = $this->crud_model->get_categories();
-        $page_data['page_title']             = 'Test Master';
-
-        $this->load->view('backend/index', $page_data);
-
-    }
-
-    public function get_student_test_master($id=0){
-        if ($id > 0) {
-            $this->db->where('id', $id);
-        }
-        return  $this->db->get('student_test_master'); 
-
-    }
-
-    public function student_test_form($param1 = "", $param2 = "")
-    {
-
-        if ($this->session->userdata('admin_login') != true) {
-            redirect(site_url('login'), 'refresh');
-        }
-
-        // CHECK ACCESS PERMISSION
-        check_permission('student_test_form');
-
-        if ($param1 == 'student_test_master_add') {
-
-            $page_data['languages'] = $this->crud_model->get_all_languages();
-            $page_data['categories'] = $this->crud_model->get_categories();
-            $page_data['page_name'] = 'student_test_master_add';
-            $page_data['page_title'] = get_phrase('add_student_test');
-
-            $page_data['get_test_master'] = $this->get_test_master();
-
-            $this->load->view('backend/index', $page_data);
-
-        }  elseif ($param1 == 'student_test_master_edit') {
-           // $this->is_drafted_course($param2);
-            $page_data['page_name'] = 'student_test_master_edit';
-            $page_data['student_test_id'] =  $param2;
-            $page_data['page_title'] = get_phrase('edit_student_test');
-            $page_data['get_test_master'] = $this->get_test_master();
-
-            $page_data['languages'] = $this->crud_model->get_all_languages();
-            $page_data['categories'] = $this->crud_model->get_categories();
-            $this->load->view('backend/index', $page_data);
-        }
-    }
-
-
-    public function student_test_actions($param1 = "", $param2 = ""){
-
-        if ($this->session->userdata('admin_login') != true) {
-            redirect(site_url('login'), 'refresh');
-        }
-        // CHECK ACCESS PERMISSION
-        check_permission('student_test_master');
-
-        if ($param1 == "add") {
-            $student_test_id = $this->crud_model->add_student_test();
-            redirect(site_url('admin/student_test_form/student_test_master_edit/' . $student_test_id), 'refresh');
-        } elseif ($param1 == "edit") {
-            $this->crud_model->update_student_test($param2);
-            // CHECK IF LIVE CLASS ADDON EXISTS, ADD OR UPDATE IT TO ADDON MODEL
-            redirect(site_url('admin/student_test_form/student_test_master_edit/' . $param2));
-
-        } elseif ($param1 == 'delete') {
-            $this->crud_model->delete_student_test($param2);
-            redirect(site_url('admin/student_test_master'), 'refresh');
-        }
-    }
-
-    function ajax_student_test_master(){
-
-        if($this->input->post('action') == 'get_students'){
-
-            $stream_id = $this->input->post('current_stream_id');
-            $selected_student_id = $this->input->post('selected_student_id');
-
-            $students = $this->user_model->get_user_for_stream($stream_id)->result();
-            $student_list = '<option value="">Select Student</option>';
-
-            if(count($students) > 0 ){
-                //print_r($students);
-                foreach ($students as $row)
-                {
-                    $select_active = '';
-                    if ($selected_student_id == $row->id){
-                        $select_active = 'selected="select"';
-                    }
-                   $student_list .= '<option value="'.$row->id.'" '.$select_active .' >'.$row->first_name.' '.$row->last_name.'</option>';
-                }
-            }
-            echo $student_list;
-
-        }
-
-    }
-    /** Test Master function
-    */
-
-    public function test_master()
-    {
-        if ($this->session->userdata('admin_login') != true) {
-            redirect(site_url('login'), 'refresh');
-        }
-
-        $page_data['selected_category_id']   = isset($_GET['category_id']) ? $_GET['category_id'] : "all";
-        $page_data['selected_instructor_id'] = isset($_GET['instructor_id']) ? $_GET['instructor_id'] : "all";
-        $page_data['selected_price']         = isset($_GET['price']) ? $_GET['price'] : "all";
-        $page_data['selected_status']        = isset($_GET['status']) ? $_GET['status'] : "all";
-
-        // Test Master query 
-        $page_data['test_master']            = $this->get_test_master();
-
-        $page_data['page_name']              = 'test_master';
-
-        $page_data['categories']             = $this->crud_model->get_categories();
-        $page_data['page_title']             = 'Test Master';
-
-        $this->load->view('backend/index', $page_data);
-
-    }
-
-    //Get the test master data..
-    function get_test_master($id=0){
-        if ($id > 0) {
-            $this->db->where('id', $id);
-        }
-        $this->db->where('is_active', 1);
-        return  $this->db->get('test_master'); 
-    }
-    
-
-    public function test_form($param1 = "", $param2 = "")
-    {
-
-        if ($this->session->userdata('admin_login') != true) {
-            redirect(site_url('login'), 'refresh');
-        }
-
-        // CHECK ACCESS PERMISSION
-        check_permission('course');
-
-        if ($param1 == 'add_test_master') {
-
-            $page_data['languages'] = $this->crud_model->get_all_languages();
-            $page_data['categories'] = $this->crud_model->get_categories();
-            $page_data['page_name'] = 'test_master_add';
-            $page_data['page_title'] = get_phrase('add_test');
-            $this->load->view('backend/index', $page_data);
-
-        }  elseif ($param1 == 'edit_test_master') {
-           // $this->is_drafted_course($param2);
-            $page_data['page_name'] = 'test_master_edit';
-            $page_data['test_id'] =  $param2;
-            $page_data['page_title'] = get_phrase('edit_test');
-            $page_data['languages'] = $this->crud_model->get_all_languages();
-            $page_data['categories'] = $this->crud_model->get_categories();
-            $this->load->view('backend/index', $page_data);
-        }
-    }
-
-    public function test_actions($param1 = "", $param2 = "")
-    {
-        if ($this->session->userdata('admin_login') != true) {
-            redirect(site_url('login'), 'refresh');
-        }
-        // CHECK ACCESS PERMISSION
-        check_permission('course');
-
-        if ($param1 == "add") {
-            $test_id = $this->crud_model->add_test();
-            redirect(site_url('admin/test_form/edit_test_master/' . $test_id), 'refresh');
-        } elseif ($param1 == "edit") {
-            $this->crud_model->update_test($param2);
-            // CHECK IF LIVE CLASS ADDON EXISTS, ADD OR UPDATE IT TO ADDON MODEL
-            redirect(site_url('admin/test_form/edit_test_master/' . $param2));
-
-        } elseif ($param1 == 'delete') {
-            $this->crud_model->delete_test($param2);
-            redirect(site_url('admin/test_master'), 'refresh');
-        }
-    }
-
-
     public function courses()
     {
         if ($this->session->userdata('admin_login') != true) {
@@ -983,6 +700,7 @@ class Admin extends CI_Controller
                 }
 
                 $view_course_on_frontend_url = site_url('home/course/' . rawurlencode(slugify($row->title)) . '/' . $row->id);
+                $go_to_course_playing_page = site_url('home/lesson/' . rawurlencode(slugify($row->title)) . '/' . $row->id);
                 $edit_this_course_url = site_url('admin/course_form/course_edit/' . $row->id);
                 $section_and_lesson_url = site_url('admin/course_form/course_edit/' . $row->id);
 
@@ -1014,7 +732,7 @@ class Admin extends CI_Controller
 
                 $course_edit_menu = '<li><a class="dropdown-item" href="' . $edit_this_course_url . '">' . get_phrase("edit_this_course") . '</a></li>';
 
-                $course_delete_menu = '<li><a class="dropdown-item" href="javascript::" onclick="' . $delete_course_url . '">' . get_phrase("delete") . '</a></li>';
+                $course_delete_menu = '<li><a class="dropdown-item" href="javascript:;" onclick="' . $delete_course_url . '">' . get_phrase("delete") . '</a></li>';
 
                 $action = '
                 <div class="dropright dropright">
@@ -1023,8 +741,9 @@ class Admin extends CI_Controller
                 </button>
                 <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="' . $view_course_on_frontend_url . '" target="_blank">' . get_phrase("view_course_on_frontend") . '</a></li>
+                <li><a class="dropdown-item" href="' . $go_to_course_playing_page . '" target="_blank">' . get_phrase("go_to_course_playing_page") . '</a></li>
                 ' . $course_edit_menu . $section_and_lesson_menu . '
-                <li><a class="dropdown-item" href="javascript::" onclick="' . $course_status_changing_action . '">' . $course_status_changing_message . '</a></li>
+                <li><a class="dropdown-item" href="javascript:;" onclick="' . $course_status_changing_action . '">' . $course_status_changing_message . '</a></li>
                 ' . $course_delete_menu . '
                 </ul>
                 </div>
@@ -1529,16 +1248,12 @@ class Admin extends CI_Controller
         }
         $quiz_details = $this->crud_model->get_lessons('lesson', $quiz_id)->row_array();
 
-        if ($action == 'add') {
-            $response = $this->crud_model->add_quiz_questions($quiz_id);
-            echo $response;
-        } elseif ($action == 'edit') {
-            $response = $this->crud_model->update_quiz_questions($question_id);
-            echo $response;
+        if ($action == 'add' || $action == 'edit') {
+            echo $this->crud_model->manage_quiz_questions($quiz_id, $question_id, $action);
         } elseif ($action == 'delete') {
             $response = $this->crud_model->delete_quiz_question($question_id);
             $this->session->set_flashdata('flash_message', get_phrase('question_has_been_deleted'));
-            redirect(site_url('admin/course_form/course_edit/' . $quiz_details['course_id']));
+            redirect(site_url('admin/course_form/course_edit/' . $quiz_details['course_id']), 'refresh');
         }
     }
 
@@ -1948,10 +1663,10 @@ class Admin extends CI_Controller
 
     // AJAX PORTION
     // this function is responsible for managing multiple choice question
-    function manage_multiple_choices_options()
+    function quiz_fields_type_wize()
     {
-        $page_data['number_of_options'] = $this->input->post('number_of_options');
-        $this->load->view('backend/admin/manage_multiple_choices_options', $page_data);
+        $page_data['question_type'] = $this->input->post('question_type');
+        $this->load->view('backend/admin/quiz_fields_type_wize', $page_data);
     }
 
     public function ajax_get_sub_category($category_id)
@@ -2092,6 +1807,92 @@ class Admin extends CI_Controller
         $page_data['page_name'] = 'blog_settings';
         $this->load->view('backend/index', $page_data);
     }
-
     //End blog
+
+
+    //Don't remove this code for security reasons
+    function save_valid_purchase_code($param1 = ""){
+        if($param1 == 'update'){
+            $data['value'] = htmlspecialchars($this->input->post('purchase_code'));
+            $status = $this->crud_model->curl_request($data['value']);
+            if($status){
+                $this->db->where('key', 'purchase_code');
+                $this->db->update('settings', $data);
+                $this->session->set_flashdata('flash_message', get_phrase('purchase_code_has_been_updated'));
+                echo 1;
+            }else{
+                echo 0;
+            }
+        }else{
+            $this->load->view('backend/admin/save_purchase_code_form');
+        }
+        
+    }
+
+    function drip_content_settings($param1 = ""){
+        if($param1 == 'update'){
+            $this->crud_model->save_drip_content_settings();
+            $this->session->set_flashdata('flash_message', get_phrase('drip_content_settings_updated_successfully'));
+            redirect(site_url('admin/drip_content_settings'), 'refresh');
+        }
+        $page_data['drip_content_settings'] = json_decode(get_settings('drip_content_settings'), true);
+        $page_data['page_title'] = get_phrase('drip_content_settings');
+        $page_data['page_name'] = 'drip_content_settings';
+        $this->load->view('backend/index', $page_data);
+    }
+
+    function custom_page($param1 = "", $param2 = ""){
+        if($param1 == 'add'){
+            $this->crud_model->add_custom_page();
+            $this->session->set_flashdata('flash_message', get_phrase('new_page_added_successfully'));
+            redirect(site_url('admin/custom_page'), 'refresh');
+        }
+
+        if($param1 == 'update'){
+            $this->crud_model->update_custom_page($param2);
+            $this->session->set_flashdata('flash_message', get_phrase('page_updated_successfully'));
+            redirect(site_url('admin/custom_page'), 'refresh');
+        }
+
+        if($param1 == 'delete'){
+            $this->crud_model->delete_custom_page($param2);
+            $this->session->set_flashdata('flash_message', get_phrase('page_deleted_successfully'));
+            redirect(site_url('admin/custom_page'), 'refresh');
+        }
+
+        $page_data['custom_pages'] = $this->crud_model->get_custom_pages();
+        $page_data['page_title'] = get_phrase('custom_pages');
+        $page_data['page_name'] = 'custom_page';
+        $this->load->view('backend/index', $page_data);
+    }
+
+    function add_custom_page($custom_page_id = ""){
+        $page_data['page_title'] = get_phrase('add_custom_page');
+        $page_data['page_name'] = 'add_custom_page';
+        $this->load->view('backend/index', $page_data);
+    }
+
+    function edit_custom_page($custom_page_id = ""){
+        $page_data['custom_page'] = $this->crud_model->get_custom_pages($custom_page_id)->row_array();
+        $page_data['page_title'] = get_phrase('edit_custom_page');
+        $page_data['page_name'] = 'edit_custom_page';
+        $this->load->view('backend/index', $page_data);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

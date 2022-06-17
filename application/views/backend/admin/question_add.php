@@ -1,32 +1,42 @@
-<form action="<?php echo site_url('admin/quiz_questions/'.$param2.'/add'); ?>" method="post" id = 'mcq_form'>
-    <input type="hidden" name="question_type" value="mcq">
+<form class="pb-5" action="<?php echo site_url('admin/quiz_questions/'.$param2.'/add'); ?>" method="post" id = 'mcq_form'>
+
     <div class="form-group">
-        <label for="title"><?php echo get_phrase('question_title'); ?></label>
-        <input class="form-control" type="text" name="title" id="title" required>
+        <label for="question_title"><?php echo get_phrase('write_your_question'); ?></label>
+        <textarea name="title" id="question_title" class="form-control"></textarea>
     </div>
-    <div class="form-group" id='multiple_choice_question'>
-        <label for="number_of_options"><?php echo get_phrase('number_of_options'); ?></label>
-        <div class="input-group">
-            <input type="number" class="form-control" name="number_of_options" id="number_of_options" data-validate="required" data-message-required="Value Required" min="0">
-            <div class="input-group-append" style="padding: 0px"><button type="button" class="btn btn-secondary btn-sm pull-right" name="button" onclick="showOptions(jQuery('#number_of_options').val())" style="border-radius: 0px;"><i class="fa fa-check"></i></button></div>
-        </div>
+
+    <div class="form-group">
+        <label for="title"><?php echo get_phrase('question_type'); ?></label>
+        <select class="form-control select2" data-toggle="select2" name="question_type" id="question_type" onchange="quiz_fields_type_wize(this)" required>
+            <option value=""><?php echo get_phrase('select_question_type'); ?></option>
+            <option value="multiple_choice"><?php echo get_phrase('multiple_choice'); ?></option>
+            <option value="single_choice"><?php echo get_phrase('single_choice').' '.get_phrase('and').' true/false'; ?></option>
+            <!-- <option value="plain_text"><?php echo get_phrase('plain_text'); ?></option> -->
+            <option value="fill_in_the_blank"><?php echo get_phrase('fill_in_the_blank'); ?></option>
+        </select>
     </div>
-    <div class="text-center">
-        <button class = "btn btn-success" id = "submitButton" type="button" name="button" data-dismiss="modal"><?php echo get_phrase('submit'); ?></button>
+
+
+    <div id="quiz_fields_type_wize"></div>
+
+
+    <div class="text-center pt-3">
+        <button class = "btn btn-success" id = "submitButton" type="button" name="button" data-dismiss="modal"><?php echo get_phrase('submit_quiz_question'); ?></button>
     </div>
 </form>
 <script type="text/javascript">
-function showOptions(number_of_options){
-    $.ajax({
-        type: "POST",
-        url: "<?php echo site_url('admin/manage_multiple_choices_options'); ?>",
-        data: {number_of_options : number_of_options},
-        success: function(response){
-            jQuery('.options').remove();
-            jQuery('#multiple_choice_question').after(response);
-        }
-    });
-}
+    function quiz_fields_type_wize(e){
+        var question_type = $('#question_type').val();
+        $.ajax({
+            type: "POST",
+            url: "<?php echo site_url('admin/quiz_fields_type_wize'); ?>",
+            data: {question_type : question_type},
+            success: function(response){
+                jQuery('#quiz_fields_type_wize').html(response);
+            }
+        });
+    }
+
 
 $('#submitButton').click( function(event) {
     $.ajax({
@@ -34,6 +44,7 @@ $('#submitButton').click( function(event) {
         type: 'post',
         data: $('form#mcq_form').serialize(),
         success: function(response) {
+            console.log(response);
            if (response == 1) {
                success_notify('<?php echo get_phrase('question_has_been_added'); ?>');
            }else {
@@ -42,5 +53,10 @@ $('#submitButton').click( function(event) {
          }
     });
     showLargeModal('<?php echo site_url('modal/popup/quiz_questions/'.$param2); ?>', '<?php echo get_phrase('manage_quiz_questions'); ?>');
+});
+
+$(function(){
+    initSummerNote(['#question_title']);
+    $('.select2').select2();
 });
 </script>

@@ -94,6 +94,20 @@
                         </div>
 
                         <div class="form-group">
+                            <label for="language"><?php echo get_phrase('course_accessibility'); ?></label>
+                            <select class="form-control select2" data-toggle="select2" name="course_accessibility" id="course_accessibility">
+                                <option value="publicly" <?php if(get_settings('course_accessibility') == "publicly") echo 'selected'; ?>><?php echo get_phrase('publicly'); ?></option>
+                                <option value="only_logged_in_users" <?php if(get_settings('course_accessibility') == "only_logged_in_users") echo 'selected'; ?>><?php echo get_phrase('only_logged_in_users'); ?></option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="allowed_device_number_of_loging"><?php echo get_phrase('number_of_authorized_devices'); ?><span class="required">*</span></label>
+                            <input type="number" name = "allowed_device_number_of_loging" id = "allowed_device_number_of_loging" class="form-control" value="<?php echo get_settings('allowed_device_number_of_loging');  ?>" min="1" required>
+                            <small><?php echo get_phrase('how_many_devices_do_you_want_to_allow_for_logging_in_using_a_single_account'); ?>?</small>
+                        </div>
+
+                        <div class="form-group">
                             <label for="footer_text"><?php echo get_phrase('footer_text'); ?></label>
                             <input type="text" name = "footer_text" id = "footer_text" class="form-control" value="<?php echo get_settings('footer_text');  ?>">
                         </div>

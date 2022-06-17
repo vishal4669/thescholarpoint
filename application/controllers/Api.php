@@ -18,6 +18,7 @@ class Api extends REST_Controller {
 
   public function web_redirect_to_buy_course_get($auth_token = "", $course_id = "", $app_url = ""){
     $this->load->library('session');
+    $price = 0;
     if($auth_token != "" && $course_id != "" && is_numeric($course_id)){
 
       //decode user auth token
@@ -27,11 +28,13 @@ class Api extends REST_Controller {
       //user login
       if ($query->num_rows() > 0) {
           $row = $query->row();
+          $this->session->set_userdata('custom_session_limit', (time()+604800));
           $this->session->set_userdata('user_id', $row->id);
           $this->session->set_userdata('role_id', $row->role_id);
           $this->session->set_userdata('role', get_user_role('user_role', $row->id));
           $this->session->set_userdata('name', $row->first_name . ' ' . $row->last_name);
           $this->session->set_userdata('is_instructor', $row->is_instructor);
+
           if ($row->role_id == 1) {
               $this->session->set_userdata('admin_login', '1');
           } else if ($row->role_id == 2) {
@@ -47,18 +50,19 @@ class Api extends REST_Controller {
           }
           $previous_cart_items = $this->session->userdata('cart_items');
           if (in_array($course_id, $previous_cart_items)) {
-              $key = array_search($course_id, $previous_cart_items);
-              unset($previous_cart_items[$key]);
+              // $key = array_search($course_id, $previous_cart_items);
+              // unset($previous_cart_items[$key]);
           } else {
               array_push($previous_cart_items, $course_id);
           }
-
-          $course_details = $this->crud_model->get_course_by_id($course_id)->row_array();
-          if($course_details['discount_flag'] == 1){
-            $price = $course_details['discounted_price'];
-          }else{
-            $price = $course_details['price'];
-          }
+          foreach($previous_cart_items as $course_id):
+            $course_details = $this->crud_model->get_course_by_id($course_id)->row_array();
+            if($course_details['discount_flag'] == 1){
+              $price += $course_details['discounted_price'];
+            }else{
+              $price += $course_details['price'];
+            }
+          endforeach;
 
           $this->session->set_userdata('total_price_of_checking_out', $price);
           $this->session->set_userdata('cart_items', $previous_cart_items);
@@ -153,6 +157,44 @@ class Api extends REST_Controller {
     }
     return $this->set_response($userdata, REST_Controller::HTTP_OK);
   }
+
+  // // For single device Login Api
+  // public function login_get() {
+  //   $this->load->library('session');
+  //   $credential = array('email' => $_GET['email'], 'password' => sha1($_GET['password']), 'status' => 1);
+  //   $query = $this->db->get_where('users', $credential);
+  //   if ($query->num_rows() > 0) {
+  //     $row = $query->row_array();
+  //     $session_id = $this->crud_model->store_session_in_user($row['id']);
+  //   }else{
+  //       $session_id = '';
+  //   }
+
+  //   $userdata = $this->api_model->login_get($session_id);
+  //   if ($userdata['validity'] == 1) {
+  //     $userdata['token'] = $this->tokenHandler->GenerateToken($userdata);
+  //   }
+  //   return $this->set_response($userdata, REST_Controller::HTTP_OK);
+  // }
+
+  // function device_identification_get($auth_token = ""){
+  //   $this->load->library('session');
+  //   $logged_in_user_details = json_decode($this->token_data_get($auth_token), true);
+  //   $session_id = $logged_in_user_details['session_id'];
+    
+    
+    
+  //   $this->db->where('id', $logged_in_user_details['user_id']);
+  // $user_sessions = $this->db->get('users')->row('session_id');
+  // $pre_session = json_decode($user_sessions);
+
+  //   if(in_array($session_id, $pre_session)){
+  //     $response['status'] = 1;
+  //   }else{
+  //     $response['status'] = 0;
+  //   }
+  //   return $this->set_response($response, REST_Controller::HTTP_OK);
+  // }
 
   // Signup Api
   public function signup_post() {
@@ -560,8 +602,6 @@ class Api extends REST_Controller {
   }
 
 
-
-
   // Fetch all the bundle courses
   public function bundles_get($bundle_id = "") {
     $bundle_courses = array();
@@ -622,6 +662,7 @@ class Api extends REST_Controller {
       //user login
       if ($query->num_rows() > 0) {
           $row = $query->row();
+          $this->session->set_userdata('custom_session_limit', (time()+604800));
           $this->session->set_userdata('user_id', $row->id);
           $this->session->set_userdata('role_id', $row->role_id);
           $this->session->set_userdata('role', get_user_role('user_role', $row->id));

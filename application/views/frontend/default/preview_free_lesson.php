@@ -146,10 +146,8 @@
 
                 <?php else: ?>
                     <?php if ($lesson_details['attachment_type'] == 'iframe'): ?>
-                        <div class="my-5">
-                            <div class="embed-responsive embed-responsive-16by9">
-                              <iframe class="embed-responsive-item" src="<?php echo $lesson_details['attachment']; ?>" allowfullscreen></iframe>
-                            </div>
+                        <div class="embed-responsive embed-responsive-16by9">
+                          <iframe class="embed-responsive-item w-100" src="<?php echo $lesson_details['attachment']; ?>" style="height: 500px;" allowfullscreen></iframe>
                         </div>
                     <?php else: ?>
                         <div class="bg-white">

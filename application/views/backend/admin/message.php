@@ -51,7 +51,7 @@
                                 <!-- <span class="badge badge-light pull-right" style="color:#aaa;"><?php echo $user_details['role_id'] == 1 ? get_phrase('admin') : get_phrase('student') ;?></span> -->
 
                                 <?php if ($unread_message_number > 0):?>
-                                    <span class="badge badge-secondary pull-right">
+                                    <span class="badge badge-secondary float-right">
                                         <?php echo $unread_message_number;?>
                                     </span>
                                 <?php endif;?>

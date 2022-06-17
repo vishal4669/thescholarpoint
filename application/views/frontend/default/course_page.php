@@ -3,7 +3,6 @@ $course_details = $this->crud_model->get_course_by_id($course_id)->row_array();
 
 //Apply the condition for the current date with course launch date...
 $is_course_launch = compare_course_launch_date($course_details['course_launch_date']);
-
 $instructor_details = $this->user_model->get_all_user($course_details['user_id'])->row_array();
 ?>
 <section class="course-header-area">
@@ -478,16 +477,14 @@ $instructor_details = $this->user_model->get_all_user($course_details['user_id']
               <?php endif; ?>
             </div>
 
-
         <?php if($is_course_launch =='YES') : ?>
-
             <?php if (is_purchased($course_details['id'])) : ?>
               <div class="already_purchased">
-                <a href="<?php echo site_url('home/my_courses'); ?>"><?php echo site_phrase('already_purchased'); ?></a>
+                <a href="<?php echo site_url('home/lesson/'.rawurlencode(slugify($course_details['title'])).'/'.$course_details['id']); ?>"><?php echo site_phrase('start_session'); ?></a>
               </div>
             <?php else : ?>
 
-              <!-- WISHLIST BUTTON -->            
+              <!-- WISHLIST BUTTON -->
               <div class="buy-btns">
                 <button class="btn btn-add-wishlist <?php echo $this->crud_model->is_added_to_wishlist($course_details['id']) ? 'active' : ''; ?>" type="button" id="<?php echo $course_details['id']; ?>" onclick="handleAddToWishlist(this)">
                   <?php
@@ -511,11 +508,10 @@ $instructor_details = $this->user_model->get_all_user($course_details['user_id']
               <?php else : ?>
                 <div class="buy-btns">
                   <?php if (in_array($course_details['id'], $this->session->userdata('cart_items'))) : ?>
-                    <button class="btn btn-buy-now active" type="button" id="<?php echo $course_details['id']; ?>" onclick="handleCartItems(this)"><?php echo site_phrase('added_to_cart'); ?></button>
+                    <button style="display: none;" class="btn btn-buy-now active" type="button" id="<?php echo $course_details['id']; ?>" onclick="handleCartItems(this)"><?php echo site_phrase('added_to_cart'); ?></button>
                   <?php else : ?>
-                    <button class="btn btn-buy-now" type="button" id="<?php echo $course_details['id']; ?>" onclick="handleCartItems(this)"><?php echo site_phrase('add_to_cart'); ?></button>
+                    <button style="display: none;" class="btn btn-buy-now" type="button" id="<?php echo $course_details['id']; ?>" onclick="handleCartItems(this)"><?php echo site_phrase('add_to_cart'); ?></button>
                   <?php endif; ?>
-
                    <button class="btn btn-buy" type="button" id="course_<?php echo $course_details['id']; ?>" onclick="handleBuyNow(this)"><?php echo site_phrase('buy_now'); ?></button>
                 </div>
               <?php endif; ?>
@@ -543,13 +539,9 @@ $instructor_details = $this->user_model->get_all_user($course_details['user_id']
                   <li><i class="fas fa-mobile-alt"></i><?php echo site_phrase('access_on_laptop_and_tv'); ?></li>
                 <?php endif; ?>
                 <li><i class="far fa-compass"></i><?php echo site_phrase('full_lifetime_access'); ?></li>
-
-               <?php if($is_course_launch =='YES') : ?>
                 <li class="text-center pt-3">
                   <a class="badge-sub-warning text-decoration-none fw-600 hover-shadow-1 d-inline-block" href="<?php echo site_url('home/compare?course-1=' . rawurlencode(slugify($course_details['title'])) . '&&course-id-1=' . $course_details['id']); ?>"><i class="fas fa-balance-scale"></i> <?php echo site_phrase('compare_this_course_with_other'); ?></a>
                 </li>
-              <?php endif; ?>
-
               </ul>
             </div>
           </div>

@@ -4,7 +4,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 if (file_exists("application/aws-module/aws-autoloader.php")) {
     include APPPATH . 'aws-module/aws-autoloader.php';
 }
-//v5.5
+//v5.7
 class Crud_model extends CI_Model
 {
 
@@ -339,12 +339,27 @@ class Crud_model extends CI_Model
         $data['value'] = html_escape($this->input->post('student_email_verification'));
         $this->db->where('key', 'student_email_verification');
         $this->db->update('settings', $data);
+
+        $data['value'] = html_escape($this->input->post('course_accessibility'));
+        $this->db->where('key', 'course_accessibility');
+        $this->db->update('settings', $data);
+
+        $data['value'] = html_escape($this->input->post('allowed_device_number_of_loging'));
+        if($data['value'] < 1 || !is_numeric($data['value'])){
+            $data['value'] = 1;
+        }
+        $this->db->where('key', 'allowed_device_number_of_loging');
+        $this->db->update('settings', $data);
     }
 
     public function update_smtp_settings()
     {
         $data['value'] = html_escape($this->input->post('protocol'));
         $this->db->where('key', 'protocol');
+        $this->db->update('settings', $data);
+
+        $data['value'] = html_escape($this->input->post('smtp_crypto'));
+        $this->db->where('key', 'smtp_crypto');
         $this->db->update('settings', $data);
 
         $data['value'] = html_escape($this->input->post('smtp_host'));
@@ -490,151 +505,6 @@ class Crud_model extends CI_Model
         }
     }
 
-    public function add_subject($param1 = ""){
-
-        $outcomes = $this->trim_and_return_json($this->input->post('outcomes'));
-        $requirements = $this->trim_and_return_json($this->input->post('requirements'));
-
-        $data['subject_name'] = $this->input->post('subject_name');
-    
-        $this->db->insert('subject_master', $data);
-
-        $subject_id = $this->db->insert_id();
-    
-        $this->session->set_flashdata('flash_message', get_phrase('subject_has_been_added_successfully'));
-        return $subject_id;
-
-    }
-
-    
-    public function update_subject($id){
-        $data['subject_name'] = $this->input->post('subject_name');
-        $this->db->where('id', $id);
-        $this->db->update('subject_master', $data);
-        $this->session->set_flashdata('flash_message', get_phrase('subject_updated_successfully'));
-
-    }
-
-    public function get_subject_by_id($id = "")
-    {
-        return $this->db->get_where('subject_master', array('id' => $id));
-    }
-
-
-    public function delete_subject($id = "")
-    {
-        $this->db->where('id', $id);
-        $this->db->delete('subject_master');
-    }
-
-
-    //Get the subject master data
-    public function get_subject_master($id=0){
-        if ($id > 0) {
-            $this->db->where('id', $id);
-        }
-        return  $this->db->get('subject_master'); 
-    }
-
-
-    public function add_student_test($param1 = "")
-    {
-        $outcomes = $this->trim_and_return_json($this->input->post('outcomes'));
-        $requirements = $this->trim_and_return_json($this->input->post('requirements'));
-
-        $data['stream_id'] = $this->input->post('stream_id');
-        $data['student_id'] = $this->input->post('student_id');
-        $data['test_id'] = $this->input->post('test_id');
-        $data['marks'] = $this->input->post('marks');
-        $data['comment'] = html_escape($this->input->post('comment'));
-
-        $this->db->insert('student_test_master', $data);
-        $student_test_id = $this->db->insert_id();
-        $this->session->set_flashdata('flash_message', get_phrase('student_test_has_been_added_successfully'));
-        return $student_test_id;
-    }
-
-    public function update_student_test($student_test_id){
-        $test_details = $this->get_test_by_id($student_test_id)->row_array();
-        $data['stream_id'] = $this->input->post('stream_id');
-        $data['student_id'] = $this->input->post('student_id');
-        $data['test_id'] = $this->input->post('test_id');
-        $data['marks'] = $this->input->post('marks');
-        $data['comment'] = html_escape($this->input->post('comment'));
-
-        $this->db->where('id', $student_test_id);
-        $this->db->update('student_test_master', $data);
-        $this->session->set_flashdata('flash_message', get_phrase('student_test_updated_successfully'));
-    }
-
-
-   public function get_student_test_by_id($student_test_id = "")
-    {
-        return $this->db->get_where('student_test_master', array('id' => $student_test_id));
-    }
-
-    public function delete_student_test($test_id = "")
-    {
-        $this->db->where('id', $test_id);
-        $this->db->delete('student_test_master');
-    }
-
-    public function add_test($param1 = "")
-    {
-        $outcomes = $this->trim_and_return_json($this->input->post('outcomes'));
-        $requirements = $this->trim_and_return_json($this->input->post('requirements'));
-
-        $data['test_name'] = $this->input->post('test_name');
-        $testDate = $this->input->post('test_date');
-        $data['test_date'] = date("Y-m-d", strtotime($testDate)); //need to convert as per the calender
-        $data['test_stream'] = html_escape($this->input->post('test_stream'));
-        $data['test_subject'] = $this->input->post('test_subject');
-        $data['test_total_marks'] = $this->input->post('test_total_marks');
-        
-        $data['is_active'] = 1;
-
-        $this->db->insert('test_master', $data);
-
-        $test_id = $this->db->insert_id();
-      
-        if ($data['status'] == 'approved') {
-            $this->session->set_flashdata('flash_message', get_phrase('test_added_successfully'));
-        } elseif ($data['status'] == 'pending') {
-            $this->session->set_flashdata('flash_message', get_phrase('test_added_successfully') . '. ' . get_phrase('please_wait_untill_Admin_approves_it'));
-        }
-
-        $this->session->set_flashdata('flash_message', get_phrase('test_has_been_added_successfully'));
-        return $test_id;
-    }
-
-    public function update_test($test_id){
-
-        $test_details = $this->get_test_by_id($test_id)->row_array();
-
-        $data['test_name'] = $this->input->post('test_name');
-        $testDate = $this->input->post('test_date');
-        $data['test_date'] = date("Y-m-d", strtotime($testDate));
-        $data['test_stream'] = html_escape($this->input->post('test_stream'));
-        $data['test_subject'] = $this->input->post('test_subject');
-        $data['test_total_marks'] = $this->input->post('test_total_marks');
-
-        $this->db->where('id', $test_id);
-        $this->db->update('test_master', $data);
-        $this->session->set_flashdata('flash_message', get_phrase('test_updated_successfully'));
-
-    }
-
-    public function delete_test($test_id = "")
-    {
-        $this->db->where('id', $test_id);
-        $this->db->delete('test_master');
-    }
-
-    public function get_test_by_id($test_id = "")
-    {
-        return $this->db->get_where('test_master', array('id' => $test_id));
-    }
-
     public function add_course($param1 = "")
     {
         $outcomes = $this->trim_and_return_json($this->input->post('outcomes'));
@@ -657,6 +527,13 @@ class Crud_model extends CI_Model
         $data['is_free_course'] = $this->input->post('is_free_course');
         $data['video_url'] = html_escape($this->input->post('course_overview_url'));
         $data['course_launch_date'] = html_escape(date("Y-m-d", strtotime($this->input->post('course_launch_date'))));
+
+        $enable_drip_content = $this->input->post('enable_drip_content');
+        if(isset($enable_drip_content) && $enable_drip_content){
+            $data['enable_drip_content'] = 1;
+        }else{
+            $data['enable_drip_content'] = 0;
+        }
 
         if ($this->input->post('course_overview_url') != "") {
             $data['course_overview_provider'] = html_escape($this->input->post('course_overview_provider'));
@@ -768,7 +645,6 @@ class Crud_model extends CI_Model
     function trim_and_return_json($untrimmed_array)
     {
         $trimmed_array = array();
-
         if (sizeof($untrimmed_array) > 0) {
             foreach ($untrimmed_array as $row) {
                 if ($row != "") {
@@ -801,6 +677,13 @@ class Crud_model extends CI_Model
         $data['level'] = $this->input->post('level');
         $data['video_url'] = $this->input->post('course_overview_url');
         $data['course_launch_date'] = html_escape(date("Y-m-d", strtotime($this->input->post('course_launch_date'))));
+        
+        $enable_drip_content = $this->input->post('enable_drip_content');
+        if(isset($enable_drip_content) && $enable_drip_content){
+            $data['enable_drip_content'] = 1;
+        }else{
+            $data['enable_drip_content'] = 0;
+        }
 
         if ($this->input->post('course_overview_url') != "") {
             $data['course_overview_provider'] = html_escape($this->input->post('course_overview_provider'));
@@ -1063,30 +946,34 @@ class Crud_model extends CI_Model
 
         if ($status != "") {
             $this->db->where('status', $status);
-            $this->db->where('user_id', $this->session->userdata('user_id'));
             if ($multi_instructor_course_ids && count($multi_instructor_course_ids)) {
-                $this->db->or_where_in('id', $multi_instructor_course_ids);
+                $this->db->where_in('id', $multi_instructor_course_ids);
+            }else{
+                $this->db->where('creator', $this->session->userdata('user_id'));
             }
             $courses = $this->db->get('course');
         } else {
             $this->db->where('status', 'draft');
-            $this->db->where('user_id', $this->session->userdata('user_id'));
             if ($multi_instructor_course_ids && count($multi_instructor_course_ids)) {
                 $this->db->or_where_in('id', $multi_instructor_course_ids);
+            }else{
+                $this->db->where('creator', $this->session->userdata('user_id'));
             }
             $courses['draft'] = $this->db->get('course');
 
             $this->db->where('status', 'draft');
-            $this->db->where('user_id', $this->session->userdata('user_id'));
             if ($multi_instructor_course_ids && count($multi_instructor_course_ids)) {
                 $this->db->or_where_in('id', $multi_instructor_course_ids);
+            }else{
+                $this->db->where('creator', $this->session->userdata('user_id'));
             }
             $courses['pending'] = $this->db->get('course');
 
             $this->db->where('status', 'draft');
-            $this->db->where('user_id', $this->session->userdata('user_id'));
             if ($multi_instructor_course_ids && count($multi_instructor_course_ids)) {
                 $this->db->or_where_in('id', $multi_instructor_course_ids);
+            }else{
+                $this->db->where('creator', $this->session->userdata('user_id'));
             }
             $courses['active'] = $this->db->get('course');
         }
@@ -2197,6 +2084,7 @@ class Crud_model extends CI_Model
         $data_message['message']                = $message;
         $data_message['sender']                 = $sender;
         $data_message['timestamp']              = $timestamp;
+        $data_message['read_status']            = 0;
         $this->db->insert('message', $data_message);
 
         return $message_thread_code;
@@ -2212,6 +2100,7 @@ class Crud_model extends CI_Model
         $data_message['message']                = $message;
         $data_message['sender']                 = $sender;
         $data_message['timestamp']              = $timestamp;
+        $data_message['read_status']            = 0;
         $this->db->insert('message', $data_message);
     }
 
@@ -2457,9 +2346,6 @@ class Crud_model extends CI_Model
             $multi_instructor_course_ids = $this->multi_instructor_course_ids_for_an_instructor($instructor_id);
         }
 
-        if (!addon_status('scorm_course')) {
-            $this->db->where('course_type', 'general');
-        }
         $this->db->where('status', 'active');
         if ($price_status == 'free') {
             $this->db->where('is_free_course', 1);
@@ -2467,10 +2353,12 @@ class Crud_model extends CI_Model
             $this->db->where('is_free_course', null);
         }
 
-        if ($instructor_id > 0) {
-            $this->db->where('user_id', $instructor_id);
+
+        if(!$this->session->userdata('admin_login')){
             if ($multi_instructor_course_ids && count($multi_instructor_course_ids)) {
-                $this->db->or_where_in('id', $multi_instructor_course_ids);
+                $this->db->where_in('id', $multi_instructor_course_ids);
+            }else{
+                $this->db->where('creator', $instructor_id);
             }
         }
         return $this->db->get('course');
@@ -2484,7 +2372,9 @@ class Crud_model extends CI_Model
         $data['section_id'] = html_escape($this->input->post('section_id'));
 
         $data['lesson_type'] = 'quiz';
-        $data['duration'] = '00:00:00';
+        $data['duration'] = $this->input->post('quiz_duration');
+        $data['attachment_type'] = 'json';
+        $data['attachment'] = json_encode(array('total_marks' => htmlspecialchars($this->input->post('total_marks'))));
         $data['date_added'] = strtotime(date('D, d-M-Y'));
         $data['summary'] = html_escape($this->input->post('summary'));
         $this->db->insert('lesson', $data);
@@ -2495,6 +2385,8 @@ class Crud_model extends CI_Model
     {
         $data['title'] = html_escape($this->input->post('title'));
         $data['section_id'] = html_escape($this->input->post('section_id'));
+        $data['duration'] = $this->input->post('quiz_duration');
+        $data['attachment'] = json_encode(array('total_marks' => htmlspecialchars($this->input->post('total_marks'))));
         $data['last_modified'] = strtotime(date('D, d-M-Y'));
         $data['summary'] = html_escape($this->input->post('summary'));
         $this->db->where('id', $lesson_id);
@@ -2517,76 +2409,83 @@ class Crud_model extends CI_Model
     }
 
     // Add Quiz Questions
-    public function add_quiz_questions($quiz_id)
+    public function manage_quiz_questions($quiz_id, $question_id, $action)
     {
         $question_type = $this->input->post('question_type');
-        if ($question_type == 'mcq') {
-            $response = $this->add_multiple_choice_question($quiz_id);
-            return $response;
+        if ($question_type == 'multiple_choice' || $question_type == 'single_choice') {
+            return $this->manage_mcq_choice_question($quiz_id, $question_id, $action);
+        }elseif ($question_type == 'plain_text') {
+            return $this->manage_plain_text_question($quiz_id, $question_id, $action);
+        }elseif ($question_type == 'fill_in_the_blank') {
+            return $this->manage_fill_in_the_blank_question($quiz_id, $question_id, $action);
         }
     }
 
-    public function update_quiz_questions($question_id)
-    {
-        $question_type = $this->input->post('question_type');
-        if ($question_type == 'mcq') {
-            $response = $this->update_multiple_choice_question($question_id);
-            return $response;
-        }
-    }
     // multiple_choice_question crud functions
-    function add_multiple_choice_question($quiz_id)
+    function manage_mcq_choice_question($quiz_id, $question_id, $action)
     {
         if (sizeof($this->input->post('options')) != $this->input->post('number_of_options')) {
             return false;
         }
         foreach ($this->input->post('options') as $option) {
-            if ($option == "") {
-                return false;
-            }
+            if ($option == ""){return false;}
         }
-        if (sizeof($this->input->post('correct_answers')) == 0) {
+        if (is_array($this->input->post('correct_answers')) && sizeof($this->input->post('correct_answers')) == 0) {
             $correct_answers = [""];
         } else {
             $correct_answers = $this->input->post('correct_answers');
         }
-        $data['quiz_id']            = $quiz_id;
-        $data['title']              = html_escape($this->input->post('title'));
-        $data['number_of_options']  = html_escape($this->input->post('number_of_options'));
-        $data['type']               = 'multiple_choice';
+        
+        $data['title']              = htmlspecialchars($this->input->post('title', false));
+        $data['number_of_options']  = htmlspecialchars($this->input->post('number_of_options'));
+        $data['type']               = htmlspecialchars($this->input->post('question_type'));
         $data['options']            = json_encode($this->input->post('options'));
         $data['correct_answers']    = json_encode($correct_answers);
-        $this->db->insert('question', $data);
+
+        if($action == 'add'){
+            $data['quiz_id']            = $quiz_id;
+            $this->db->insert('question', $data);
+        }elseif($action == 'edit'){
+            $this->db->where('id', $question_id);
+            $this->db->update('question', $data);
+        }
         return true;
     }
-    // update multiple choice question
-    function update_multiple_choice_question($question_id)
+
+    function manage_plain_text_question($quiz_id, $question_id, $action)
     {
-        if (sizeof($this->input->post('options')) != $this->input->post('number_of_options')) {
-            return false;
-        }
-        foreach ($this->input->post('options') as $option) {
-            if ($option == "") {
-                return false;
-            }
-        }
+        $data['title']              = htmlspecialchars($this->input->post('title', false));
+        $data['type']               = htmlspecialchars($this->input->post('question_type'));
+        $data['number_of_options']  = 1;
 
-        if (sizeof($this->input->post('correct_answers')) == 0) {
-            $correct_answers = [""];
-        } else {
-            $correct_answers = $this->input->post('correct_answers');
+        if($action == 'add'){
+            $data['quiz_id']            = $quiz_id;
+            $this->db->insert('question', $data);
+        }elseif($action == 'edit'){
+            $this->db->where('id', $question_id);
+            $this->db->update('question', $data);
         }
-
-        $data['title']              = html_escape($this->input->post('title'));
-        $data['number_of_options']  = html_escape($this->input->post('number_of_options'));
-        $data['type']               = 'multiple_choice';
-        $data['options']            = json_encode($this->input->post('options'));
-        $data['correct_answers']    = json_encode($correct_answers);
-        $this->db->where('id', $question_id);
-        $this->db->update('question', $data);
         return true;
     }
 
+    function manage_fill_in_the_blank_question($quiz_id, $question_id, $action)
+    {
+        $data['title']              = htmlspecialchars($this->input->post('title', false));
+        $data['type']               = htmlspecialchars($this->input->post('question_type'));
+        $data['correct_answers']    = json_encode(explode(",", $this->input->post('correct_answers')));
+        $data['options']            = json_encode(array());
+        $data['number_of_options']  = count(json_decode($data['correct_answers']));
+
+        if($action == 'add'){
+            $data['quiz_id']            = $quiz_id;
+            $this->db->insert('question', $data);
+        }elseif($action == 'edit'){
+            $this->db->where('id', $question_id);
+            $this->db->update('question', $data);
+        }
+        return true;
+    }
+    
     function delete_quiz_question($question_id)
     {
         $this->db->where('id', $question_id);
@@ -2646,9 +2545,9 @@ class Crud_model extends CI_Model
             $support_expiry_date  = date("d M, Y", $support_expiry_timestamp);
 
             if ($todays_timestamp > $support_expiry_timestamp)
-                $support_status    = get_phrase('expired');
+                $support_status    = 'expired';
             else
-                $support_status    = get_phrase('valid');
+                $support_status    = 'valid';
 
             $returnable_array = array(
                 'purchase_code_status' => $support_status,
@@ -2751,9 +2650,11 @@ class Crud_model extends CI_Model
             $objects = scandir($dir);
             foreach ($objects as $object) {
                 if ($object != "." && $object != "..") {
-                    if (filetype($dir . "/" . $object) == "dir")
+                    if (filetype($dir . "/" . $object) == "dir"){
                         $this->remove_files_and_folders($dir . "/" . $object);
-                    else unlink($dir . "/" . $object);
+                    }else{
+                        unlink($dir . "/" . $object);
+                    }
                 }
             }
             reset($objects);
@@ -2782,42 +2683,48 @@ class Crud_model extends CI_Model
     }
 
     // code of mark this lesson as completed
-    function save_course_progress()
+    function update_watch_history_manually($lesson_id = "", $course_id = "")
     {
-        $lesson_id = $this->input->post('lesson_id');
-        $progress = $this->input->post('progress');
+        $is_completed = 0;
+        if($lesson_id == ""){
+            $lesson_id = $this->input->post('lesson_id');
+        }
+        if($course_id == ""){
+            $course_id = $this->input->post('course_id');
+        }
         $user_id   = $this->session->userdata('user_id');
-        $user_details  = $this->user_model->get_all_user($user_id)->row_array();
-        $watch_history = $user_details['watch_history'];
-        $watch_history_array = array();
-        if ($watch_history == '') {
-            array_push($watch_history_array, array('lesson_id' => $lesson_id, 'progress' => $progress));
-        } else {
-            $founder = false;
-            $watch_history_array = json_decode($watch_history, true);
-            for ($i = 0; $i < count($watch_history_array); $i++) {
-                $watch_history_for_each_lesson = $watch_history_array[$i];
-                if ($watch_history_for_each_lesson['lesson_id'] == $lesson_id) {
-                    $watch_history_for_each_lesson['progress'] = $progress;
-                    $watch_history_array[$i]['progress'] = $progress;
-                    $founder = true;
+        $query = $this->db->get_where('watch_histories', array('course_id' => $course_id, 'student_id' => $user_id));
+        $course_progress = $query->row('course_progress');
+        if($query->num_rows() > 0){
+            $lesson_ids = json_decode($query->row('completed_lesson'), true);
+            if(!is_array($lesson_ids)) $lesson_ids = array();
+            if(!in_array($lesson_id, $lesson_ids)){
+                array_push($lesson_ids, $lesson_id);
+                $total_lesson = $this->db->get_where('lesson', array('course_id' => $course_id))->num_rows();
+                $course_progress = (100/$total_lesson) * count($lesson_ids);
+
+                $this->db->where('watch_history_id', $query->row('watch_history_id'));
+                $this->db->update('watch_histories', array('course_progress' => $course_progress, 'completed_lesson' => json_encode($lesson_ids), 'date_updated' => time()));
+                $is_completed = 1;
+            }else{
+                if (($key = array_search($lesson_id, $lesson_ids)) !== false) {
+                    unset($lesson_ids[$key]);
                 }
+                $total_lesson = $this->db->get_where('lesson', array('course_id' => $course_id))->num_rows();
+                $course_progress = (100/$total_lesson) * count($lesson_ids);
+
+                $this->db->where('watch_history_id', $query->row('watch_history_id'));
+                $this->db->update('watch_histories', array('course_progress' => $course_progress, 'completed_lesson' => json_encode($lesson_ids), 'date_updated' => time()));
+                $is_completed = 0;
             }
-            if (!$founder) {
-                array_push($watch_history_array, array('lesson_id' => $lesson_id, 'progress' => $progress));
+            // CHECK IF THE USER IS ELIGIBLE FOR CERTIFICATE
+            if (addon_status('certificate') && $course_progress >= 100) {
+                $this->load->model('addons/Certificate_model', 'certificate_model');
+                $this->certificate_model->check_certificate_eligibility($course_id, $user_id);
             }
         }
-        $data['watch_history'] = json_encode($watch_history_array);
-        $this->db->where('id', $user_id);
-        $this->db->update('users', $data);
 
-        // CHECK IF THE USER IS ELIGIBLE FOR CERTIFICATE
-        if (addon_status('certificate')) {
-            $this->load->model('addons/Certificate_model', 'certificate_model');
-            $this->certificate_model->check_certificate_eligibility("lesson", $lesson_id, $user_id);
-        }
-
-        return $progress;
+        return json_encode(array('lesson_id' => $lesson_id, 'course_progress' => round($course_progress), 'is_completed' => $is_completed));
     }
 
 
@@ -3068,6 +2975,8 @@ class Crud_model extends CI_Model
             $exploded_user_ids = explode(',', $multi_instructor_course['user_id']);
             if (in_array($instructor_id, $exploded_user_ids)) {
                 array_push($course_ids, $multi_instructor_course['id']);
+            }elseif($multi_instructor_course['creator'] == $instructor_id){
+                array_push($course_ids, $multi_instructor_course['id']);
             }
         }
         return $course_ids;
@@ -3186,11 +3095,28 @@ class Crud_model extends CI_Model
         return $this->db->get('lesson');
     }
 
-    function update_watch_history($course_id = "", $lesson_id = ""){
+    function get_watch_histories($user_id = 0, $course_id = 0){
+        if($user_id > 0){
+            $this->db->where('student_id', $user_id);
+        }
+        if($course_id > 0){
+            $this->db->where('course_id', $course_id);
+        }
+        return $this->db->get('watch_histories');
+    }
+
+    function update_last_played_lesson($course_id = "", $lesson_id = ""){
         $user_id = $this->session->userdata('user_id');
         $query = $this->db->get_where('watch_histories', array('course_id' => $course_id, 'student_id' => $user_id));
 
-        if($course_id != "" && $lesson_id != ""){
+        if($course_id != ""){
+            if($lesson_id == ""){
+                $this->db->where('course_id', $course_id);
+                $this->db->order_by('order', 'asc');
+                $this->db->order_by('id', 'asc');
+                $this->db->limit(1);
+                $lesson_id = $this->db->get('lesson')->row('id');
+            }
             if($query->num_rows() > 0){
                 $this->db->where('watch_history_id', $query->row('watch_history_id'));
                 $this->db->update('watch_histories', array('watching_lesson_id' => $lesson_id, 'date_updated' => time()));
@@ -3205,6 +3131,84 @@ class Crud_model extends CI_Model
         }elseif($query->num_rows() > 0){
             return $query->row('watching_lesson_id');
         }
+    }
+
+    function update_watch_history_with_duration(){
+        $course_progress = 0;
+        $is_completed = 0;
+        $data['watched_course_id'] = htmlspecialchars($this->input->post('course_id'));
+        $data['watched_lesson_id'] = htmlspecialchars($this->input->post('lesson_id'));
+        $data['watched_student_id'] = $this->session->userdata('user_id');
+
+        $current_duration = htmlspecialchars($this->input->post('current_duration'));
+
+        $current_history = $this->db->get_where('watched_duration', $data);
+        if($current_history->num_rows() > 0){
+            $current_history = $current_history->row_array();
+            $watched_duration_arr = json_decode($current_history['watched_counter'], true);
+            if(!is_array($watched_duration_arr)) $watched_duration_arr = array();
+            if(!in_array($current_duration, $watched_duration_arr)){
+                array_push($watched_duration_arr, $current_duration);
+            }
+
+            $watched_duration_json = json_encode($watched_duration_arr);
+
+            $this->db->where('watched_course_id', $data['watched_course_id']);
+            $this->db->where('watched_lesson_id', $data['watched_lesson_id']);
+            $this->db->where('watched_student_id', $data['watched_student_id']);
+            $this->db->update('watched_duration', array('watched_counter' => $watched_duration_json));
+        }else{
+            $watched_duration_arr = array($current_duration);
+            $data['watched_counter'] = json_encode($watched_duration_arr);
+            $this->db->insert('watched_duration', $data);
+        }
+
+
+        $drip_content_settings = json_decode(get_settings('drip_content_settings'), true);
+        $lesson_total_duration = $this->db->get_where('lesson', array('id' => $data['watched_lesson_id']))->row('duration');
+        $lesson_total_duration = explode(':', $lesson_total_duration);
+        $lesson_total_seconds = ($lesson_total_duration[0] * 3600) + ($lesson_total_duration[1] * 60) + $lesson_total_duration[2];
+        $current_total_seconds = count($watched_duration_arr) * 5;
+
+        if($drip_content_settings['lesson_completion_role'] == 'duration'){
+            if($current_total_seconds >= $drip_content_settings['minimum_duration']){
+                $is_completed = 1;
+            }elseif(($current_total_seconds+4) >= $lesson_total_seconds){
+                $is_completed = 1;
+            }
+        }else{
+            $required_duration = ($lesson_total_seconds/100) * $drip_content_settings['minimum_percentage'];
+            if($current_total_seconds >= $required_duration){
+                $is_completed = 1;
+            }elseif(($current_total_seconds+4) >= $lesson_total_seconds){
+                $is_completed = 1;
+            }
+        }
+
+        if($is_completed == 1){
+            $query = $this->db->get_where('watch_histories', array('course_id' => $data['watched_course_id'], 'student_id' => $data['watched_student_id']));
+            $course_progress = $query->row('course_progress');
+
+            if($query->num_rows() > 0){
+                $lesson_ids = json_decode($query->row('completed_lesson'), true);
+                if(!is_array($lesson_ids)) $lesson_ids = array();
+                if(!in_array($data['watched_lesson_id'], $lesson_ids)){
+                    array_push($lesson_ids, $data['watched_lesson_id']);
+                    $total_lesson = $this->db->get_where('lesson', array('course_id' => $data['watched_course_id']))->num_rows();
+                    $course_progress = (100/$total_lesson) * count($lesson_ids);
+
+                    $this->db->where('watch_history_id', $query->row('watch_history_id'));
+                    $this->db->update('watch_histories', array('course_progress' => $course_progress, 'completed_lesson' => json_encode($lesson_ids), 'date_updated' => time()));
+
+                    // CHECK IF THE USER IS ELIGIBLE FOR CERTIFICATE
+                    if (addon_status('certificate') && $course_progress >= 100) {
+                        $this->load->model('addons/Certificate_model', 'certificate_model');
+                        $this->certificate_model->check_certificate_eligibility($course_id, $user_id);
+                    }
+                }
+            }
+        }
+        return json_encode(array('lesson_id' => $data['watched_lesson_id'], 'course_progress' => round($course_progress), 'is_completed' => $is_completed));
     }
 
     function get_top_instructor($limit = 10){
@@ -3569,7 +3573,78 @@ class Crud_model extends CI_Model
     }
 
 
+    function save_drip_content_settings(){
+        $settings_data['lesson_completion_role'] = htmlspecialchars($this->input->post('lesson_completion_role'));
+        $time = htmlspecialchars($this->input->post('minimum_duration'));
+        $time = explode(':', $time);
+        $seconds = ($time[0] * 3600) + ($time[1] * 60) + $time[2];
+        $settings_data['minimum_duration'] = $seconds;
+        $settings_data['minimum_percentage'] = htmlspecialchars($this->input->post('minimum_percentage'));
+        $settings_data['locked_lesson_message'] = htmlspecialchars($this->input->post('locked_lesson_message', false));
 
+        $data['value'] = json_encode($settings_data);
+
+        $this->db->where('key', 'drip_content_settings');
+        $this->db->update('settings', $data);
+    }
+
+    function get_custom_pages($custom_page_id= '', $button_position = ""){
+        if($custom_page_id > 0){
+            $this->db->where('custom_page_id', $custom_page_id);
+        }
+
+        if($button_position != ""){
+            $this->db->where('button_position', $button_position);
+        }
+        return $this->db->get('custom_page');
+    }
+
+    function add_custom_page(){
+        $data['page_title'] = htmlspecialchars($this->input->post('page_title'));
+        $data['page_content'] = htmlspecialchars($this->input->post('page_content', false));
+        $data['page_url'] = slugify($this->input->post('page_url'));
+        $data['button_title'] = htmlspecialchars($this->input->post('button_title'));
+        $data['button_position'] = htmlspecialchars($this->input->post('button_position'));
+        $data['status'] = 1;
+
+        $this->db->insert('custom_page', $data);
+    }
+
+    function update_custom_page($custom_page_id = ""){
+        $data['page_title'] = htmlspecialchars($this->input->post('page_title'));
+        $data['page_content'] = htmlspecialchars($this->input->post('page_content', false));
+        $data['page_url'] = slugify($this->input->post('page_url'));
+        $data['button_title'] = htmlspecialchars($this->input->post('button_title'));
+        $data['button_position'] = htmlspecialchars($this->input->post('button_position'));
+
+        $this->db->where('custom_page_id', $custom_page_id);
+        $this->db->update('custom_page', $data);
+    }
+
+    function delete_custom_page($custom_page_id = ""){
+        $this->db->where('custom_page_id', $custom_page_id);
+        $this->db->delete('custom_page');
+    }
+
+    function is_course_instructor($course_id = "", $user_id = ""){
+        $course_details = $this->get_course_by_id($course_id)->row_array();
+
+        if($course_details['creator'] == $user_id){
+            return true;
+        }elseif($course_details['multi_instructor'] == 1){
+            $user_ids = explode(',', $course_details['user_id']);
+            if(in_array($user_id, $user_ids)){
+                return true;
+            }else{
+                return false;
+            }
+        }else{
+            return false;
+        }
+    }
+
+
+    
 
 
 

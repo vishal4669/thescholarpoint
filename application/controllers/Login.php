@@ -13,160 +13,89 @@ class Login extends CI_Controller
         /*cache control*/
         $this->output->set_header('Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
         $this->output->set_header('Pragma: no-cache');
+
+        //Check custom session data
+        $this->user_model->check_session_data();
     }
 
     public function index()
     {
-        if ($this->session->userdata('admin_login')) {
-            redirect(site_url('admin'), 'refresh');
-        } elseif ($this->session->userdata('user_login')) {
-            redirect(site_url('user'), 'refresh');
-        }
+        //Check custom session data
+        $this->user_model->check_session_data('login');
+
         $page_data['page_name'] = 'login';
         $page_data['page_title'] = site_phrase('login');
         $this->load->view('frontend/' . get_frontend_settings('theme') . '/index', $page_data);
     }
 
-     /**
-     * @verification_code
-     * @mobile_number
-     **/
-
-    public function SendOTPMobile($verification_code, $mobile_number)
-    {
-        $otp_text_msg = ('TheScholarPoint Verification OTP: '.$verification_code. ' validate your signup - https://thescholarpoint.com');
-        $url = 'https://onlysms.co.in/api/sms.aspx';
-        
-        $ch = curl_init();
-        $headers = array(
-            'Accept: application/json',
-            'Content-Type: application/json',
-        );
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS,'UserID=Vishalkotak&UserPass=India@123&MobileNo='.$mobile_number.'&GSMID=INFORM&Message='.$otp_text_msg.'&UNICODE=TEXT');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $output = curl_exec($ch);
-
-        /*Print error if any*/
-        if(curl_errno($ch))
-        {
-            $error =  'error:' . curl_error($ch);
-        }
-        curl_close($ch);
-
-        $op_arr = explode('=',$output);
-
-        if($op_arr[0] != 100){
-           return 0;
-        }else{
-            return 1;
-        }
-    }
-
-
-     //Validate OTP.
-    public function validate_otp(){
-        if(isset($_POST['login_otp']) && $_POST['login_otp'] !=''){
-
-            if($_POST['login_otp'] == $this->session->userdata('otp_no')){
-                //Valid OTP.
-                $this->session->set_flashdata('flash_message', get_phrase('welcome to').' '.$this->session->userdata('name'));
-
-                if ($this->session->userdata('role_id') == 1) {
-                    $this->session->set_userdata('admin_login', '1');
-                    redirect(site_url('admin/dashboard'), 'refresh');
-                }else if($this->session->userdata('role_id') == 2){
-                    $this->session->set_userdata('user_login', '1');
-                    redirect(site_url('home'), 'refresh');
-                }
-            }else{
-                //Invalid OTP. Redirect to login form.
-                $this->session->set_flashdata('error_message', get_phrase('error_wrong_otp_entered,_please_enter_valid_OTP'));
-                redirect(site_url('home/login/OTP'), 'refresh');
-            }
-        }
-    }
-
-    // Generate token
-    public function getToken($length){
-      $token = "";
-      $codeAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-      $codeAlphabet.= "abcdefghijklmnopqrstuvwxyz";
-      $codeAlphabet.= "0123456789";
-      $max = strlen($codeAlphabet); // edited
-
-      for ($i=0; $i < $length; $i++) {
-        $token .= $codeAlphabet[random_int(0, $max-1)];
-      }
-      return $token;
-    }
-
 
     public function validate_login($from = "")
     {
-
-        if($this->crud_model->check_recaptcha() == false && get_frontend_settings('recaptcha_status') == true){
-            $this->session->set_flashdata('error_message',get_phrase('recaptcha_verification_failed'));
+        if ($this->crud_model->check_recaptcha() == false && get_frontend_settings('recaptcha_status') == true) {
+            $this->session->set_flashdata('error_message', get_phrase('recaptcha_verification_failed'));
             redirect(site_url('home/login'), 'refresh');
         }
         
         $mobile = $this->input->post('mobile');
         $password = $this->input->post('password');
 
-        //$credential = array('mobile' => $mobile, 'password' => sha1($password), 'status' => 1);
-        // Checking login credential for admin
+        //$credential = array('email' => $email, 'password' => sha1($password), 'status' => 1);
         $this->db->where('mobile', $mobile);
         $this->db->where('password', sha1($password));
         $this->db->where('status', 1);
         $this->db->where('mobile !=', 0);
         $this->db->or_where('email', $mobile);
-        $query = $this->db->get_where('users', $credential);
 
-        if ($query->num_rows() > 0) { 
+        // Checking login credential for admin
+        $query = $this->db->get_where('users');
+
+
+        if ($query->num_rows() > 0) {
             $row = $query->row();
-
-            //update user session token..
-            $token = $this->getToken(10);
-            $this->session->set_userdata('mobile', $mobile);
-            $this->session->set_userdata('session_token', $token);
-
-            // Update user token 
-            $condition = array('mobile' => $mobile);
-            $query_token = $this->db->get_where('user_token', $condition);
-            $token_count = $query_token->num_rows();
-
-            if($token_count > 0){
-                $this->db->where('mobile' , $mobile);
-                $this->db->update('user_token', array('token' => $token) );
-            }else{
-                $this->db->set('mobile', $mobile);
-                $this->db->set('token', $token);
-                $this->db->insert('user_token');
-            }
-            // End Update user token 
-
-            $this->session->set_userdata('user_id', $row->id);
-            $this->session->set_userdata('role_id', $row->role_id);
-            $this->session->set_userdata('referral_code', $row->referral_code);
-            $this->session->set_userdata('role', get_user_role('user_role', $row->id));
-            $this->session->set_userdata('name', $row->first_name.' '.$row->last_name);
-            $this->session->set_userdata('is_instructor', $row->is_instructor);
-           
-            $this->session->set_flashdata('flash_message', get_phrase('welcome').' '.$row->first_name.' '.$row->last_name);
-
-            if ($row->role_id == 1) {
-                $this->session->set_userdata('admin_login', '1');
-                redirect(site_url('admin/dashboard'), 'refresh');
-            }else if($row->role_id == 2){
-                $this->session->set_userdata('user_login', '1');
-                redirect(site_url('home'), 'refresh');
-            }
-
-        }else {
-            $this->session->set_flashdata('error_message',get_phrase('invalid_login_credentials'));
+            $this->user_model->new_device_login_tracker($row->id);
+            $this->user_model->set_login_userdata($row->id);
+        } else {
+            $this->session->set_flashdata('error_message', get_phrase('invalid_login_credentials'));
             redirect(site_url('home/login'), 'refresh');
         }
+    }
+
+    function new_login_confirmation($param1 = ""){
+        $new_device_code_expiration_time = $this->session->userdata('new_device_code_expiration_time');
+        if(!$new_device_code_expiration_time || $new_device_code_expiration_time < (time())){
+            $this->session->set_flashdata('error_message', get_phrase('time_over').'! '.site_phrase('please_try_again'));
+            redirect(site_url('login'), 'refresh');
+        }
+
+        if($param1 == 'submit'){
+            $new_device_verification_code = $this->input->post('new_device_verification_code');
+            if($new_device_verification_code != $this->session->userdata('new_device_verification_code')){
+                $this->session->set_flashdata('error_message', get_phrase('verification_code_is_wrong'));
+                redirect(site_url('login/new_login_confirmation'), 'refresh');
+            }
+
+            // Checking login credential for admin
+            $query = $this->db->get_where('users', array('id' => $this->session->userdata('new_device_user_id')));
+
+            if ($query->num_rows() > 0) {
+                $row = $query->row();
+
+                // For device login tracker
+                $this->user_model->new_device_login_tracker($row->id, true);
+                $this->user_model->set_login_userdata($row->id);
+            }
+            $this->session->set_flashdata('error_message', get_phrase('something_is_wrong').'! '.site_phrase('please_try_again'));
+            redirect(site_url('home'), 'refresh');
+        }
+
+        if($param1 == 'resend'){
+            $this->email_model->new_device_login_alert();
+            return;
+        }
+
+        $page_data['page_name'] = 'new_login_confirmation';
+        $page_data['page_title'] = site_phrase('new_login_confirmation');
+        $this->load->view('frontend/' . get_frontend_settings('theme') . '/index', $page_data);
     }
     
     public function fb_validate_login($access_token = "", $fb_user_id = "") {
@@ -256,33 +185,11 @@ class Login extends CI_Controller
         }
     }
 
-
-
     public function logout($from = "")
     {
         //destroy sessions of specific userdata. We've done this for not removing the cart session
-        $this->session_destroy();
-        redirect(site_url('home/login'), 'refresh');
-    }
-
-    public function session_destroy()
-    {
-        $this->session->unset_userdata('user_id');
-        $this->session->unset_userdata('role_id');
-        $this->session->unset_userdata('role');
-        $this->session->unset_userdata('referral_code');
-        $this->session->unset_userdata('name');
-        $this->session->unset_userdata('is_instructor');
-        $this->session->unset_userdata('url_history');
-        if ($this->session->userdata('admin_login') == 1) {
-            $this->session->unset_userdata('admin_login');
-        } else {
-            $this->session->unset_userdata('user_login');
-        }
-        
-        if($this->session->userdata('fb_login') == 1){
-            $this->session->unset_userdata('fb_login');
-        }
+        $this->user_model->session_destroy();
+        redirect(site_url('login'), 'refresh');
     }
 
 
@@ -350,15 +257,7 @@ class Login extends CI_Controller
     {
         $email = $this->input->post('email');
         $verification_code = $this->db->get_where('users', array('email' => $email))->row('verification_code');
-        $mobile_number = $this->db->get_where('users', array('email' => $email))->row('mobile');
-
-        /***********OTP Send on Mobile number************/
-        $response_mobile_otp = $this->SendOTPMobile($verification_code, $mobile_number);
-        if($response_mobile_otp == 0){
-             $this->session->set_flashdata('error_message', get_phrase('mobile_otp_sending_failed'));
-        }
-        /***********OTP Send on Mobile number************/
-        //$this->email_model->send_email_verification_mail($email, $verification_code);
+        $this->email_model->send_email_verification_mail($email, $verification_code);
 
         return true;
     }
@@ -396,8 +295,8 @@ class Login extends CI_Controller
             $this->session->set_userdata('user_login', '1');
 
             //redirect(site_url('home'), 'refresh');
-
-            echo site_url('home');
+            echo $this->session->userdata('url_history');
+            
         } else {
             $this->session->set_flashdata('error_message', get_phrase('the_verification_code_is_wrong') . '.');
             echo false;

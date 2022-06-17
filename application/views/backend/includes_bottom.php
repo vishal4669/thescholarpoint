@@ -31,6 +31,9 @@
 <!-- component js -->
 <script src="<?php echo base_url('assets/backend/js/ui/component.dragula.js'); ?>"></script>
 
+<!-- Jquery form -->
+<script src="<?php echo base_url('assets/global/jquery-form/jquery.form.min.js'); ?>"></script>
+
 <script src="<?php echo site_url('assets/backend/js/custom.js');?>"></script>
 
 <!-- Dashboard chart's data is coming from this file -->

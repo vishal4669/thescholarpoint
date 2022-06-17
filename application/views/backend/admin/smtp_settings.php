@@ -22,6 +22,11 @@
                         </div>
 
                         <div class="form-group">
+                            <label for="smtp_crypto"><?php echo get_phrase('smtp_crypto'); ?> <small>(ssl or tls)</small><span class="required">*</span></label>
+                            <input type="text" name = "smtp_crypto" id = "smtp_crypto" class="form-control" value="<?php echo get_settings('smtp_crypto');  ?>" required>
+                        </div>
+
+                        <div class="form-group">
                             <label for="smtp_host"><?php echo get_phrase('smtp_host'); ?><span class="required">*</span></label>
                             <input type="text" name = "smtp_host" id = "smtp_host" class="form-control" value="<?php echo get_settings('smtp_host');  ?>" required>
                         </div>
@@ -38,7 +43,7 @@
 
                         <div class="form-group">
                             <label for="smtp_pass"><?php echo get_phrase('smtp_password'); ?><span class="required">*</span></label>
-                            <input onfocus="$(this).attr('type', 'text');" onblur="$(this).attr('type', 'password');" type="text" name = "smtp_pass" id = "smtp_pass" class="form-control" value="<?php echo get_settings('smtp_pass');  ?>" required>
+                            <input onfocus="$(this).attr('type', 'text');" onblur="$(this).attr('type', 'password');" type="password" name = "smtp_pass" id = "smtp_pass" class="form-control" value="<?php echo get_settings('smtp_pass');  ?>" required>
                         </div>
 
                         <button type="button" class="btn btn-primary" onclick="checkRequiredFields()"><?php echo get_phrase('save'); ?></button>

@@ -13,18 +13,14 @@ class User extends CI_Controller
         $this->output->set_header('Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
         $this->output->set_header('Pragma: no-cache');
 
-
-        // SESSION DATA FOR IS INSTRUCTOR
-        if (!$this->session->userdata('is_instructor')) {
-            $logged_in_user_details = $this->user_model->get_all_user($this->session->userdata('user_id'))->row_array();
-            $this->session->set_userdata('is_instructor', $logged_in_user_details['is_instructor']);
-        }
-
         // THIS FUNCTION DECIDES WHTHER THE ROUTE IS REQUIRES PUBLIC INSTRUCTOR.
         $this->get_protected_routes($this->router->method);
 
         // THIS MIDDLEWARE FUNCTION CHECKS WHETHER THE USER IS TRYING TO ACCESS INSTRUCTOR STUFFS.
         $this->instructor_authorization($this->router->method);
+
+        // CHECK CUSTOM SESSION DATA
+        $this->user_model->check_session_data('user');
     }
 
 
@@ -44,7 +40,7 @@ class User extends CI_Controller
     {
         // IF THE USER IS NOT AN INSTRUCTOR HE/SHE CAN NEVER ACCESS THE OTHER FUNCTIONS EXCEPT FOR BELOW FUNCTIONS.
         if ($this->session->userdata('is_instructor') != 1) {
-            $unprotected_routes = ['become_an_instructor', 'manage_profile', 'save_course_progress'];
+            $unprotected_routes = ['become_an_instructor', 'manage_profile', 'save_course_progress', 'start_quiz', 'submit_quiz_answer', 'finish_quize_submission'];
 
             if (!in_array($method, $unprotected_routes)) {
                 redirect(site_url('user/become_an_instructor'), 'refresh');
@@ -163,6 +159,7 @@ class User extends CI_Controller
                 }
 
                 $view_course_on_frontend_url = site_url('home/course/' . rawurlencode(slugify($row->title)) . '/' . $row->id);
+                $go_to_course_playing_page = site_url('home/lesson/' . rawurlencode(slugify($row->title)) . '/' . $row->id);
                 $edit_this_course_url = site_url('user/course_form/course_edit/' . $row->id);
                 $section_and_lesson_url = site_url('user/course_form/course_edit/' . $row->id);
 
@@ -189,10 +186,11 @@ class User extends CI_Controller
                 </button>
                 <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="' . $view_course_on_frontend_url . '" target="_blank">' . get_phrase("view_course_on_frontend") . '</a></li>
+                <li><a class="dropdown-item" href="' . $go_to_course_playing_page . '" target="_blank">' . get_phrase("go_to_course_playing_page") . '</a></li>
                 <li><a class="dropdown-item" href="' . $edit_this_course_url . '">' . get_phrase("edit_this_course") . '</a></li>
                 ' . $section_and_lesson_menu . '
-                <li><a class="dropdown-item" href="javascript::" onclick="' . $course_status_changing_action . '">' . $course_status_changing_message . '</a></li>
-                <li><a class="dropdown-item" href="javascript::" onclick="' . $delete_course_url . '">' . get_phrase("delete") . '</a></li>
+                <li><a class="dropdown-item" href="javascript:;" onclick="' . $course_status_changing_action . '">' . $course_status_changing_message . '</a></li>
+                <li><a class="dropdown-item" href="javascript:;" onclick="' . $delete_course_url . '">' . get_phrase("delete") . '</a></li>
                 </ul>
                 </div>
                 ';
@@ -468,18 +466,8 @@ class User extends CI_Controller
         }
         $quiz_details = $this->crud_model->get_lessons('lesson', $quiz_id)->row_array();
 
-        if ($action == 'add') {
-            $this->is_the_course_belongs_to_current_instructor($quiz_details['course_id'], $quiz_id, 'quize');
-            $response = $this->crud_model->add_quiz_questions($quiz_id);
-            echo $response;
-        } elseif ($action == 'edit') {
-            if ($this->db->get_where('question', array('id' => $question_id, 'quiz_id' => $quiz_id))->num_rows() <= 0) {
-                $this->session->set_flashdata('error_message', get_phrase('you_do_not_have_right_to_access_this_quiz_question'));
-                redirect(site_url('user/courses'), 'refresh');
-            }
-
-            $response = $this->crud_model->update_quiz_questions($question_id);
-            echo $response;
+        if ($action == 'add' || $action == 'edit') {
+            echo $this->crud_model->manage_quiz_questions($quiz_id, $question_id, $action);
         } elseif ($action == 'delete') {
             if ($this->db->get_where('question', array('id' => $question_id, 'quiz_id' => $quiz_id))->num_rows() <= 0) {
                 $this->session->set_flashdata('error_message', get_phrase('you_do_not_have_right_to_access_this_quiz_question'));
@@ -488,7 +476,7 @@ class User extends CI_Controller
 
             $response = $this->crud_model->delete_quiz_question($question_id);
             $this->session->set_flashdata('flash_message', get_phrase('question_has_been_deleted'));
-            redirect(site_url('user/course_form/course_edit/' . $quiz_details['course_id']));
+            redirect(site_url('user/course_form/course_edit/' . $quiz_details['course_id']), 'refresh');
         }
     }
 
@@ -586,11 +574,12 @@ class User extends CI_Controller
         echo $video_details['duration'];
     }
 
+    // AJAX PORTION
     // this function is responsible for managing multiple choice question
-    function manage_multiple_choices_options()
+    function quiz_fields_type_wize()
     {
-        $page_data['number_of_options'] = $this->input->post('number_of_options');
-        $this->load->view('backend/user/manage_multiple_choices_options', $page_data);
+        $page_data['question_type'] = $this->input->post('question_type');
+        $this->load->view('backend/admin/quiz_fields_type_wize', $page_data);
     }
 
     // This function checks if this course belongs to current logged in instructor
@@ -641,12 +630,7 @@ class User extends CI_Controller
         $this->crud_model->sort_question($question_json);
     }
 
-    // Mark this lesson as completed codes
-    function save_course_progress()
-    {
-        $response = $this->crud_model->save_course_progress();
-        echo $response;
-    }
+    
 
     // REMOVING INSTRUCTOR FROM COURSE
     public function remove_an_instructor($course_id, $instructor_id)
@@ -769,6 +753,126 @@ class User extends CI_Controller
 
     //End Blog
 
+
+    function start_quiz($quiz_id = ""){
+        $quiz_details = $this->crud_model->get_lessons('lesson', $quiz_id)->row_array();
+
+
+        $data['quiz_id'] = $quiz_details['id'];
+        $data['user_id'] = $this->session->userdata('user_id');
+        $data['user_answers'] = json_encode(array());
+        $data['correct_answers'] = json_encode(array());
+        $data['date_added'] = time();
+
+
+        $row = $this->db->get_where('quiz_results', array('user_id' => $data['user_id'], 'quiz_id' => $quiz_id));
+        if($row->num_rows() <= 0){
+            $this->db->insert('quiz_results', $data);
+        }
+
+        $page_data['quiz_questions'] = $this->db->get_where('question', array('quiz_id' => $quiz_id));
+        $page_data['quiz_id'] = $quiz_id;
+        $this->load->view('lessons/quiz_answer_sheet', $page_data);
+    }
+
+    function submit_quiz_answer($quiz_id = "", $question_id = "", $question_type = ""){
+
+        //Quize details
+        $user_id = $this->session->userdata('user_id');
+        $quiz_details = $this->crud_model->get_lessons('lesson', $quiz_id)->row_array();
+        $total_seconds = time_to_seconds($quiz_details['duration']);
+        $total_marks = json_decode($quiz_details['attachment'], true)['total_marks'];
+
+        //Question details
+        $question_details = $this->db->get_where('question', array('id' => $question_id))->row_array();
+
+
+        $results = $this->db->get_where('quiz_results', array('quiz_id' => $quiz_id, 'user_id' => $user_id));
+        
+        if($results->num_rows() > 0 && ($total_seconds + $results->row('date_added')) > time()){
+            $result = $results->row_array();
+            $correct_answer_question_ids = json_decode($result['correct_answers'], true);
+
+            $answers = $this->input->post('answer');
+
+            $user_answers = json_decode($result['user_answers'], true);
+            $user_answers[$question_id] = $answers;
+
+            if($question_type == 'multiple_choice'){
+                $is_correct_answer = 1;
+                $currect_answers = json_decode($question_details['correct_answers'], true);
+                foreach($answers as $answer){
+                    if(!in_array($answer, $currect_answers)){
+                        $is_correct_answer = 0;
+                    }
+                }
+                if(!is_array($answers) || count($answers) <= 0 || count($currect_answers) != count($answers)){
+                    $is_correct_answer = 0;
+                }
+            }elseif($question_type == 'single_choice'){
+                $is_correct_answer = 0;
+                $currect_answers = json_decode($question_details['correct_answers'], true);
+                if(in_array($answers[0], $currect_answers)){
+                    $is_correct_answer = 1;
+                }
+            }elseif($question_type == 'fill_in_the_blank'){
+                $is_correct_answer = 1;
+                $currect_answers = json_decode(strtolower($question_details['correct_answers']), true);
+                foreach($answers as $key => $answer){
+                    $answer = strtolower($answer);
+                    if($answer != $currect_answers[$key]){
+                        $is_correct_answer = 0;
+                    }
+                }
+                if(!is_array($answers) || count($answers) <= 0 || count($currect_answers) != count($answers)){
+                    $is_correct_answer = 0;
+                }
+            }
+
+            if($is_correct_answer == 1){
+                if(!in_array($question_id, $correct_answer_question_ids)){
+                    array_push($correct_answer_question_ids, $question_id);
+                }
+            }else{
+                $updated_correct_answer_question_ids = array();
+                foreach($correct_answer_question_ids as $correct_answer_question_id){
+                    if($correct_answer_question_id != $question_id){
+                        array_push($updated_correct_answer_question_ids, $correct_answer_question_id);
+                    }
+                }
+                $correct_answer_question_ids = $updated_correct_answer_question_ids;
+            }
+
+            $total_questions = $this->db->get_where('question', array('quiz_id' => $quiz_id))->num_rows();
+            $data['total_obtained_marks'] = round(($total_marks/$total_questions)*count($correct_answer_question_ids), 1);
+
+            $data['user_answers'] = json_encode($user_answers);
+            $data['correct_answers'] = json_encode($correct_answer_question_ids);
+            $data['date_updated'] = time();
+            $this->db->where('user_id', $user_id);
+            $this->db->where('quiz_id', $quiz_id);
+            $this->db->update('quiz_results', $data);
+        }else{
+            $this->finish_quize_submission($quiz_id);
+            $response['status'] = 'time_over';
+            $response['message'] = site_phrase('time_over');
+            echo json_encode($response);
+        }
+    }
+
+    function finish_quize_submission($quiz_id = ""){
+        $user_id = $this->session->userdata('user_id');
+
+        $data['is_submitted'] = 1;
+
+        $this->db->where('user_id', $user_id);
+        $this->db->where('quiz_id', $quiz_id);
+        $this->db->update('quiz_results', $data);
+
+        $response['status'] = 'submit';
+        $response['message'] = site_phrase('quiz_submission_successfully');
+        echo json_encode($response);
+    }
 
 
 

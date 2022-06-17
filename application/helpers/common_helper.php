@@ -322,6 +322,34 @@ if (!function_exists('readable_time_for_humans')) {
     }
 }
 
+// Human readable time
+if (!function_exists('seconds_to_time_format')) {
+    function seconds_to_time_format($seconds)
+    {
+        if ($seconds) {
+            $hours = floor($seconds / 3600);
+            $mins = floor($seconds / 60 % 60);
+            $secs = floor($seconds % 60);
+
+            $duration = sprintf('%02d:%02d:%02d', $hours, $mins, $secs);
+        } else {
+            $duration = '00:00:00';
+        }
+        return $duration;
+    }
+}
+
+// Human readable time
+if (!function_exists('time_to_seconds')) {
+    function time_to_seconds($time)
+    {
+        $time = explode(':', $time);
+        $seconds = $time[0] * 3600;
+        $seconds = $seconds + ($time[1] * 60);
+        return $seconds = $seconds + $time[2];
+    }
+}
+
 if (!function_exists('trimmer')) {
     function trimmer($text)
     {
@@ -336,25 +364,27 @@ if (!function_exists('trimmer')) {
 }
 
 if (!function_exists('lesson_progress')) {
-    function lesson_progress($lesson_id = "", $user_id = "")
+    function lesson_progress($lesson_id = "", $user_id = "", $course_id = "")
     {
         $CI    = &get_instance();
         $CI->load->database();
         if ($user_id == "") {
             $user_id = $CI->session->userdata('user_id');
         }
-        $user_details = $CI->user_model->get_all_user($user_id)->row_array();
-        $watch_history_array = json_decode($user_details['watch_history'], true);
-        
-        if(!is_array($watch_history_array)) $watch_history_array = array();
+        if ($course_id == "") {
+            $course_id = $CI->db->get_where('lesson', array('id' => $lesson_id))->row('course_id');
+        }
 
-        for ($i = 0; $i < count($watch_history_array); $i++) {
-            $watch_history_for_each_lesson = $watch_history_array[$i];
-            if ($watch_history_for_each_lesson['lesson_id'] == $lesson_id) {
-                return $watch_history_for_each_lesson['progress'];
+        $query = $CI->db->get_where('watch_histories', array('course_id' => $course_id, 'student_id' => $user_id));
+
+        if($query->num_rows() > 0){
+            $lesson_ids = json_decode($query->row('completed_lesson'), true);
+            if(is_array($lesson_ids) && in_array($lesson_id, $lesson_ids)){
+                return 1;
+            }else{
+                return 0;
             }
         }
-        return 0;
     }
 }
 if (!function_exists('course_progress')) {
@@ -365,52 +395,16 @@ if (!function_exists('course_progress')) {
         if ($user_id == "") {
             $user_id = $CI->session->userdata('user_id');
         }
-        $user_details = $CI->user_model->get_all_user($user_id)->row_array();
 
-        // this array will contain all the completed lessons from different different courses by a user
-        $completed_lessons_ids = array();
-
-        $completed_lessons_ids_for_single_course = array();
-
-        // this variable will contain number of completed lessons for a certain course. Like for this one the course_id
-        $lesson_completed = 0;
-
-        // User's watch history
-        $watch_history_array = json_decode($user_details['watch_history'], true);
-        // desired course's lessons
-        $lessons_for_that_course = $CI->crud_model->get_lessons('course', $course_id);
-        // total number of lessons for that course
-        $total_number_of_lessons = $lessons_for_that_course->num_rows();
-        // arranging completed lesson ids
-        for ($i = 0; $i < count($watch_history_array); $i++) {
-            $watch_history_for_each_lesson = $watch_history_array[$i];
-            if ($watch_history_for_each_lesson['progress'] == 1) {
-                array_push($completed_lessons_ids, $watch_history_for_each_lesson['lesson_id']);
-            }
-        }
-
+        $watch_history = $CI->crud_model->get_watch_histories($user_id, $course_id)->row_array();
 
         if ($return_type == "completed_lesson_ids") {
-            foreach ($lessons_for_that_course->result_array() as $row) {
-                if (in_array($row['id'], $completed_lessons_ids)) {
-                    array_push($completed_lessons_ids_for_single_course, $row['id']);
-                }
-            }
-            return $completed_lessons_ids_for_single_course;
-        } else {
-            foreach ($lessons_for_that_course->result_array() as $row) {
-                if (in_array($row['id'], $completed_lessons_ids)) {
-                    $lesson_completed++;
-                }
-            }
-
-            if ($lesson_completed > 0 && $total_number_of_lessons > 0) {
-                // calculate the percantage of progress
-                $course_progress = ($lesson_completed / $total_number_of_lessons) * 100;
-                return $course_progress;
-            } else {
-                return 0;
-            }
+            return json_decode($watch_history['completed_lesson']);
+        }
+        if(is_array($watch_history) && $watch_history['course_progress'] > 0){
+            return $watch_history['course_progress'];
+        }else{
+            return 0;
         }
     }
 }
@@ -482,25 +476,12 @@ if (!function_exists('get_bundle_validity')) {
     }
 }
 
-//Check the user token session...
-if (!function_exists('chk_user_token_session')) {
-//Check the only one session at a time for each user.
-    function chk_user_token_session(){
-        $CI = &get_instance();
-        $condition = array('mobile' => $CI->session->userdata('mobile'));
-        $query_token = $CI->db->get_where('user_token', $condition);
-        $token_count = $query_token->num_rows();
 
-        if($token_count >0 ){
-                $row_token = $query_token->row();
-            if($CI->session->userdata('session_token') != $row_token->token){
-                session_destroy();
-                redirect('login', 'refresh');
-            }
-        }
 
-    }
-}
+// ------------------------------------------------------------------------
+/* End of file common_helper.php */
+/* Location: ./system/helpers/common.php */
+
 
 //Compare Course Launch Date...
 if (!function_exists('compare_course_launch_date')) {
@@ -521,7 +502,3 @@ if (!function_exists('compare_course_launch_date')) {
         }
     }
 }
-
-// ------------------------------------------------------------------------
-/* End of file common_helper.php */
-/* Location: ./system/helpers/common.php */

@@ -24,7 +24,7 @@ $sections = $this->crud_model->get_section('course', $param2)->result_array();
 </div>
 
 <!-- ACTUAL LESSON ADDING FORM -->
-<form action="<?php echo site_url('admin/lessons/'.$param2.'/add'); ?>" method="post" enctype="multipart/form-data">
+<form class="<?php if($param3 == 'video'): ?>ajaxFormSubmission<?php endif; ?>" action="<?php echo site_url('admin/lessons/'.$param2.'/add'); ?>" method="post" enctype="multipart/form-data">
     <input type="hidden" name="course_id" value="<?php echo $param2; ?>">
     <div class="form-group">
         <label><?php echo get_phrase('title'); ?></label>
@@ -64,7 +64,7 @@ $sections = $this->crud_model->get_section('course', $param2)->result_array();
     </div>
 
     <div class="text-center">
-        <button class = "btn btn-success" type="submit" name="button"><?php echo get_phrase('add_lesson'); ?></button>
+        <button class = "btn btn-success formSubmissionBtn" type="submit" name="button"><?php echo get_phrase('add_lesson'); ?></button>
     </div>
 </form>
 
@@ -115,4 +115,38 @@ function checkURLValidity(video_url) {
         return false;
     }
 }
+
+
+$(function() {
+    var formSubmissionBtn = $('.formSubmissionBtn');
+    var formSubmissionBtnTxt = $(formSubmissionBtn).html();
+    //The form of submission to RailTeam js is defined here.(Form class or ID)
+    $('.ajaxFormSubmission').ajaxForm({
+        beforeSend: function() {
+            var percentVal = '0%';
+            $(formSubmissionBtn).html('<?php echo get_phrase('uploading'); ?>... '+percentVal);
+            $(formSubmissionBtn).attr('disabled', true);
+        },
+        uploadProgress: function(event, position, total, percentComplete) {
+            var percentVal = percentComplete + '%';
+            if(percentComplete < 100){
+                $(formSubmissionBtn).html('<?php echo get_phrase('uploading'); ?>... '+percentVal);
+            }else{
+                $(formSubmissionBtn).html('<?php echo get_phrase('please_wait'); ?>... '+percentVal);
+            }
+        },
+        complete: function(xhr) {
+            setTimeout(function(){
+                $(formSubmissionBtn).attr('disabled', false);
+                $(formSubmissionBtn).html(formSubmissionBtnTxt);
+                set_js_flashdata('<?php echo site_url('home/set_flashdata_for_js/flash_message/your_video_file_uploaded_succesfully') ?>');
+                location.reload();
+            }, 500);
+        },
+        error: function()
+        {
+            //You can write here your js error message
+        }
+    });
+});
 </script>
